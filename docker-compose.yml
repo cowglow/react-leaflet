@@ -1,0 +1,12 @@
+services:
+  map-sector-creator:
+    container_name: map-sector-create-env
+    working_dir: /app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "4173:4173"
+    volumes:
+      - ./:/app/
