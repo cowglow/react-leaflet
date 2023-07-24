@@ -4,25 +4,26 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  build:
-    name: Deploy Update
+  build_and_deploy:
+    name: Build and Deploy Update
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v3.0.2
-      - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: "18.12.0"
-      - name: Install dependencies 📦
-        run: |
-          yarn install
-      - name: Build
-        run: |
-          yarn build
+          node-version: "18" # Use the latest LTS version, or specify a specific version you want to use
+
+      - name: Install Dependencies 📦
+        run: yarn install
+
+      - name: Build 🚧
+        run: yarn build
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
