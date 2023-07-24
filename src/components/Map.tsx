@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css";
 import styled from "styled-components";
 
 const StyledMapContainer = styled(MapContainer)`
-  border: thin solid red;
   display: block;
   width: 100%;
   height: 100%;

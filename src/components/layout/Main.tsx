@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import styled from "styled-components";
 import ExportController from "../ExportController.tsx";
 import { useMarkers } from "../../hooks/use-markers.ts";
+import Footer from "./Footer.tsx";
 
 const StyledWrapper = styled("div")`
   display: flex;
@@ -10,16 +11,21 @@ const StyledWrapper = styled("div")`
   justify-content: center;
 `;
 
-const StyleHeader = styled("header")`
+const StyledHeader = styled("header")`
   display: flex;
   justify-content: space-between;
-  border: thick solid greenyellow;
   padding: 0 2rem 0;
 `;
 
 const StyledMain = styled("main")`
   display: block;
   flex-grow: 1;
+`;
+
+const StyledFooter = styled("footer")`
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
 `;
 
 interface MainLayoutProps {
@@ -30,12 +36,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { markers } = useMarkers();
   return (
     <StyledWrapper>
-      <StyleHeader>
+      <StyledHeader>
         <h1>Vite + React</h1>
         <ExportController label="Export Marker Coords" data={markers} />
-      </StyleHeader>
+      </StyledHeader>
       <StyledMain>{children}</StyledMain>
-      <footer>GitHub Repo</footer>
+      <StyledFooter>
+        <Footer />
+      </StyledFooter>
     </StyledWrapper>
   );
 }
