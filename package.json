@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "/react-leaflet",
+  "homepage": "https://cowglow.github.io/react-leaflet/",
   "scripts": {
     "dev": "vite --host --port $PORT",
     "docker:dev": "docker compose run --service-ports react-leaflet bash",
