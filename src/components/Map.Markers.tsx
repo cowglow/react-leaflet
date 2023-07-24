@@ -1,4 +1,4 @@
-import { useMapEvent } from "react-leaflet/hooks";
+import { useMapEvent } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 
 interface MapMarkersProps {
