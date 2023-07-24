@@ -5,6 +5,9 @@ const defaultValues: MarkersContextApi = {
   addMarker: () => {
     throw Error("ERROR:: Add Marker | Uninitialized");
   },
+  clearMarkers: () => {
+    throw Error("ERROR:: Clear Markers | Uninitialized");
+  }
 };
 
 export const MarkerContext = createContext<MarkersContextApi>(defaultValues);

@@ -4,4 +4,5 @@ interface MarkerContextProps {
 
 type MarkersContextApi = {
   addMarker: (event: LeafletMouseEvent) => void;
+  clearMarkers: () => void;
 } & MarkerContextProps;

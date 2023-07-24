@@ -23,11 +23,16 @@ export const MarkerContextProvider = ({
     ]);
   };
 
+  const clearMarkers = () => {
+    setMarkers([]);
+  };
+
   return (
     <MarkerContext.Provider
       value={{
         markers,
         addMarker,
+        clearMarkers,
       }}
     >
       {children}

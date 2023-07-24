@@ -15,6 +15,11 @@ const StyledHeader = styled("header")`
   display: flex;
   justify-content: space-between;
   padding: 0 2rem 0;
+  & div {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+  }
 `;
 
 const StyledMain = styled("main")`
@@ -33,12 +38,15 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const { markers } = useMarkers();
+  const { markers, clearMarkers } = useMarkers();
   return (
     <StyledWrapper>
       <StyledHeader>
         <h1>Vite + React</h1>
-        <ExportController label="Export Marker Coords" data={markers} />
+        <div>
+          <ExportController label="Export Marker Coords" data={markers} />
+          <button onClick={clearMarkers}>Reset</button>
+        </div>
       </StyledHeader>
       <StyledMain>{children}</StyledMain>
       <StyledFooter>
