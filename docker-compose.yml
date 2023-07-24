@@ -1,6 +1,6 @@
 services:
-  map-sector-creator:
-    container_name: map-sector-create-env
+  react-leaflet:
+    container_name: react-leaflet-dev
     working_dir: /app
     build:
       context: .
