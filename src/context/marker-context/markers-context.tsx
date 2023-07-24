@@ -7,7 +7,10 @@ const defaultValues: MarkersContextApi = {
   },
   clearMarkers: () => {
     throw Error("ERROR:: Clear Markers | Uninitialized");
-  }
+  },
+  removeMarker: () => {
+    throw Error("ERROR:: Remove Marker | Uninitialized");
+  },
 };
 
 export const MarkerContext = createContext<MarkersContextApi>(defaultValues);

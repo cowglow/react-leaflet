@@ -7,13 +7,14 @@ import MapMarker from "./Map.Marker.tsx";
 import { useMarkers } from "../hooks/use-markers.ts";
 
 type MapEditMode = "marker" | "poly";
+
 export default function App() {
-  const { markers, addMarker } = useMarkers();
+  const { markers, addMarker, removeMarker } = useMarkers();
 
   const nbgCenter = new L.LatLng(49.4521, 11.0767);
 
   const editMode: MapEditMode = "marker";
-  
+
   const handleMapClick = (event: LeafletMouseEvent) => {
     if (editMode === "marker") {
       addMarker(event);
@@ -26,7 +27,7 @@ export default function App() {
         <MapMarkers onClick={handleMapClick} />
         {markers &&
           markers.map((marker, index) => (
-            <MapMarker key={index} position={marker} />
+            <MapMarker key={index} position={marker} remove={removeMarker} />
           ))}
       </Map>
     </MainLayout>

@@ -27,12 +27,19 @@ export const MarkerContextProvider = ({
     setMarkers([]);
   };
 
+  const removeMarker = (position: LatLng) => {
+    setMarkers((prevState: LatLng[]) => {
+      return [...prevState.filter((_, i) => i !== prevState.indexOf(position))];
+    });
+  };
+
   return (
     <MarkerContext.Provider
       value={{
         markers,
         addMarker,
         clearMarkers,
+        removeMarker,
       }}
     >
       {children}
