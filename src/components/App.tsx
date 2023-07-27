@@ -13,8 +13,7 @@ type MapEditMode = "marker" | "poly";
 const StyledController = styled("div")`
   padding: 1.235em;
   display: flex;
-  justify-content: flex-end;
-
+  justify-content: flex-start;
   gap: 1rem;
   background-color: #333333;
 `;
@@ -45,9 +44,10 @@ export default function App() {
   return (
     <MainLayout>
       <StyledController>
-        <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({ editMode, points: points.length, markers: markers.length })}</pre>
+
         <button onClick={() => setEditMode("marker")} disabled={editMode === "marker"}>Marker</button>
         <button onClick={() => setEditMode("poly")} disabled={editMode === "poly"}>Poly</button>
+        <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({ editMode, points: points.length, markers: markers.length })}</pre>
       </StyledController>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
         <MapEvents onClick={handleMapClick} />

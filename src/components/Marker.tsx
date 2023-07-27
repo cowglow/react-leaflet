@@ -12,7 +12,7 @@ export default function Marker({ children, events, position, remove, ...other }:
       events={events}
       position={position}
       remove={remove}
-      other
+      {...other}
     />
   );
 
