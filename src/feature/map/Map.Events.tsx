@@ -5,7 +5,7 @@ interface MapMarkersProps {
   onClick: (event: LeafletMouseEvent) => void;
 }
 
-export default function MapMarkers({ onClick }: MapMarkersProps) {
+export default function MapEvents({ onClick }: MapMarkersProps) {
   useMapEvent("click", (event) => onClick(event));
   return null;
 }
