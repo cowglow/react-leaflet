@@ -1,6 +1,6 @@
 import { Marker } from "react-leaflet";
 
-export default function MapMarker({ children, position, remove, events, ...other }: MapMarkerProps) {
+export default function MapMarker({ events, position, remove, ...other }: MapMarkerProps) {
   let eventHandlers: L.LeafletEventHandlerFnMap = {
     click: () => remove(position)
   };
@@ -10,8 +10,6 @@ export default function MapMarker({ children, position, remove, events, ...other
   }
 
   return (
-    <Marker {...other} position={position} {...{ eventHandlers }}>
-      {children}
-    </Marker>
+    <Marker {...other} position={position} {...{ eventHandlers }} />
   );
 }

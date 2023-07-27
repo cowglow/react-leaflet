@@ -11,11 +11,12 @@ import MarkerPoint from "./Marker.Point.tsx";
 type MapEditMode = "marker" | "poly";
 
 const StyledController = styled("div")`
-  padding: 0 4rem 2rem;
+  padding: 1.235em;
   display: flex;
   justify-content: flex-end;
+
   gap: 1rem;
-  background-color: red;
+  background-color: #333333;
 `;
 
 export default function App() {
@@ -44,20 +45,19 @@ export default function App() {
   return (
     <MainLayout>
       <StyledController>
+        <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({ editMode, points: points.length, markers: markers.length })}</pre>
         <button onClick={() => setEditMode("marker")} disabled={editMode === "marker"}>Marker</button>
         <button onClick={() => setEditMode("poly")} disabled={editMode === "poly"}>Poly</button>
       </StyledController>
-      <pre style={{ color: "white", fontSize: "1.235em" }}>
-        {JSON.stringify({ editMode, points: points.length, markers: markers.length })}</pre>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
         <MapEvents onClick={handleMapClick} />
         {markers &&
           markers.map((marker, index) => (
-            <Marker key={index} position={marker} remove={removeMarker} />
+            <Marker key={index} position={marker} remove={removeMarker} draggable={true} />
           ))}
         {points &&
           points.map((marker, index) => (
-            <MarkerPoint key={index} position={marker} remove={removePoint} />
+            <MarkerPoint key={index} position={marker} remove={removePoint} draggable={true} />
           ))}
       </Map>
     </MainLayout>
