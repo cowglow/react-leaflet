@@ -1,5 +1,4 @@
 import MapMarker from "../feature/map/Map.Marker.tsx";
-import { ReactNode } from "react";
 
 interface MarkerProps extends MapMarkerProps {}
 
