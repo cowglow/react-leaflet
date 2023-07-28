@@ -1,15 +1,18 @@
-import { Marker } from "react-leaflet";
+import { Marker } from 'react-leaflet';
+import { MapMarkerProps } from './typing.ts';
 
-export default function MapMarker({ events, position, remove, ...other }: MapMarkerProps) {
-  let eventHandlers: L.LeafletEventHandlerFnMap = {
-    click: () => remove(position)
-  };
+export default function MapMarker(props: MapMarkerProps) {
+	const { remove, position, events } = props;
 
-  if (events) {
-    eventHandlers = events;
-  }
+	let eventHandlers: L.LeafletEventHandlerFnMap = {
+		click: () => remove(position),
+	};
 
-  return (
-    <Marker {...other} position={position} {...{ eventHandlers }} />
-  );
+	if (events) {
+		eventHandlers = events;
+	}
+
+	return (
+		<Marker {...props} {...{ eventHandlers }} />
+	);
 }

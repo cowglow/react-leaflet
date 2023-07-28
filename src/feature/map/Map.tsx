@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
-import type { LatLng } from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import styled from "styled-components";
+import type { ReactNode } from 'react';
+import type { LatLng } from 'leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import styled from 'styled-components';
 
 const StyledMapContainer = styled(MapContainer)`
   display: block;
@@ -11,36 +11,36 @@ const StyledMapContainer = styled(MapContainer)`
 `;
 
 interface MapProps {
-  children?: ReactNode;
-  position: LatLng;
-  scrollWheelZoom: boolean;
-  zoom: number | undefined;
+	children?: ReactNode;
+	position: LatLng;
+	scrollWheelZoom: boolean;
+	zoom: number | undefined;
 }
 
 export default function Map({
-  children,
-  position,
-  scrollWheelZoom,
-  zoom,
-}: MapProps) {
-  return (
-    <StyledMapContainer
-      center={position}
-      zoom={zoom}
-      scrollWheelZoom={scrollWheelZoom}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {/*
+															children,
+															position,
+															scrollWheelZoom,
+															zoom,
+														}: MapProps) {
+	return (
+		<StyledMapContainer
+			center={position}
+			zoom={zoom}
+			scrollWheelZoom={scrollWheelZoom}
+		>
+			<TileLayer
+				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+				url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+			/>
+			{/*
       <LayersControl position="bottomleft">
-        <LayersControl.Overlay name="Marker with popup">
-          <Marker position={position}>
+        <LayersControl.Overlay name="MarkerDefault with popup">
+          <MarkerDefault position={position}>
             <Popup>
               A pretty CSS3 popup. <br /> Easily customizable.
             </Popup>
-          </Marker>
+          </MarkerDefault>
         </LayersControl.Overlay>
         <LayersControl.Overlay checked name="Layer group with circles">
           <LayerGroup>
@@ -73,7 +73,7 @@ export default function Map({
         </LayersControl.Overlay>
       </LayersControl>
       */}
-      {children}
-    </StyledMapContainer>
-  );
+			{children}
+		</StyledMapContainer>
+	);
 }
