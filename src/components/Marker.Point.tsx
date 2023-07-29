@@ -1,9 +1,9 @@
-import MapMarker from '../feature/map/Map.Marker.tsx';
-import { MapMarkerProps } from '../feature/map/typing.ts';
+import MapMarker from 'feature/map/Map.Marker.tsx';
+import { MapMarkerProps } from 'feature/map/typing.ts';
 import L from 'leaflet';
-import pointIcon from '../assets/markers/point/point-icon.png';
-import pointIcon2x from '../assets/markers/point/point-icon-2x.png';
-import pointIconShadow from '../assets/markers/point/point-shadow.png';
+import pointIcon from 'assets/markers/point/point-icon.png';
+import pointIcon2x from 'assets/markers/point/point-icon-2x.png';
+import pointIconShadow from 'assets/markers/point/point-shadow.png';
 
 
 interface MarkerPointProps extends MapMarkerProps {

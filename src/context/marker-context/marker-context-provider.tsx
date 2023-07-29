@@ -2,24 +2,24 @@ import { ReactNode } from "react";
 import { MarkerContext } from "./markers-context.tsx";
 import type { LeafletMouseEvent } from "leaflet";
 import { LatLng } from "leaflet";
-import { useLocalStorage } from "../../hooks/use-local-storage.ts";
+import { useLocalStorage } from "hooks/use-local-storage.ts";
 
 interface MarkerContextProviderProps {
   children: ReactNode;
 }
 
 export const MarkerContextProvider = ({
-  children,
-}: MarkerContextProviderProps) => {
+                                        children
+                                      }: MarkerContextProviderProps) => {
   const [markers, setMarkers] = useLocalStorage<LatLng[]>({
     key: "MAP_MARKERS",
-    defaultValue: [],
+    defaultValue: []
   });
 
   const addMarker = ({ latlng }: LeafletMouseEvent) => {
     setMarkers((prevState: LatLng[]) => [
       ...prevState,
-      new LatLng(latlng.lat, latlng.lng),
+      new LatLng(latlng.lat, latlng.lng)
     ]);
   };
 
@@ -39,7 +39,7 @@ export const MarkerContextProvider = ({
         markers,
         addMarker,
         clearMarkers,
-        removeMarker,
+        removeMarker
       }}
     >
       {children}
