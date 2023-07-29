@@ -9,8 +9,9 @@ import Map from "feature/map/Map.tsx";
 import MapEvents from "feature/map/Map.Events.tsx";
 import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
+import { Polygon } from "react-leaflet";
 
-type MapEditMode = "marker" | "poly" | "point";
+type MapEditMode = "marker" | "point" | "poly"
 
 const StyledController = styled("div")`
   padding: 1.235em;
@@ -38,11 +39,11 @@ export default function App() {
     if (editMode === "marker") {
       addMarker(position);
     }
-    if (editMode === "poly") {
-      console.log("poly", polygons);
-    }
     if (editMode === "point") {
       addPoint((prevState) => [...prevState, position]);
+    }
+    if (editMode === "poly") {
+      console.log("poly", polygons);
     }
   };
 
@@ -66,7 +67,7 @@ export default function App() {
       <StyledController>
         <button onClick={() => setEditMode("marker")} disabled={editMode === "marker"}>Marker</button>
         <button onClick={() => setEditMode("point")} disabled={editMode === "point"}>Point</button>
-        <button onClick={() => setEditMode("poly")} disabled>Polygon (Coming Soon)</button>
+        <button onClick={() => setEditMode("poly")} disabled={editMode === "poly"}>Polygon</button>
         <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({
           editMode,
           points: points.length,
@@ -84,6 +85,11 @@ export default function App() {
           points.map((marker, index) => (
             <MarkerPoint key={index} position={marker} remove={removePoint} draggable={true} />
           ))}
+        {markers &&
+          [markers].map((markers, index) => (
+            <Polygon key={index} positions={markers} />
+          ))
+        }
       </Map>
     </MainLayout>
   );
