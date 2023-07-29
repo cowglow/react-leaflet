@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { MarkerContext } from "./markers-context.tsx";
-import type { LeafletMouseEvent } from "leaflet";
 import { LatLng } from "leaflet";
 import { useLocalStorage } from "hooks/use-local-storage.ts";
 
@@ -16,7 +15,7 @@ export const MarkerContextProvider = ({
     defaultValue: []
   });
 
-  const addMarker = ({ latlng }: LeafletMouseEvent) => {
+  const addMarker = (latlng: LatLng) => {
     setMarkers((prevState: LatLng[]) => [
       ...prevState,
       new LatLng(latlng.lat, latlng.lng)

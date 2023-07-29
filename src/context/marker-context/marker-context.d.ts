@@ -3,7 +3,7 @@ interface MarkerContextProps {
 }
 
 type MarkersContextApi = {
-  addMarker: (event: L.LeafletMouseEvent) => void;
+  addMarker: (position: L.LatLng) => void;
   clearMarkers: () => void;
   removeMarker: (position: L.LatLng) => void;
 } & MarkerContextProps;
