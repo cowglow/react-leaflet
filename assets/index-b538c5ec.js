@@ -49,7 +49,7 @@ Error generating stack: `+l.message+`
   padding: 2rem;
   color: white;
 `;function M0(){return nt.jsxs(z0,{children:["Footer",nt.jsx("a",{href:"https://github.com/cowglow/react-leaflet",target:"_blank",children:"Git Repo"})]})}function O0(t){if(t.length===0)return"";const e=Object.keys(t[0]),i=[e.join(",")];for(const o of t){const a=e.map(l=>o[l]).join(",");i.push(a)}return i.join(`
-`)}function I0(t,e){const i=new Blob([t],{type:"text/csv"}),o=URL.createObjectURL(i),a=document.createElement("a");a.href=o,a.download=e,document.body.appendChild(a),a.click(),URL.revokeObjectURL(o)}function R0({label:t,data:e}){const i=()=>{const o=O0(e);I0(o,"output.csv")};return nt.jsx("button",{onClick:i,children:t})}const N0={markers:[],addMarker:()=>{throw Error("ERROR:: Add MarkerDefault | Uninitialized")},clearMarkers:()=>{throw Error("ERROR:: Clear Markers | Uninitialized")},removeMarker:()=>{throw Error("ERROR:: Remove MarkerDefault | Uninitialized")}},wm=ot.createContext(N0),B0=()=>ot.useContext(wm),xm=()=>B0(),D0=Jn("header")`
+`)}function I0(t,e){const i=new Blob([t],{type:"text/csv"}),o=URL.createObjectURL(i),a=document.createElement("a");a.href=o,a.download=e,document.body.appendChild(a),a.click(),URL.revokeObjectURL(o)}function R0({label:t,data:e}){const i=()=>{if(!e)return;console.log(e);const o=e.map(({lat:l,lng:f})=>({lat:l,lng:f})),a=O0(o);I0(a,"output.csv")};return nt.jsx("button",{onClick:i,disabled:e.length<=0,children:t})}const N0={markers:[],addMarker:()=>{throw Error("ERROR:: Add MarkerDefault | Uninitialized")},clearMarkers:()=>{throw Error("ERROR:: Clear Markers | Uninitialized")},removeMarker:()=>{throw Error("ERROR:: Remove MarkerDefault | Uninitialized")}},wm=ot.createContext(N0),B0=()=>ot.useContext(wm),xm=()=>B0(),D0=Jn("header")`
   display: flex;
   justify-content: space-between;
   padding: 0 2rem 0;
@@ -59,12 +59,12 @@ Error generating stack: `+l.message+`
     gap: 2rem;
     padding: 2rem;
   }
-`;function Z0(){const{markers:t,clearMarkers:e}=xm(),i=()=>{e(),location.reload()};return nt.jsxs(D0,{children:[nt.jsx("h1",{children:"Vite + React"}),nt.jsxs("div",{children:[nt.jsx(R0,{label:"Export MarkerDefault Coords",data:t}),nt.jsx("button",{onClick:i,children:"Reset"})]})]})}const F0=Jn("div")`
+`;function Z0(){const{markers:t,clearMarkers:e}=xm(),i=()=>{e(),location.reload()};return nt.jsxs(D0,{children:[nt.jsx("h1",{children:"Vite + React-Leaflet"}),nt.jsxs("div",{children:[nt.jsx(R0,{label:"Export MarkerDefault Coords",data:t}),nt.jsx("button",{onClick:i,children:"Reset"})]})]})}const F0=Jn("div")`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
-  border: thin solid greenyellow;
+  border: 0.42em solid #61BA9E;
 `,j0=Jn("main")`
   display: flex;
   flex-direction: column;
