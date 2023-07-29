@@ -1,8 +1,8 @@
-import styled from 'styled-components';
-import ExportController from 'components/ExportController.tsx';
-import { useMarkers } from 'hooks/use-markers.ts';
+import styled from "styled-components";
+import ExportController from "components/ExportController.tsx";
+import { useMarkers } from "hooks/use-markers.ts";
 
-const StyledHeader = styled('header')`
+const StyledHeader = styled("header")`
   display: flex;
   justify-content: space-between;
   padding: 0 2rem 0;
@@ -15,20 +15,20 @@ const StyledHeader = styled('header')`
 `;
 
 export default function Header() {
-	const { markers, clearMarkers } = useMarkers();
+  const { markers, clearMarkers } = useMarkers();
 
-	const resetMap = () => {
-		clearMarkers();
-		location.reload();
-	};
+  const resetMap = () => {
+    clearMarkers();
+    location.reload();
+  };
 
-	return (
-		<StyledHeader>
-			<h1>Vite + React</h1>
-			<div>
-				<ExportController label='Export MarkerDefault Coords' data={markers} />
-				<button onClick={resetMap}>Reset</button>
-			</div>
-		</StyledHeader>
-	);
+  return (
+    <StyledHeader>
+      <h1>Vite + React-Leaflet</h1>
+      <div>
+        <ExportController label="Export MarkerDefault Coords" data={markers} />
+        <button onClick={resetMap}>Reset</button>
+      </div>
+    </StyledHeader>
+  );
 }

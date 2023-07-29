@@ -8,7 +8,7 @@ const StyledWrapper = styled("div")`
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
-  border: thin solid greenyellow;
+  border: 0.42em solid #61BA9E;
 `;
 
 
