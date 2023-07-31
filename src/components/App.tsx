@@ -11,7 +11,8 @@ import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
 import { Polygon } from "react-leaflet";
 
-type MapEditMode = "marker" | "point" | "poly"
+type MarkerType = "marker" | "point"
+type MarkerMode = "single" | "poly"
 
 const StyledController = styled("div")`
   padding: 1.235em;
@@ -28,7 +29,8 @@ const StyledButton = styled("button")`
 export default function App() {
   const { markers, addMarker, removeMarker } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
-  const [editMode, setEditMode] = useState<MapEditMode>("marker");
+  const [markerType, setMarkerType] = useState<MarkerType>("marker");
+  const [markerMode, setMarkerMode] = useState<MarkerMode>("poly");
   const [points, addPoint] = useState<L.LatLng[]>([]);
   const [polygons, _setPolygons] = useState<L.LatLng[][]>([]);
 
@@ -36,10 +38,10 @@ export default function App() {
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
     const position = new L.LatLng(event.latlng.lat, event.latlng.lng);
-    if (editMode === "marker") {
+    if (markerType === "marker") {
       addMarker(position);
     }
-    if (editMode === "point") {
+    if (markerType === "point") {
       addPoint((prevState) => [...prevState, position]);
     }
     if (editMode === "poly") {
@@ -54,7 +56,7 @@ export default function App() {
   const fetchRandomLocations = async () => {
     const data = await getRandomCoordinates();
 
-    if (editMode === "marker") {
+    if (markerType === "marker") {
       data.forEach(item => addMarker(item));
       return;
     }
@@ -65,13 +67,17 @@ export default function App() {
   return (
     <MainLayout>
       <StyledController>
-        <button onClick={() => setEditMode("marker")} disabled={editMode === "marker"}>Marker</button>
-        <button onClick={() => setEditMode("point")} disabled={editMode === "point"}>Point</button>
-        <button onClick={() => setEditMode("poly")} disabled={editMode === "poly"}>Polygon</button>
+        <button onClick={() => toggleMarkerType("marker")} disabled={markerType === "marker"}>Marker</button>
+        <button onClick={() => toggleMarkerType("point")} disabled={markerType === "point"}>Point</button>
+        <button onClick={togglePolyCapture}>
+          {markerMode === "single" ? "Marker" : "Poly"}
+        </button>
         <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({
-          editMode,
           points: points.length,
-          markers: markers.length
+          markers: markers.length,
+          polygons: polygons.length,
+          markerMode,
+          markerType
         })}</pre>
         <StyledButton onClick={fetchRandomLocations}>Fetch Random Locations</StyledButton>
       </StyledController>
