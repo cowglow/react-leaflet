@@ -94,11 +94,8 @@ export default function App() {
         </button>
         <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({
           points: points.length,
-          markers: markers.length,
-          polygons: polygons.length,
-          markerMode,
-          markerType
-        })}</pre>
+          polygons: polygons.length
+        })} // {JSON.stringify({ markerMode, markerType })}</pre>
         <StyledButton onClick={fetchRandomLocations}>Fetch Random Locations</StyledButton>
       </StyledController>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
