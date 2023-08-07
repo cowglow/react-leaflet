@@ -12,7 +12,6 @@ export default function ExportController({ label, data }: ExportControllerProps)
   const clickHandler = () => {
     if (!data) return;
 
-    console.log(data);
     const csvData: CSVData[] = data.map(({ lat, lng }) => ({ lat, lng }));
     const output = convertToCSV(csvData);
     exportCSVFile(output, "output.csv");
