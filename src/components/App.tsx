@@ -11,7 +11,7 @@ import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
 import { LayerGroup, Polygon } from "react-leaflet";
 
-type MarkerType = "marker" | "point"
+type MarkerType = "default" | "custom"
 type MarkerMode = "single" | "poly"
 
 const StyledController = styled("div")`
@@ -29,8 +29,8 @@ const StyledButton = styled("button")`
 export default function App() {
   const { markers, addMarker, removeMarker } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
-  const [markerType, setMarkerType] = useState<MarkerType>("marker");
-  const [markerMode, setMarkerMode] = useState<MarkerMode>("poly");
+  const [markerType, setMarkerType] = useState<MarkerType>("default");
+  const [markerMode, setMarkerMode] = useState<MarkerMode>("single");
   const [points, addPoint] = useState<L.LatLng[]>([]);
   const [polygons, setPolygons] = useState<L.LatLng[][]>([[]]);
 
@@ -38,10 +38,10 @@ export default function App() {
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
     const position = new L.LatLng(event.latlng.lat, event.latlng.lng);
-    if (markerType === "marker") {
+    if (markerType === "default") {
       addMarker(position);
     }
-    if (markerType === "point") {
+    if (markerType === "custom") {
       addPoint((prevState) => [...prevState, position]);
     }
     if (markerMode === "poly") {
@@ -53,14 +53,22 @@ export default function App() {
     }
   };
 
+  const markerRemover = (event) => {
+    removeMarker(event);
+    removePolygonPoint(event);
+  };
   const removePoint = (event) => {
     addPoint((prevState) => removeFromCollection(event, prevState));
+    removePolygonPoint(event);
+  };
+  const removePolygonPoint = (event) => {
+    setPolygons(prevState => prevState.map(polygon => removeFromCollection(event, polygon)));
   };
 
   const fetchRandomLocations = async () => {
     const data = await getRandomCoordinates();
 
-    if (markerType === "marker") {
+    if (markerType === "default") {
       data.forEach(item => addMarker(item));
       return;
     }
@@ -79,23 +87,33 @@ export default function App() {
     initializePoly();
   };
 
-  const togglePolyCapture = () => {
-    setMarkerMode(prevState => prevState === "single" ? "poly" : "single");
+  const togglePolyCapture = (polyCapture: MarkerMode) => {
+    setMarkerMode(polyCapture);
     initializePoly();
   };
 
+  const preStyle = { color: "white", fontSize: "1.235em" };
   return (
     <MainLayout>
       <StyledController>
-        <button onClick={() => toggleMarkerType("marker")} disabled={markerType === "marker"}>Marker</button>
-        <button onClick={() => toggleMarkerType("point")} disabled={markerType === "point"}>Point</button>
-        <button onClick={togglePolyCapture}>
-          {markerMode === "single" ? "Marker" : "Poly"}
-        </button>
-        <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({
-          points: points.length,
-          polygons: polygons.length
-        })} // {JSON.stringify({ markerMode, markerType })}</pre>
+        <div>
+          <h3>Marker Type</h3>
+          <button onClick={() => toggleMarkerType("default")} disabled={markerType === "default"}>Default</button>
+          &nbsp;
+          <button onClick={() => toggleMarkerType("custom")} disabled={markerType === "custom"}>Custom</button>
+          <pre style={preStyle}>{JSON.stringify({ markerType })}</pre>
+        </div>
+        <div>
+          <h3>Marker Mode</h3>
+          <button onClick={() => togglePolyCapture("single")} disabled={markerMode === "single"}>Marker</button>
+          &nbsp;
+          <button onClick={() => togglePolyCapture("poly")} disabled={markerMode === "poly"}>Polygon</button>
+          <pre style={preStyle}>{JSON.stringify({ markerMode })}</pre>
+        </div>
+        {markerMode === "single" ? "Marker" : "Poly"}
+        <pre style={{ color: "white", fontSize: "1.235em" }}>
+          {JSON.stringify({ markers: markers.length, points: points.length, polygons: polygons.length }, null, 2)}
+        </pre>
         <StyledButton onClick={fetchRandomLocations}>Fetch Random Locations</StyledButton>
       </StyledController>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
@@ -103,7 +121,7 @@ export default function App() {
         <LayerGroup>
           {markers &&
             markers.map((marker, index) => (
-              <MarkerDefault key={index} position={marker} remove={removeMarker} draggable={true} />))}
+              <MarkerDefault key={index} position={marker} remove={markerRemover} draggable={true} />))}
         </LayerGroup>
         <LayerGroup>
           {points &&
