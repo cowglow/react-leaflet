@@ -1,5 +1,5 @@
-import MapMarker from 'feature/map/Map.Marker.tsx';
-import { MapMarkerProps } from 'feature/map/typing.ts';
+import MapMarker from "feature/map/Map.Marker.tsx";
+import type { MapMarkerProps } from "feature/map/typing.ts";
 
 interface MarkerProps extends MapMarkerProps {
 }

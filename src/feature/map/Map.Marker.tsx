@@ -1,5 +1,5 @@
 import { Marker } from "react-leaflet";
-import { MapMarkerProps } from "./typing.ts";
+import type { MapMarkerProps } from "./typing.ts";
 
 export default function MapMarker(props: MapMarkerProps) {
   const { remove, position, events } = props;
