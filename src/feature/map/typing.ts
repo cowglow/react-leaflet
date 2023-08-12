@@ -4,3 +4,7 @@ export interface MapMarkerProps extends L.MarkerOptions, L.EventedProps {
   position: L.LatLng;
   remove: (position: L.LatLng) => void;
 }
+
+export interface MapLayerGroupProps {
+  children?: React.ReactNode;
+}
