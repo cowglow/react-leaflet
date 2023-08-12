@@ -10,6 +10,7 @@ import MapEvents from "feature/map/Map.Events.tsx";
 import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
 import { LayerGroup, Polygon, Popup, Tooltip } from "react-leaflet";
+import LayerGroupDefault from "components/LayerGroup.Default.tsx";
 
 type MarkerType = "default" | "custom"
 type MarkerMode = "single" | "poly"
@@ -118,14 +119,14 @@ export default function App() {
       </StyledController>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
         <MapEvents onClick={handleMapClick} />
-        <LayerGroup>
+        <LayerGroupDefault>
           {markers &&
             markers.map((marker, index) => (
               <MarkerDefault key={index} position={marker} remove={markerRemover} draggable={true}>
                 <Popup position={marker}>A pretty CSS3 popup. <br /> Easily customizable.</Popup>
                 <Tooltip>A pretty CSS3 popup. <br /> Easily customizable.</Tooltip>
               </MarkerDefault>))}
-        </LayerGroup>
+        </LayerGroupDefault>
         <LayerGroup>
           {points &&
             points.map((marker, index) => (
