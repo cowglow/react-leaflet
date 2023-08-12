@@ -1,16 +1,20 @@
 import { useState } from "react";
 import L from "leaflet";
+/**
+ * The goal here is to remove the react-leaflet dependency
+ * A wrapper class can also be created around L
+ */
+import { Polygon, Tooltip } from "react-leaflet";
 import styled from "styled-components";
 import MainLayout from "components/layout/MainLayout.tsx";
 import MarkerPoint from "components/Marker.Point.tsx";
-import MarkerDefault from "components/Marker.Default.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
 import Map from "feature/map/Map.tsx";
 import MapEvents from "feature/map/Map.Events.tsx";
 import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
-import { LayerGroup, Polygon, Popup, Tooltip } from "react-leaflet";
 import LayerGroupDefault from "components/LayerGroup.Default.tsx";
+import LayerGroupMarker from "components/LayerGroup.Markers.tsx";
 
 type MarkerType = "default" | "custom"
 type MarkerMode = "single" | "poly"
@@ -28,7 +32,7 @@ const StyledButton = styled("button")`
 `;
 
 export default function App() {
-  const { markers, addMarker, removeMarker } = useMarkers();
+  const { markers, addMarker } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
   const [markerType, setMarkerType] = useState<MarkerType>("default");
   const [markerMode, setMarkerMode] = useState<MarkerMode>("single");
@@ -54,10 +58,6 @@ export default function App() {
     }
   };
 
-  const markerRemover = (event) => {
-    removeMarker(event);
-    removePolygonPoint(event);
-  };
   const removePoint = (event) => {
     addPoint((prevState) => removeFromCollection(event, prevState));
     removePolygonPoint(event);
@@ -119,27 +119,27 @@ export default function App() {
       </StyledController>
       <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
         <MapEvents onClick={handleMapClick} />
+        <LayerGroupMarker positions={markers}>
+          <>A pretty CSS3 popup. <br /> Easily customizable.</>
+        </LayerGroupMarker>
         <LayerGroupDefault>
-          {markers &&
-            markers.map((marker, index) => (
-              <MarkerDefault key={index} position={marker} remove={markerRemover} draggable={true}>
-                <Popup position={marker}>A pretty CSS3 popup. <br /> Easily customizable.</Popup>
-                <Tooltip>A pretty CSS3 popup. <br /> Easily customizable.</Tooltip>
-              </MarkerDefault>))}
-        </LayerGroupDefault>
-        <LayerGroup>
           {points &&
             points.map((marker, index) => (
-              <MarkerPoint key={index} position={marker} remove={removePoint} draggable={true} />))}
-        </LayerGroup>
-        <LayerGroup>
+              <MarkerPoint key={index} position={marker} remove={removePoint} draggable={true}>
+                <Tooltip>A Tooltip. <br /> Easily customizable.</Tooltip>
+              </MarkerPoint>
+            ))
+          }
+        </LayerGroupDefault>
+        <LayerGroupDefault>
           {polygons &&
             [polygons].map((points, index) => {
               if (points.length > 0) {
                 return (<Polygon key={index} positions={points} />);
               }
-            })}
-        </LayerGroup>
+            })
+          }
+        </LayerGroupDefault>
       </Map>
     </MainLayout>
   );
