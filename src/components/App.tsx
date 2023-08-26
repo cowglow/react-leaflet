@@ -105,9 +105,9 @@ export default function App() {
       <StyledController>
         <div>
           <h3>Marker Type</h3>
-          <button onClick={() => console.log("DEFAULT")} disabled={markerType() === "DEFAULT"}>Default</button>
+          <button onClick={() => markerType("DEFAULT")} disabled={markerType() === "DEFAULT"}>Default</button>
           &nbsp;
-          <button onClick={() => markerType("CUSTOM")} disabled={markerType() === "CUSTOM"}>Custom</button>
+          <button onClick={() => console.log("CUSTOM")} disabled={markerType() === "CUSTOM"}>Custom</button>
           <p>{markerType()}</p>
         </div>
         <div>
