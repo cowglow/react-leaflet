@@ -1,5 +1,6 @@
 import { useState } from "react";
 import L from "leaflet";
+import { useReactiveVar } from "@apollo/client";
 /**
  * The goal here is to remove the react-leaflet dependency
  * A wrapper class can also be created around L
@@ -15,7 +16,7 @@ import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
 import LayerGroupDefault from "components/LayerGroup.Default.tsx";
 import LayerGroupMarker from "components/LayerGroup.Markers.tsx";
-import { makeVar } from "@apollo/client";
+import { markerType } from "../cache/client.ts";
 
 
 const StyledController = styled("div")`
@@ -30,11 +31,11 @@ const StyledButton = styled("button")`
   margin-left: auto;
 `;
 type MarkerMode = "POINT" | "POLYGON"
-type MarkerType = "DEFAULT" | "CUSTOM"
 
 export default function App() {
   // const { markerType } = useReactiveState();
-  const markerType = makeVar<MarkerType>("DEFAULT");
+  // const markerType = makeVar<MarkerType>("DEFAULT");
+  const marker = useReactiveVar(markerType);
 
   const { markers, addMarker } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
@@ -49,10 +50,10 @@ export default function App() {
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
     const position = new L.LatLng(event.latlng.lat, event.latlng.lng);
-    if (markerType() === "DEFAULT") {
+    if (markerType()[0] === "DEFAULT") {
       addMarker(position);
     }
-    if (markerType() === "CUSTOM") {
+    if (markerType()[0] === "CUSTOM") {
       addPoint((prevState) => [...prevState, position]);
     }
     // if (markerMode === "poly") {
@@ -75,7 +76,7 @@ export default function App() {
   const fetchRandomLocations = async () => {
     const data = await getRandomCoordinates();
 
-    if (markerType() === "DEFAULT") {
+    if (markerType()[0] === "DEFAULT") {
       data.forEach(item => addMarker(item));
       return;
     }
@@ -105,10 +106,19 @@ export default function App() {
       <StyledController>
         <div>
           <h3>Marker Type</h3>
-          <button onClick={() => markerType("DEFAULT")} disabled={markerType() === "DEFAULT"}>Default</button>
+          <button
+            aria-selected={marker === "DEFAULT"}
+            disabled={marker === "DEFAULT"}
+            onClick={() => markerType("DEFAULT")}>
+            Default
+          </button>
           &nbsp;
-          <button onClick={() => console.log("CUSTOM")} disabled={markerType() === "CUSTOM"}>Custom</button>
-          <p>{markerType()}</p>
+          <button
+            aria-selected={marker === "CUSTOM"}
+            disabled={marker === "CUSTOM"}
+            onClick={() => markerType("CUSTOM")}>
+            Custom
+          </button>
         </div>
         <div>
           <h3>Marker Mode</h3>
