@@ -1,12 +1,20 @@
 import { ReactNode } from "react";
-import { MarkerContextProvider } from "./marker-context/marker-context-provider.tsx";
+import { MarkersContextProvider } from "context/markers-context/markers-context-provider.tsx";
+import { TileServerContextProvider } from "context/tile-server-context/tile-server-context-provider.tsx";
+import {
+  AircraftTrackPointsContextProvider
+} from "context/aircraft-track-points-context/aircraft-track-points-context-provider.tsx";
 
 interface ContextProvidersProps {
   children: ReactNode;
 }
 
 export const ContextProviders = ({ children }: ContextProvidersProps) => (
-  <MarkerContextProvider>
-    <>{children}</>
-  </MarkerContextProvider>
+  <AircraftTrackPointsContextProvider>
+    <MarkersContextProvider>
+      <TileServerContextProvider>
+        <>{children}</>
+      </TileServerContextProvider>
+    </MarkersContextProvider>
+  </AircraftTrackPointsContextProvider>
 );

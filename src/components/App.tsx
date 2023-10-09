@@ -8,15 +8,18 @@ import { useReactiveVar } from "@apollo/client";
 import { Polygon, Tooltip } from "react-leaflet";
 import styled from "styled-components";
 import MainLayout from "components/layout/MainLayout.tsx";
-import MarkerPoint from "components/Marker.Point.tsx";
+import MarkerPoint from "components/markers/Marker.Point.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
 import Map from "feature/map/Map.tsx";
 import MapEvents from "feature/map/Map.Events.tsx";
 import { removeFromCollection } from "utils/filters.ts";
 import { useCoordinates } from "hooks/use-coordinates.ts";
-import LayerGroupDefault from "components/LayerGroup.Default.tsx";
-import LayerGroupMarker from "components/LayerGroup.Markers.tsx";
-import { markerType } from "../cache/client.ts";
+import LayerGroupDefault from "components/layer-groups/LayerGroup.Default.tsx";
+import LayerGroupMarker from "components/layer-groups/LayerGroup.Markers.tsx";
+import { markerType } from "../cache/types/marker-type.ts";
+import { markerMode } from "../cache/types/marker-mode.ts";
+import { useTrackPoints } from "hooks/use-track-points.ts";
+import LayerGroupTrackPoints from "components/layer-groups/LayerGroup.TrackPoints.tsx";
 
 
 const StyledController = styled("div")`
@@ -30,19 +33,15 @@ const StyledController = styled("div")`
 const StyledButton = styled("button")`
   margin-left: auto;
 `;
-type MarkerMode = "POINT" | "POLYGON"
 
 export default function App() {
-  // const { markerType } = useReactiveState();
-  // const markerType = makeVar<MarkerType>("DEFAULT");
   const marker = useReactiveVar(markerType);
+  const mode = useReactiveVar(markerMode);
 
   const { markers, addMarker } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
-  // const [markerType, setMarkerType] = useState<MarkerType>("default");
-  const [markerMode, setMarkerMode] = useState<MarkerMode>("POINT");
+  const { addTrackPoint } = useTrackPoints();
 
-  // const marker = useReactiveVar(markerType);
   const [points, addPoint] = useState<L.LatLng[]>([]);
   const [polygons, setPolygons] = useState<L.LatLng[][]>([[]]);
 
@@ -50,19 +49,22 @@ export default function App() {
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
     const position = new L.LatLng(event.latlng.lat, event.latlng.lng);
-    if (markerType()[0] === "DEFAULT") {
+    if (marker === "AIRCRAFT") {
+      addTrackPoint(position);
+    }
+    if (marker === "DEFAULT") {
       addMarker(position);
     }
-    if (markerType()[0] === "CUSTOM") {
+    if (marker === "CUSTOM") {
       addPoint((prevState) => [...prevState, position]);
     }
-    // if (markerMode === "poly") {
-    setPolygons(prevState => {
-      return prevState.map((polygon, index) =>
-        index === prevState.length - 1 ? [...polygon, position] : polygon
-      );
-    });
-    // }
+    if (mode === "POLYGON") {
+      setPolygons(prevState => {
+        return prevState.map((polygon, index) =>
+          index === prevState.length - 1 ? [...polygon, position] : polygon
+        );
+      });
+    }
   };
 
   const removePoint = (event) => {
@@ -84,56 +86,49 @@ export default function App() {
     data.forEach(item => addPoint(prevState => [...prevState, item]));
   };
 
-  // const initializePoly = () => {
-  //   if (markerMode === "poly") {
-  //     setPolygons(prevState => [...prevState, []]);
-  //   }
-  // };
+  /*
+  const initializePoly = () => {
+    if (mode === "POLYGON") {
+      setPolygons(prevState => [...prevState, []]);
+    }
+  };
+  const toggleMarkerType = (markerType) => {
+    markerType(markerType);
+    initializePoly();
+  };
 
-  // const toggleMarkerType = (markerType: MarkerType) => {
-  //   setMarkerType(markerType);
-  //   initializePoly();
-  // };
-
-  // const togglePolyCapture = (polyCapture: MarkerMode) => {
-  //   setMarkerMode(polyCapture);
-  //   initializePoly();
-  // };
-
-  const preStyle = { color: "white", fontSize: "1.235em" };
+  const togglePolyCapture = (polyCapture) => {
+    markerMode(polyCapture);
+    initializePoly();
+  };
+  */
   return (
     <MainLayout>
       <StyledController>
         <div>
           <h3>Marker Type</h3>
-          <button
-            aria-selected={marker === "DEFAULT"}
-            disabled={marker === "DEFAULT"}
-            onClick={() => markerType("DEFAULT")}>
-            Default
-          </button>
+          <button disabled={marker === "DEFAULT"} onClick={() => markerType("DEFAULT")}>Default</button>
           &nbsp;
-          <button
-            aria-selected={marker === "CUSTOM"}
-            disabled={marker === "CUSTOM"}
-            onClick={() => markerType("CUSTOM")}>
-            Custom
-          </button>
+          <button disabled={marker === "CUSTOM"} onClick={() => markerType("CUSTOM")}>Custom</button>
+          &nbsp;
+          <button disabled={marker === "AIRCRAFT"} onClick={() => markerType("AIRCRAFT")}>Aircraft</button>
         </div>
         <div>
           <h3>Marker Mode</h3>
-          <button onClick={() => setMarkerMode("POINT")} disabled={markerMode === "POINT"}>Marker</button>
+          <button disabled={mode === "POINT"} onClick={() => markerMode("POINT")}>Marker</button>
           &nbsp;
-          <button onClick={() => setMarkerMode("POLYGON")} disabled={markerMode === "POLYGON"}>Polygon</button>
-          <pre style={preStyle}>{JSON.stringify({ markerMode })}</pre>
+          <button disabled={mode === "POLYGON"} onClick={() => markerMode("POLYGON")}>Polygon</button>
         </div>
-        {/*{markerMode === "single" ? "Marker" : "Poly"}*/}
         <pre style={{ color: "white", fontSize: "1.235em" }}>
-            {JSON.stringify({ markers: markers.length, points: points.length, polygons: polygons.length }, null, 2)}
-          </pre>
+            {JSON.stringify({
+              markers: markers.length,
+              points: points.length,
+              polygons: polygons.length
+            }, null, 2)}
+        </pre>
         <StyledButton onClick={fetchRandomLocations}>Fetch Random Locations</StyledButton>
       </StyledController>
-      <Map position={nbgCenter} zoom={13} scrollWheelZoom={true}>
+      <Map center={nbgCenter} zoom={3} scrollWheelZoom={true}>
         <MapEvents onClick={handleMapClick} />
         <LayerGroupMarker positions={markers}>
           <>A pretty CSS3 popup. <br /> Easily customizable.</>
@@ -156,6 +151,7 @@ export default function App() {
             })
           }
         </LayerGroupDefault>
+        <LayerGroupTrackPoints />
       </Map>
     </MainLayout>
   );

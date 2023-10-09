@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import ExportController from "components/ExportController.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
+import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
+import { ChangeEvent } from "react";
+import { useTrackPoints } from "hooks/use-track-points.ts";
 
 const StyledHeader = styled("header")`
   display: flex;
@@ -15,11 +18,19 @@ const StyledHeader = styled("header")`
 `;
 
 export default function Header() {
+  const { clearTrackPoints } = useTrackPoints();
   const { markers, clearMarkers } = useMarkers();
+  const { tileServers, setServer } = useTileServer();
 
   const resetMap = () => {
     clearMarkers();
+    clearTrackPoints();
+    setServer(0);
     location.reload();
+  };
+
+  const selectChangeHandler = ({ target }: ChangeEvent<HTMLSelectElement>) => {
+    setServer(parseInt(target.value));
   };
 
   return (
@@ -28,6 +39,9 @@ export default function Header() {
       <div>
         <ExportController label="Export MarkerDefault Coords" data={markers} />
         <button onClick={resetMap}>Reset</button>
+        <select onChange={selectChangeHandler}>
+          {tileServers.map((tileServer, index) => <option key={index} value={index}>{tileServer.label}</option>)}
+        </select>
       </div>
     </StyledHeader>
   );

@@ -1,6 +1,6 @@
 import type { MapLayerGroupProps } from "feature/map/typing.ts";
-import LayerGroupDefault from "components/LayerGroup.Default.tsx";
-import MarkerDefault from "components/Marker.Default.tsx";
+import LayerGroupDefault from "./LayerGroup.Default.tsx";
+import MarkerDefault from "components/markers/Marker.Default.tsx";
 import { Popup } from "react-leaflet";
 
 interface LayerGroupMarkersProps extends MapLayerGroupProps {

@@ -1,3 +1,3 @@
-import { useMarkersContext } from 'context/marker-context/marker-context-hook.ts';
+import { useMarkersContext } from "context/markers-context/markers-context-hook.ts";
 
 export const useMarkers = () => useMarkersContext();

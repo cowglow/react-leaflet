@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
-import type { LatLng } from 'leaflet';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import styled from 'styled-components';
+import type { MapContainerProps } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import styled from "styled-components";
+import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 
 const StyledMapContainer = styled(MapContainer)`
   display: block;
@@ -10,30 +10,27 @@ const StyledMapContainer = styled(MapContainer)`
   height: 100%;
 `;
 
-interface MapProps {
-	children?: ReactNode;
-	position: LatLng;
-	scrollWheelZoom: boolean;
-	zoom: number | undefined;
-}
-
 export default function Map({
-															children,
-															position,
-															scrollWheelZoom,
-															zoom,
-														}: MapProps) {
-	return (
-		<StyledMapContainer
-			center={position}
-			zoom={zoom}
-			scrollWheelZoom={scrollWheelZoom}
-		>
-			<TileLayer
-				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-				url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-			/>
-			{/*
+                              children,
+                              center,
+                              scrollWheelZoom,
+                              zoom
+                            }: MapContainerProps) {
+  const { tileServer } = useTileServer();
+  return (
+    <StyledMapContainer
+      center={center}
+      zoom={zoom}
+      scrollWheelZoom={scrollWheelZoom}
+      boundsOptions={{
+        maxZoom: 2
+      }}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url={tileServer.url}
+      />
+      {/*
       <LayersControl position="bottomleft">
         <LayersControl.Overlay name="MarkerDefault with popup">
           <MarkerDefault position={position}>
@@ -73,7 +70,7 @@ export default function Map({
         </LayersControl.Overlay>
       </LayersControl>
       */}
-			{children}
-		</StyledMapContainer>
-	);
+      {children}
+    </StyledMapContainer>
+  );
 }

@@ -5,7 +5,6 @@ import pointIcon from "assets/markers/point/point-icon.png";
 import pointIcon2x from "assets/markers/point/point-icon-2x.png";
 import pointIconShadow from "assets/markers/point/point-shadow.png";
 
-
 interface MarkerPointProps extends MapMarkerProps {
 }
 
