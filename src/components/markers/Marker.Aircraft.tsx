@@ -2,6 +2,8 @@ import type { MapMarkerProps } from "feature/map/typing.ts";
 import { useMap } from "react-leaflet";
 import { useEffect } from "react";
 
+const { BASE_URL } = import.meta.env;
+
 interface AircraftMarkerProps extends MapMarkerProps {
   bearing?: number;
 }
@@ -16,7 +18,7 @@ export default function({ bearing = 45, position, alt = "Aircraft" }: AircraftMa
 
   const aircraftIcon = L.divIcon({
     className: "aircraft-marker",
-    html: iconHtml(`<img src="/aircraft-icon.svg" style="transform: rotate(${bearing}deg)" alt="${fixedBearing}" />`),
+    html: iconHtml(`<img src="${BASE_URL}/aircraft-icon.svg" style="transform: rotate(${bearing}deg)" alt="${fixedBearing}" />`),
     iconSize: new L.Point(24, 24)
   });
 
