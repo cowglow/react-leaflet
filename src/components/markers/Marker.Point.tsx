@@ -13,12 +13,12 @@ export default function MarkerPoint({ children, events, position, remove }: Mark
   const customIcon = L.icon({
     iconUrl: pointIcon,
     iconRetinaUrl: pointIcon2x,
-    shadowUrl: pointIconShadow
-    // iconSize: [60, 55],
+    shadowUrl: pointIconShadow,
     // shadowSize: [50, 64],
-    // iconAnchor: [22, 94],
     // shadowAnchor: [4, 62],
-    // popupAnchor: [-3, -76]
+    // popupAnchor: [-3, -76],
+    iconSize: [25, 41],
+    iconAnchor: [12.5, 41]
   });
 
   return (

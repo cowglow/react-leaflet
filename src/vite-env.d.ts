@@ -2,12 +2,16 @@
 /// <reference types="@types/react" />
 
 declare namespace React {
-    import {ReactNode} from "react";
-    export {ReactNode}
+  import { ReactNode } from "react";
+  export { ReactNode };
 }
 
 declare namespace L {
-    import {LeafletEventHandlerFnMap, MarkerOptions} from "leaflet";
-    import {EventedProps} from "@react-leaflet/core";
-    export {LeafletEventHandlerFnMap, MarkerOptions, EventedProps}
+  import { LeafletEventHandlerFnMap, MarkerOptions } from "leaflet";
+  import { EventedProps } from "@react-leaflet/core";
+  export { LeafletEventHandlerFnMap, MarkerOptions, EventedProps };
 }
+
+type MarkerType = "AIRCRAFT" | "CUSTOM" | "DEFAULT"
+
+type MarkerMode = "POINT" | "POLYGON"
