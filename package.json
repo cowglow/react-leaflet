@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port $PORT",
+    "dev": "vite --host --port 3000",
     "docker:dev": "docker compose run --service-ports react-leaflet bash",
     "build": "tsc && vite build",
     "lint": "eslint map-sector-creator --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
