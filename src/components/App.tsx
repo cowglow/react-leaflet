@@ -162,7 +162,12 @@ export default function App() {
         </StyledButton>
       </StyledController>
       */}
-      <Map center={nbgCenter} zoom={3} scrollWheelZoom={true}>
+      <Map
+        center={nbgCenter}
+        zoom={3}
+        scrollWheelZoom={true}
+        bounceAtZoomLimits
+      >
         <MapBounds disableZoom={mode === "POLYGON"} />
         <MapEvents onClick={handleMapClick} />
         <LayerGroupMarker positions={markers}>

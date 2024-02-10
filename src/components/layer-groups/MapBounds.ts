@@ -12,10 +12,9 @@ export default function MapBounds({ disableZoom = false }: MapBoundsProps) {
 
   useEffect(() => {
     const bounds = L.latLngBounds(markers);
-    if (bounds.isValid() && !disableZoom) {
+    if (bounds.isValid() && !disableZoom && markers.length > 1) {
       map.fitBounds(bounds);
     }
-
   }, [markers]);
 
   return null;
