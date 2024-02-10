@@ -1,13 +1,10 @@
-FROM node:18
+FROM node:18 as BUILDER
 WORKDIR /app
-COPY ./package.json /app
-COPY ./yarn.lock /app
+COPY . /app
 
-RUN yarn install --mutex file:/usr/local/share/.cache/yarn/.yarn-mutex
-
-COPY . ./
-ENV PORT=3000
-ENV NODE_ENV=development
-
-EXPOSE 3000
-CMD ["yarn","dev"]
+FROM node:18 as DEVELOPMENT
+RUN mkdir /app
+COPY --from=BUILDER /app /app
+RUN cd /app
+RUN yarn cache clean
+WORKDIR /app
