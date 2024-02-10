@@ -1,21 +1,20 @@
 import styled from "styled-components";
-import { useMarkers } from "hooks/use-markers.ts";
+import { Sheet } from "@mui/joy";
 
-const StyledFooter = styled("footer")`
+const StyledFooter = styled(Sheet)`
   display: flex;
-  justify-content: space-between;
-  padding: 2rem;
-  color: white;
+  justify-content: flex-end;
+  padding: 1.25% 2.5%;
 `;
 
 export default function Footer() {
-  const { markers } = useMarkers();
   return (
-    <StyledFooter>
-      <pre style={{ color: "white", fontSize: "1.235em" }}>{JSON.stringify({ markers: markers.length })}</pre>
-      <a href="https://github.com/cowglow/react-leaflet" target="_blank">
-        Git Repo
-      </a>
-    </StyledFooter>
+    <footer>
+      <StyledFooter>
+        <a href="https://github.com/cowglow/react-leaflet" target="_blank">
+          Git Repo
+        </a>
+      </StyledFooter>
+    </footer>
   );
 }
