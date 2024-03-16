@@ -1,3 +1,9 @@
+export function parseCSVString(csvString: string) {
+  const [, ...rows] = csvString.trim().split("\n");
+
+  return rows.map((row) => row.split(","));
+}
+
 export function convertToCSV<T extends Record<string, unknown>>(
   data: T[],
 ): string {

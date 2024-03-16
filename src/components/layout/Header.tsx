@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import ExportController from "components/ExportController.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
 import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 import { ChangeEvent } from "react";
 import { useTrackPoints } from "hooks/use-track-points.ts";
 import { Sheet } from "@mui/joy";
+import { ExportController, ImportController } from "feature/cvs";
 // import { Box, Breadcrumbs, Button, Link, Typography } from "@mui/joy";
 // import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 // import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -26,7 +26,7 @@ const ControlGroup = styled("div")`
 
 export default function Header() {
   const { clearTrackPoints } = useTrackPoints();
-  const { markers, clearMarkers } = useMarkers();
+  const { markers, addMarker, clearMarkers } = useMarkers();
   const { tileServers, setServer } = useTileServer();
 
   const resetMap = () => {
@@ -40,28 +40,34 @@ export default function Header() {
     setServer(parseInt(target.value));
   };
 
+  const dataImportHandler = (data: string[][]) => {
+    data.forEach(([lat, lng]) => {
+      const position = L.latLng([Number(lat), Number(lng)]);
+      addMarker(position);
+    });
+  };
+
   return (
-    <header>
-      <StyledHeader>
-        <h1>Vite + React-Leaflet</h1>
+    <StyledHeader component="header">
+      <h1>Vite + React-Leaflet</h1>
+      <ControlGroup>
+        <ExportController label="Export Markers as CSV" data={markers} />
+        <ImportController
+          label="Import Markers from CSV"
+          onLoad={dataImportHandler}
+        />
         <ControlGroup>
-          <ExportController
-            label="Export MarkerDefault Coords"
-            data={markers}
-          />
-          <ControlGroup>
-            <select onChange={selectChangeHandler}>
-              {tileServers.map((tileServer, index) => (
-                <option key={index} value={index}>
-                  {tileServer.label}
-                </option>
-              ))}
-            </select>
-            <button onClick={resetMap}>Reset</button>
-          </ControlGroup>
+          <select onChange={selectChangeHandler}>
+            {tileServers.map((tileServer, index) => (
+              <option key={index} value={index}>
+                {tileServer.label}
+              </option>
+            ))}
+          </select>
+          <button onClick={resetMap}>Reset</button>
         </ControlGroup>
-      </StyledHeader>
-    </header>
+      </ControlGroup>
+    </StyledHeader>
   );
 
   // return (

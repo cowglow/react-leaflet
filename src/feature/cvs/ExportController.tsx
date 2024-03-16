@@ -1,14 +1,16 @@
 import { convertToCSV, exportCSVFile } from "utils/helper.ts";
-import type { LatLng } from "leaflet";
 
-type CSVData = Record<string, unknown>
+type CSVData = Record<string, unknown>;
 
 interface ExportControllerProps {
   label: string;
-  data: LatLng[];
+  data: L.LatLng[];
 }
 
-export default function ExportController({ label, data }: ExportControllerProps) {
+export default function ExportController({
+  label,
+  data,
+}: ExportControllerProps) {
   const clickHandler = () => {
     if (!data) return;
 
@@ -17,5 +19,9 @@ export default function ExportController({ label, data }: ExportControllerProps)
     exportCSVFile(output, "output.csv");
   };
 
-  return <button onClick={clickHandler} disabled={data.length <= 0}>{label}</button>;
+  return (
+    <button onClick={clickHandler} disabled={data.length <= 0}>
+      {label}
+    </button>
+  );
 }
