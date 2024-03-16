@@ -4,7 +4,7 @@ import { useTileServer } from "context/tile-server-context/tile-server-context-h
 import { ChangeEvent } from "react";
 import { useTrackPoints } from "hooks/use-track-points.ts";
 import { Sheet } from "@mui/joy";
-import { ExportController, ImportController } from "feature/cvs";
+import { ExportController, ImportController } from "feature/csv";
 // import { Box, Breadcrumbs, Button, Link, Typography } from "@mui/joy";
 // import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 // import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -47,15 +47,14 @@ export default function Header() {
     });
   };
 
+  const exporterLabel = "Export Markers as CSV";
+  const importerLabel = "Import Markers from CSV";
   return (
     <StyledHeader component="header">
       <h1>Vite + React-Leaflet</h1>
       <ControlGroup>
-        <ExportController label="Export Markers as CSV" data={markers} />
-        <ImportController
-          label="Import Markers from CSV"
-          onLoad={dataImportHandler}
-        />
+        <ExportController label={exporterLabel} data={markers} />
+        <ImportController label={importerLabel} onLoad={dataImportHandler} />
         <ControlGroup>
           <select onChange={selectChangeHandler}>
             {tileServers.map((tileServer, index) => (

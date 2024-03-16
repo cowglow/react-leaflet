@@ -1,4 +1,6 @@
-export function parseCSVString(csvString: string) {
+export function parseCSVString(csvString: string | null) {
+  if (!csvString) return null;
+
   const [, ...rows] = csvString.trim().split("\n");
 
   return rows.map((row) => row.split(","));
@@ -22,7 +24,7 @@ export function convertToCSV<T extends Record<string, unknown>>(
   return csvRows.join("\n");
 }
 
-export function exportCSVFile(csvString: string, filename: string): void {
+export function createCSVFile(csvString: string, filename: string): void {
   const blob = new Blob([csvString], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
 
