@@ -1,4 +1,5 @@
 import useCsvData from "../hook/use-csv-data";
+import { StyledExportControllerButton } from "./ExportButton.Styled.ts";
 
 interface ExportControllerProps {
   label: string;
@@ -19,9 +20,11 @@ export default function ExportController({
     exportCSVFile(csvData, file);
   };
 
+  const isDisabled = data.length <= 0;
+
   return (
-    <button onClick={clickHandler} disabled={data.length <= 0}>
+    <StyledExportControllerButton onClick={clickHandler} disabled={isDisabled}>
       {label}
-    </button>
+    </StyledExportControllerButton>
   );
 }
