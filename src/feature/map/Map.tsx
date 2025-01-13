@@ -11,11 +11,11 @@ const StyledMapContainer = styled(MapContainer)`
 `;
 
 export default function Map({
-                              children,
-                              center,
-                              scrollWheelZoom,
-                              zoom
-                            }: MapContainerProps) {
+  children,
+  center,
+  scrollWheelZoom,
+  zoom,
+}: MapContainerProps) {
   return (
     <StyledMapContainer
       center={center}

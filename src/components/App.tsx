@@ -4,7 +4,7 @@ import L from "leaflet";
  * A wrapper class can also be created around L
  */
 // import { Polygon, Tooltip } from "react-leaflet";
-// // import styled from "styled-components";
+// import styled from "styled-components";
 import MainLayout from "components/layout/MainLayout.tsx";
 // import MarkerPoint from "components/markers/Marker.Point.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
@@ -17,18 +17,35 @@ import LayerGroupMarker from "components/layer-groups/LayerGroup.Markers.tsx";
 // import { useTrackPoints } from "hooks/use-track-points.ts";
 // import LayerGroupTrackPoints from "components/layer-groups/LayerGroup.TrackPoints.tsx";
 import MapBounds from "components/layer-groups/MapBounds.ts";
+// import { useDispatch, useSelector } from "react-redux";
+// import { AppDispatch, RootState } from "context/state/store.ts";
+// import {
+//   decrement,
+//   increment,
+//   incrementAsync,
+//   incrementByAmount,
+// } from "context/state/counter/counterSlice.ts";
+import BaseMapsLayers from "components/base-map-layers/BaseMapsLayers.tsx";
+// import EditableList from "components/editable-list/EditableList.tsx";
 
-// const StyledController = styled("div")`
-//   //padding: 1.235em;
-//   display: flex;
-//   //justify-content: flex-start;
-//   gap: 1rem;
-//   background-color: #333333;
-// `;
+/*
+const StyledContainer = styled("div")`
+  border: thin solid red;
+  padding: 1.235em;
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  background-color: #cccccc;
+`;
+*/
 
-// const StyledButton = styled("button")`
-//   margin-left: auto;
-// `;
+/*
+const StyledButton = styled("button")`
+  min-width: 25%;
+  //padding: 1px 3px;
+  //margin-left: auto;
+`;
+*/
 
 export default function App() {
   // const [marker, _setMarker] = useState<MarkerType>("DEFAULT");
@@ -102,65 +119,94 @@ export default function App() {
   // setPolygons((prevState) => [...prevState, []]);
   // }, [mode, marker]);
 
+  // const count = useSelector((state: RootState) => state.counter.value);
+  // const countLabel = new Intl.NumberFormat().format(count);
+  // const dispatch = useDispatch<AppDispatch>();
   return (
     <MainLayout>
-      {/*
-      <StyledController>
-        <div>
-          <h3>Marker Type</h3>
-          <button
-            disabled={marker === "DEFAULT"}
-            onClick={() => setMarker("DEFAULT")}
-          >
-            Default
-          </button>
-          &nbsp;
-          <button
-            disabled={marker === "CUSTOM"}
-            onClick={() => setMarker("CUSTOM")}
-          >
-            Custom
-          </button>
-          &nbsp;
-          <button
-            disabled={marker === "AIRCRAFT"}
-            onClick={() => setMarker("AIRCRAFT")}
-          >
-            Aircraft
-          </button>
-        </div>
-        <div>
-          <h3>Marker Mode</h3>
-          <button disabled={mode === "POINT"} onClick={() => setMode("POINT")}>
-            Marker
-          </button>
-          &nbsp;
-          <button
-            disabled={mode === "POLYGON"}
-            onClick={() => setMode("POLYGON")}
-          >
-            Polygon
-          </button>
-        </div>
-        <pre style={{ color: "white", fontSize: "1.235em" }}>
-          {JSON.stringify(
-            {
-              markers: markers.length,
-              points: points.length,
-              polygons: polygons.length,
-            },
-            null,
-            2,
-          )}
-        </pre>
-        <StyledButton
-          onClick={fetchRandomLocations}
-          disabled={marker === "AIRCRAFT"}
-        >
-          Fetch Random Locations
-        </StyledButton>
-      </StyledController>
-      */}
+      {/*<StyledContainer>*/}
+      {/*  <StyledContainer style={{ flexDirection: "column", flex: 1 }}>*/}
+      {/*    <StyledContainer*/}
+      {/*      style={{*/}
+      {/*        justifyContent: "space-between",*/}
+      {/*        padding: 0,*/}
+      {/*      }}*/}
+      {/*    >*/}
+      {/*      <StyledButton onClick={() => dispatch(decrement())}>-</StyledButton>*/}
+      {/*      <pre>{JSON.stringify(countLabel)}</pre>*/}
+      {/*      <StyledButton onClick={() => dispatch(increment())}>+</StyledButton>*/}
+      {/*    </StyledContainer>*/}
+      {/*    <StyledContainer*/}
+      {/*      style={{*/}
+      {/*        justifyContent: "flex-end",*/}
+      {/*        padding: 0,*/}
+      {/*      }}*/}
+      {/*    >*/}
+      {/*      <button onClick={() => dispatch(incrementByAmount(count))}>*/}
+      {/*        Double It*/}
+      {/*      </button>*/}
+      {/*      <button onClick={() => dispatch(incrementAsync(100))}>*/}
+      {/*        Add 100 Asynchronous*/}
+      {/*      </button>*/}
+      {/*    </StyledContainer>*/}
+      {/*  </StyledContainer>*/}
+
+      {/*  /!**/}
+      {/*  <div>*/}
+      {/*    <h3>Marker Type</h3>*/}
+      {/*    <button*/}
+      {/*      disabled={marker === "DEFAULT"}*/}
+      {/*      onClick={() => setMarker("DEFAULT")}*/}
+      {/*    >*/}
+      {/*      Default*/}
+      {/*    </button>*/}
+      {/*    &nbsp;*/}
+      {/*    <button*/}
+      {/*      disabled={marker === "CUSTOM"}*/}
+      {/*      onClick={() => setMarker("CUSTOM")}*/}
+      {/*    >*/}
+      {/*      Custom*/}
+      {/*    </button>*/}
+      {/*    &nbsp;*/}
+      {/*    <button*/}
+      {/*      disabled={marker === "AIRCRAFT"}*/}
+      {/*      onClick={() => setMarker("AIRCRAFT")}*/}
+      {/*    >*/}
+      {/*      Aircraft*/}
+      {/*    </button>*/}
+      {/*  </div>*/}
+      {/*  <div>*/}
+      {/*    <h3>Marker Mode</h3>*/}
+      {/*    <button disabled={mode === "POINT"} onClick={() => setMode("POINT")}>*/}
+      {/*      Marker*/}
+      {/*    </button>*/}
+      {/*    &nbsp;*/}
+      {/*    <button*/}
+      {/*      disabled={mode === "POLYGON"}*/}
+      {/*      onClick={() => setMode("POLYGON")}*/}
+      {/*    >*/}
+      {/*      Polygon*/}
+      {/*    </button>*/}
+      {/*  </div>*/}
+      {/*  <pre style={{ color: "white", fontSize: "1.235em" }}>*/}
+      {/*    {JSON.stringify(*/}
+      {/*      {*/}
+      {/*        markers: markers.length,*/}
+      {/*        points: points.length,*/}
+      {/*        polygons: polygons.length,*/}
+      {/*      },*/}
+      {/*      null,*/}
+      {/*      2,*/}
+      {/*    )}*/}
+      {/*  </pre>*/}
+      {/*  <StyledButton*/}
+      {/*    onClick={fetchRandomLocations}*/}
+      {/*    disabled={marker === "AIRCRAFT"}*/}
+      {/*  >*/}
+      {/*    Fetch Random Locations*/}
+      {/*  </StyledButton>*/}
+      {/**!/*/}
+      {/*</StyledContainer>*/}
       <Map
         center={nbgCenter}
         zoom={3}
@@ -170,6 +216,14 @@ export default function App() {
         <MapBounds disableZoom={false} />
         <MapEvents onClick={handleMapClick} />
         <LayerGroupMarker positions={markers} />
+        <BaseMapsLayers />
+        {/*<EditableList
+          data={{
+            1: "One",
+            2: "Two",
+            3: "Three",
+          }}
+        />*/}
         {/*<LayerGroupDefault>*/}
         {/*  {points &&*/}
         {/*    points.map((marker, index) => (*/}
