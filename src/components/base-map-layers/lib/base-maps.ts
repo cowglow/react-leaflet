@@ -15,5 +15,3 @@ export const baseMaps = {
   OpenStreetMap: osm,
   "HOT OSM": osmHOT,
 };
-
-console.log(baseMaps);

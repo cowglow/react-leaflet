@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 import styled from "styled-components";
-import Footer from "components/layout/Footer.tsx";
-import Header from "components/layout/Header.tsx";
 import { Sheet } from "@mui/joy";
 
 const StyledWrapper = styled(Sheet)`
@@ -25,9 +23,7 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <StyledWrapper>
-      <Header />
       <StyledMain>{children}</StyledMain>
-      <Footer />
     </StyledWrapper>
   );
 }

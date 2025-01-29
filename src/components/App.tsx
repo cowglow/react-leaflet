@@ -26,6 +26,7 @@ import MapBounds from "components/layer-groups/MapBounds.ts";
 //   incrementByAmount,
 // } from "context/state/counter/counterSlice.ts";
 import BaseMapsLayers from "components/base-map-layers/BaseMapsLayers.tsx";
+import LayerControl from "components/layer-control/LayerControl.tsx";
 // import EditableList from "components/editable-list/EditableList.tsx";
 
 /*
@@ -124,89 +125,6 @@ export default function App() {
   // const dispatch = useDispatch<AppDispatch>();
   return (
     <MainLayout>
-      {/*<StyledContainer>*/}
-      {/*  <StyledContainer style={{ flexDirection: "column", flex: 1 }}>*/}
-      {/*    <StyledContainer*/}
-      {/*      style={{*/}
-      {/*        justifyContent: "space-between",*/}
-      {/*        padding: 0,*/}
-      {/*      }}*/}
-      {/*    >*/}
-      {/*      <StyledButton onClick={() => dispatch(decrement())}>-</StyledButton>*/}
-      {/*      <pre>{JSON.stringify(countLabel)}</pre>*/}
-      {/*      <StyledButton onClick={() => dispatch(increment())}>+</StyledButton>*/}
-      {/*    </StyledContainer>*/}
-      {/*    <StyledContainer*/}
-      {/*      style={{*/}
-      {/*        justifyContent: "flex-end",*/}
-      {/*        padding: 0,*/}
-      {/*      }}*/}
-      {/*    >*/}
-      {/*      <button onClick={() => dispatch(incrementByAmount(count))}>*/}
-      {/*        Double It*/}
-      {/*      </button>*/}
-      {/*      <button onClick={() => dispatch(incrementAsync(100))}>*/}
-      {/*        Add 100 Asynchronous*/}
-      {/*      </button>*/}
-      {/*    </StyledContainer>*/}
-      {/*  </StyledContainer>*/}
-
-      {/*  /!**/}
-      {/*  <div>*/}
-      {/*    <h3>Marker Type</h3>*/}
-      {/*    <button*/}
-      {/*      disabled={marker === "DEFAULT"}*/}
-      {/*      onClick={() => setMarker("DEFAULT")}*/}
-      {/*    >*/}
-      {/*      Default*/}
-      {/*    </button>*/}
-      {/*    &nbsp;*/}
-      {/*    <button*/}
-      {/*      disabled={marker === "CUSTOM"}*/}
-      {/*      onClick={() => setMarker("CUSTOM")}*/}
-      {/*    >*/}
-      {/*      Custom*/}
-      {/*    </button>*/}
-      {/*    &nbsp;*/}
-      {/*    <button*/}
-      {/*      disabled={marker === "AIRCRAFT"}*/}
-      {/*      onClick={() => setMarker("AIRCRAFT")}*/}
-      {/*    >*/}
-      {/*      Aircraft*/}
-      {/*    </button>*/}
-      {/*  </div>*/}
-      {/*  <div>*/}
-      {/*    <h3>Marker Mode</h3>*/}
-      {/*    <button disabled={mode === "POINT"} onClick={() => setMode("POINT")}>*/}
-      {/*      Marker*/}
-      {/*    </button>*/}
-      {/*    &nbsp;*/}
-      {/*    <button*/}
-      {/*      disabled={mode === "POLYGON"}*/}
-      {/*      onClick={() => setMode("POLYGON")}*/}
-      {/*    >*/}
-      {/*      Polygon*/}
-      {/*    </button>*/}
-      {/*  </div>*/}
-      {/*  <pre style={{ color: "white", fontSize: "1.235em" }}>*/}
-      {/*    {JSON.stringify(*/}
-      {/*      {*/}
-      {/*        markers: markers.length,*/}
-      {/*        points: points.length,*/}
-      {/*        polygons: polygons.length,*/}
-      {/*      },*/}
-      {/*      null,*/}
-      {/*      2,*/}
-      {/*    )}*/}
-      {/*  </pre>*/}
-      {/*  <StyledButton*/}
-      {/*    onClick={fetchRandomLocations}*/}
-      {/*    disabled={marker === "AIRCRAFT"}*/}
-      {/*  >*/}
-      {/*    Fetch Random Locations*/}
-      {/*  </StyledButton>*/}
-      {/**!/*/}
-      {/*</StyledContainer>*/}
       <Map
         center={nbgCenter}
         zoom={3}
@@ -216,38 +134,9 @@ export default function App() {
         <MapBounds disableZoom={false} />
         <MapEvents onClick={handleMapClick} />
         <LayerGroupMarker positions={markers} />
-        <BaseMapsLayers />
-        {/*<EditableList
-          data={{
-            1: "One",
-            2: "Two",
-            3: "Three",
-          }}
-        />*/}
-        {/*<LayerGroupDefault>*/}
-        {/*  {points &&*/}
-        {/*    points.map((marker, index) => (*/}
-        {/*      <MarkerPoint*/}
-        {/*        key={index}*/}
-        {/*        position={marker}*/}
-        {/*        remove={removePoint}*/}
-        {/*        draggable={true}*/}
-        {/*      >*/}
-        {/*        <Tooltip>*/}
-        {/*          A Tooltip. <br /> Easily customizable.*/}Ø
-        {/*        </Tooltip>*/}
-        {/*      </MarkerPoint>*/}
-        {/*    ))}*/}
-        {/*</LayerGroupDefault>*/}
-        {/*<LayerGroupDefault>*/}
-        {/*  {polygons &&*/}
-        {/*    [polygons].map((points, index) => {*/}
-        {/*      if (points.length > 0) {*/}
-        {/*        return <Polygon key={index} positions={points} />;*/}
-        {/*      }*/}
-        {/*    })}*/}
-        {/*</LayerGroupDefault>*/}
-        {/*<LayerGroupTrackPoints />*/}
+        <LayerControl position="bottomRight">
+          <BaseMapsLayers />
+        </LayerControl>
       </Map>
     </MainLayout>
   );
