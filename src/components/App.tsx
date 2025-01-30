@@ -27,7 +27,12 @@ import MapBounds from "components/layer-groups/MapBounds.ts";
 // } from "context/state/counter/counterSlice.ts";
 import BaseMapsLayers from "components/base-map-layers/BaseMapsLayers.tsx";
 import LayerControl from "components/layer-control/LayerControl.tsx";
+import { ExportController, ImportController } from "feature/csv";
+import { Paper } from "@mui/material";
 // import EditableList from "components/editable-list/EditableList.tsx";
+import ImportExportIcon from "@mui/icons-material/ImportExport";
+import { useTrackPoints } from "hooks/use-track-points.ts";
+import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 
 /*
 const StyledContainer = styled("div")`
@@ -51,9 +56,10 @@ const StyledButton = styled("button")`
 export default function App() {
   // const [marker, _setMarker] = useState<MarkerType>("DEFAULT");
   // const [mode, _setMode] = useState<MarkerMode>("POINT");
-  const { markers, addMarker } = useMarkers();
+  const { tileServers, setServer } = useTileServer();
+  const { markers, addMarker, clearMarkers } = useMarkers();
+  const { clearTrackPoints } = useTrackPoints();
   // const { getRandomCoordinates } = useCoordinates();
-  // const { addTrackPoint } = useTrackPoints();
 
   // const [points, addPoint] = useState<L.LatLng[]>([]);
   // const [polygons, setPolygons] = useState<L.LatLng[][]>([[]]);
@@ -123,6 +129,22 @@ export default function App() {
   // const count = useSelector((state: RootState) => state.counter.value);
   // const countLabel = new Intl.NumberFormat().format(count);
   // const dispatch = useDispatch<AppDispatch>();
+
+  const dataImportHandler = (data: string[][]) => {
+    data.forEach(([lat, lng]) => {
+      const position = L.latLng([Number(lat), Number(lng)]);
+      addMarker(position);
+    });
+  };
+
+  const resetMap = () => {
+    clearMarkers();
+    clearTrackPoints();
+    setServer(0);
+    location.reload();
+  };
+
+  console.log({ tileServers });
   return (
     <MainLayout>
       <Map
@@ -134,6 +156,25 @@ export default function App() {
         <MapBounds disableZoom={false} />
         <MapEvents onClick={handleMapClick} />
         <LayerGroupMarker positions={markers} />
+        <LayerControl position="bottomLeft" icon={<ImportExportIcon />}>
+          <Paper
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: 395,
+              gap: 2,
+              p: 2,
+            }}
+            elevation={2}
+          >
+            <ImportController
+              label="Import Markers from CSV"
+              onLoad={dataImportHandler}
+            />
+            <ExportController label="Export Markers as CSV" data={markers} />
+            <button onClick={resetMap}>Reset</button>
+          </Paper>
+        </LayerControl>
         <LayerControl position="bottomRight">
           <BaseMapsLayers />
         </LayerControl>

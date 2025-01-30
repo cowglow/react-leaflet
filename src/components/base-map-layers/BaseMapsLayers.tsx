@@ -3,17 +3,15 @@ import { baseMaps } from "components/base-map-layers/lib/base-maps.ts";
 import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
 import { useEffect } from "react";
 import {
-  Box,
   Checkbox,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   Paper,
   Typography,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+
+// import MenuIcon from "@mui/icons-material/Menu";
 
 function BaseMapsLayers() {
   const map = useMap();
