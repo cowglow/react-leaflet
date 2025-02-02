@@ -1,4 +1,4 @@
-import { Box, ClickAwayListener } from "@mui/material";
+import { Box, ClickAwayListener, Paper } from "@mui/material";
 import { PropsWithChildren, ReactNode, useEffect, useState } from "react";
 import LayersIcon from "@mui/icons-material/Layers";
 // import { useEventHandlers } from "@react-leaflet/core";
@@ -7,10 +7,23 @@ import { StyledIconButton } from "components/layer-control/LayerControl.Styled.t
 
 type ControlPosition = "topLeft" | "topRight" | "bottomRight" | "bottomLeft";
 
-interface LayerControlProps extends PropsWithChildren {
+interface BaseLayerControlProps extends PropsWithChildren {
   position?: ControlPosition;
+}
+
+interface LayerControlWithoutIconProps extends BaseLayerControlProps {
+  noIcon: true;
+  icon?: never;
+}
+
+interface LayerControlWithIconProps extends BaseLayerControlProps {
+  noIcon?: false;
   icon?: ReactNode;
 }
+
+type LayerControlProps =
+  | LayerControlWithoutIconProps
+  | LayerControlWithIconProps;
 
 const positionClass: Record<ControlPosition, string> = {
   topLeft: "leaflet-top leaflet-left",
@@ -21,15 +34,17 @@ const positionClass: Record<ControlPosition, string> = {
 
 function LayerControl({
   position = "topLeft",
+  noIcon = false,
   icon = <LayersIcon />,
   children,
 }: LayerControlProps) {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(noIcon);
+  const [isHovering, setIsHovering] = useState(false);
 
   const map = useMap();
 
   useEffect(() => {
-    if (open) {
+    if (isOpen || isHovering) {
       // @ts-ignore
       Object.values(map["_handlers"]).forEach((handler) => handler.disable());
     } else {
@@ -39,27 +54,31 @@ function LayerControl({
     return () => {
       console.log("unmount", map);
     };
-  }, [open]);
+  }, [isOpen, isHovering]);
 
-  const toggleMapEvents = () => {
-    console.log({ mapEventHandlers: Object.values(map["_handlers"]) });
-  };
-
+  const padding = position === "bottomRight" ? 2 : 1;
   return (
     <div className={positionClass[position]}>
-      <Box className="leaflet-control" px={2} py={4}>
-        {!open ? (
+      <Box className="leaflet-control" px={1} py={padding}>
+        {!isOpen ? (
           <StyledIconButton
-            onClick={() => setOpen(true)}
-            onMouseEnter={() => toggleMapEvents()}
-            onMouseLeave={() => toggleMapEvents()}
+            onClick={() => setIsOpen(true)}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
             size="small"
           >
             {icon}
           </StyledIconButton>
         ) : (
-          <ClickAwayListener onClickAway={() => setOpen(false)}>
-            <Box>{children}</Box>
+          <ClickAwayListener
+            onClickAway={() => {
+              if (!noIcon) {
+                setIsOpen(false);
+                setIsHovering(false);
+              }
+            }}
+          >
+            <Paper elevation={2}>{children}</Paper>
           </ClickAwayListener>
         )}
       </Box>

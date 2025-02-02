@@ -9,7 +9,7 @@ import MainLayout from "components/layout/MainLayout.tsx";
 // import MarkerPoint from "components/markers/Marker.Point.tsx";
 import { useMarkers } from "hooks/use-markers.ts";
 import Map from "feature/map/Map.tsx";
-import MapEvents from "feature/map/Map.Events.tsx";
+// import MapEvents from "feature/map/Map.Events.tsx";
 // import { removeFromCollection } from "utils/filters.ts";
 // import { useCoordinates } from "hooks/use-coordinates.ts";
 // import LayerGroupDefault from "components/layer-groups/LayerGroup.Default.tsx";
@@ -28,11 +28,11 @@ import MapBounds from "components/layer-groups/MapBounds.ts";
 import BaseMapsLayers from "components/base-map-layers/BaseMapsLayers.tsx";
 import LayerControl from "components/layer-control/LayerControl.tsx";
 import { ExportController, ImportController } from "feature/csv";
-import { Paper } from "@mui/material";
+import { Box } from "@mui/material";
 // import EditableList from "components/editable-list/EditableList.tsx";
 import ImportExportIcon from "@mui/icons-material/ImportExport";
 import { useTrackPoints } from "hooks/use-track-points.ts";
-import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
+import ZoomControls from "components/zoom-controls/ZoomControls.tsx";
 
 /*
 const StyledContainer = styled("div")`
@@ -56,7 +56,6 @@ const StyledButton = styled("button")`
 export default function App() {
   // const [marker, _setMarker] = useState<MarkerType>("DEFAULT");
   // const [mode, _setMode] = useState<MarkerMode>("POINT");
-  const { tileServers, setServer } = useTileServer();
   const { markers, addMarker, clearMarkers } = useMarkers();
   const { clearTrackPoints } = useTrackPoints();
   // const { getRandomCoordinates } = useCoordinates();
@@ -130,6 +129,7 @@ export default function App() {
   // const countLabel = new Intl.NumberFormat().format(count);
   // const dispatch = useDispatch<AppDispatch>();
 
+  console.log(handleMapClick);
   const dataImportHandler = (data: string[][]) => {
     data.forEach(([lat, lng]) => {
       const position = L.latLng([Number(lat), Number(lng)]);
@@ -140,11 +140,9 @@ export default function App() {
   const resetMap = () => {
     clearMarkers();
     clearTrackPoints();
-    setServer(0);
     location.reload();
   };
 
-  console.log({ tileServers });
   return (
     <MainLayout>
       <Map
@@ -154,26 +152,20 @@ export default function App() {
         bounceAtZoomLimits
       >
         <MapBounds disableZoom={false} />
-        <MapEvents onClick={handleMapClick} />
+        {/*<MapEvents onClick={handleMapClick} />*/}
         <LayerGroupMarker positions={markers} />
+        <LayerControl position="topLeft" noIcon={true}>
+          <ZoomControls />
+        </LayerControl>
         <LayerControl position="bottomLeft" icon={<ImportExportIcon />}>
-          <Paper
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: 395,
-              gap: 2,
-              p: 2,
-            }}
-            elevation={2}
-          >
+          <Box display="flex" gap={2} p={2}>
+            <ExportController label="Export Markers as CSV" data={markers} />
             <ImportController
               label="Import Markers from CSV"
               onLoad={dataImportHandler}
             />
-            <ExportController label="Export Markers as CSV" data={markers} />
             <button onClick={resetMap}>Reset</button>
-          </Paper>
+          </Box>
         </LayerControl>
         <LayerControl position="bottomRight">
           <BaseMapsLayers />

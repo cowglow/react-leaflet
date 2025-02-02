@@ -18,6 +18,7 @@ export default function Map({
 }: MapContainerProps) {
   return (
     <StyledMapContainer
+      zoomControl={false}
       center={center}
       zoom={zoom}
       scrollWheelZoom={scrollWheelZoom}
