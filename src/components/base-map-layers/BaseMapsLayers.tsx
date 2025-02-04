@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
+// import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
 import { useEffect } from "react";
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { FormControl } from "@mui/material";
@@ -12,9 +12,13 @@ function BaseMapsLayers() {
   const map = useMap();
 
   useEffect(() => {
-    const layerControl = L.control.layers(baseMaps, overlayMaps, {
-      collapsed: true,
-    });
+    const layerControl = L.control.layers(
+      baseMaps,
+      {},
+      {
+        collapsed: true,
+      },
+    );
     map.addControl(layerControl);
     return () => {
       map.removeControl(layerControl);
@@ -36,7 +40,7 @@ function BaseMapsLayers() {
     <FormControl>
       <RadioGroup
         name="leaflet-base-layers"
-        defaultValue={layers[0]}
+        defaultValue={selectedBaseMap}
         onChange={(_, value) => setSelectedBaseMap(value)}
       >
         {layers.map((key) => (

@@ -7,5 +7,4 @@ interface TileServerContextProps {
 
 export type TileServerContextApi = {
   setSelectedBaseMap: Dispatch<SetStateAction<string>>;
-  switchServer: () => void;
 } & TileServerContextProps;

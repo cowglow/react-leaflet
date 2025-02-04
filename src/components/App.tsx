@@ -157,7 +157,7 @@ export default function App() {
         <LayerControl position="topLeft" noIcon={true}>
           <ZoomControls />
         </LayerControl>
-        <LayerControl position="bottomLeft" icon={<ImportExportIcon />}>
+        <LayerControl position="topRight" icon={<ImportExportIcon />}>
           <Box display="flex" gap={2} p={2}>
             <ExportController label="Export Markers as CSV" data={markers} />
             <ImportController
@@ -168,7 +168,9 @@ export default function App() {
           </Box>
         </LayerControl>
         <LayerControl position="bottomRight">
-          <BaseMapsLayers />
+          <Box p={2}>
+            <BaseMapsLayers />
+          </Box>
         </LayerControl>
       </Map>
     </MainLayout>

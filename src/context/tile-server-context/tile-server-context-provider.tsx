@@ -1,6 +1,6 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { TileServerContext } from "./tile-server-context.ts";
-// import { useLocalStorage } from "hooks/use-local-storage.ts";
+import { useLocalStorage } from "hooks/use-local-storage.ts";
 import { baseMaps } from "components/base-map-layers/lib/base-maps.ts";
 
 interface TileServerContextProviderProps {
@@ -11,20 +11,19 @@ export const TileServerContextProvider = ({
   children,
 }: TileServerContextProviderProps) => {
   const layers = Object.keys(baseMaps);
-  const [selectedBaseMap, setSelectedBaseMap] = useState(layers[0]);
 
-  // const [serverIndex, setServerIndex] = useLocalStorage({
-  //   key: "TILE_SERVER",
-  //   defaultValue: 0,
-  // });
+  const [serverIndex, setServerIndex] = useLocalStorage({
+    key: "TILE_SERVER",
+    defaultValue: layers[0],
+  });
 
-  // const setServer = (index: number) => {
-  //   setServerIndex(index);
-  // };
+  const initialMap = serverIndex && layers[0];
+  const [selectedBaseMap, setSelectedBaseMap] = useState(initialMap);
 
-  const switchServer = () => {
-    //   setServerIndex(Math.floor(Math.random() * tileServers.length));
-  };
+  useEffect(() => {
+    console.log(selectedBaseMap);
+    setServerIndex(selectedBaseMap);
+  }, [selectedBaseMap]);
 
   return (
     <TileServerContext.Provider
@@ -32,7 +31,6 @@ export const TileServerContextProvider = ({
         baseMaps,
         selectedBaseMap,
         setSelectedBaseMap,
-        switchServer,
       }}
     >
       {children}

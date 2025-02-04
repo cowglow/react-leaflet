@@ -1,6 +1,5 @@
 import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
-import { TileLayer, useMap } from "react-leaflet";
-import type { TileLayerProps } from "react-leaflet/lib/TileLayer";
+import { useMap } from "react-leaflet";
 import { useEffect } from "react";
 
 export default function MapAttribution() {

@@ -3,6 +3,7 @@ import { IconButton } from "@mui/material";
 
 export const StyledIconButton = styled(IconButton)`
   &.MuiIconButton-root {
+    border-radius: inherit;
     background-color: white;
   }
 

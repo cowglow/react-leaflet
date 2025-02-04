@@ -7,9 +7,6 @@ const defaultValues: TileServerContextApi = {
   setSelectedBaseMap: () => {
     throw Error("Error:: Set Server | Uninitialized");
   },
-  switchServer: () => {
-    throw Error("Error:: Switch Server | Uninitialized");
-  },
 };
 
 export const TileServerContext =
