@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { TileServerContext } from "./tile-server-context.ts";
 import { useLocalStorage } from "hooks/use-local-storage.ts";
 import { baseMaps } from "components/base-map-layers/lib/base-maps.ts";
+import { TileServerName } from "context/tile-server-context/tile-server-context.type.ts";
 
 interface TileServerContextProviderProps {
   children: ReactNode;
@@ -17,11 +18,10 @@ export const TileServerContextProvider = ({
     defaultValue: layers[0],
   });
 
-  const initialMap = serverIndex && layers[0];
-  const [selectedBaseMap, setSelectedBaseMap] = useState(initialMap);
+  const [selectedBaseMap, setSelectedBaseMap] =
+    useState<TileServerName>(serverIndex);
 
   useEffect(() => {
-    console.log(selectedBaseMap);
     setServerIndex(selectedBaseMap);
   }, [selectedBaseMap]);
 

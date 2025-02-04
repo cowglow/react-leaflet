@@ -1,8 +1,12 @@
 import { useMap } from "react-leaflet";
 // import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
-import { useEffect } from "react";
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { FormControl } from "@mui/material";
+import { ChangeEvent, useEffect } from "react";
+import {
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
 import "./style-overrides.css";
 import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 
@@ -12,41 +16,31 @@ function BaseMapsLayers() {
   const map = useMap();
 
   useEffect(() => {
-    const layerControl = L.control.layers(
-      baseMaps,
-      {},
-      {
-        collapsed: true,
-      },
-    );
-    map.addControl(layerControl);
-    return () => {
-      map.removeControl(layerControl);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Clear BaseMaps
     layers.forEach((layer) => {
       if (map.hasLayer(baseMaps[layer])) {
         map.removeLayer(baseMaps[layer]);
       }
     });
-    // Add BaseMap
     map.addLayer(baseMaps[selectedBaseMap]);
   }, [selectedBaseMap]);
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelectedBaseMap((event.target as HTMLInputElement).value);
+  };
+
   return (
     <FormControl>
-      <RadioGroup
-        name="leaflet-base-layers"
-        defaultValue={selectedBaseMap}
-        onChange={(_, value) => setSelectedBaseMap(value)}
-      >
-        {layers.map((key) => (
-          <FormControlLabel value={key} control={<Radio />} label={key} />
-        ))}
-      </RadioGroup>
+      <div className="standard-dialog">
+        <RadioGroup
+          name="leaflet-base-layers"
+          value={selectedBaseMap}
+          onChange={handleChange}
+        >
+          {layers.map((key) => (
+            <FormControlLabel value={key} control={<Radio />} label={key} />
+          ))}
+        </RadioGroup>
+      </div>
     </FormControl>
   );
   /*

@@ -78,7 +78,20 @@ function LayerControl({
               }
             }}
           >
-            <Paper elevation={2}>{children}</Paper>
+            <Paper elevation={2}>
+              {/*<div className="window">*/}
+              {/*  <div className="title-bar">*/}
+              {/*    <button aria-label="Close" className="close"></button>*/}
+              {/*    <h1 className="title">Select Base Map</h1>*/}
+              {/*    <button*/}
+              {/*      aria-label="Resize"*/}
+              {/*      disabled*/}
+              {/*      className="hidden"*/}
+              {/*    ></button>*/}
+              {/*  </div>*/}
+              {children}
+              {/*</div>*/}
+            </Paper>
           </ClickAwayListener>
         )}
       </Box>
