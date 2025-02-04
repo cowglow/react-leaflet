@@ -168,9 +168,7 @@ export default function App() {
           </Box>
         </LayerControl>
         <LayerControl position="bottomRight">
-          <Box p={2}>
-            <BaseMapsLayers />
-          </Box>
+          <BaseMapsLayers />
         </LayerControl>
       </Map>
     </MainLayout>
