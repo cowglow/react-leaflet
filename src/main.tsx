@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./components/App.tsx";
 import "./index.css";
-// import "@sakun/system.css";
+import "@sakun/system.css";
 import { ContextProviders } from "./context/context-providers.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

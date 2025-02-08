@@ -1,12 +1,6 @@
 import { useMap } from "react-leaflet";
-// import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
-import { ChangeEvent, useEffect } from "react";
-import {
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-} from "@mui/material";
+import { useEffect } from "react";
+import { Paper } from "@mui/material";
 import "./style-overrides.css";
 import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 
@@ -22,47 +16,24 @@ function BaseMapsLayers() {
       }
     });
     map.addLayer(baseMaps[selectedBaseMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBaseMap]);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedBaseMap((event.target as HTMLInputElement).value);
-  };
-
   return (
-    <FormControl>
-      <div className="standard-dialog">
-        <RadioGroup
-          name="leaflet-base-layers"
-          value={selectedBaseMap}
-          onChange={handleChange}
-        >
-          {layers.map((key) => (
-            <FormControlLabel value={key} control={<Radio />} label={key} />
-          ))}
-        </RadioGroup>
-      </div>
-    </FormControl>
+    <Paper className="standard-dialog" elevation={2}>
+      {layers.map((key, index) => (
+        <div className="field-row">
+          <input
+            id={`base-layer-option-${index}`}
+            type="radio"
+            name="first-example"
+            onClick={() => setSelectedBaseMap(key)}
+          />
+          <label htmlFor={`base-layer-option-${index}`}>{key}</label>
+        </div>
+      ))}
+    </Paper>
   );
-  /*
-  return (
-    <List disablePadding>
-      {Object.keys(baseMaps).map((key) => {
-        return (
-          <ListItem
-            disablePadding
-            disableGutters
-            secondaryAction={<Checkbox />}
-            onClick={setBaseLayer(key)}
-          >
-            <ListItemButton>
-              <Typography>{key}</Typography>
-            </ListItemButton>
-          </ListItem>
-        );
-      })}
-    </List>
-  );
-   */
 }
 
 export default BaseMapsLayers;

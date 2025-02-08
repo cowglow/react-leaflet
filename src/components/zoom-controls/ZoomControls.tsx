@@ -1,8 +1,8 @@
-import { Box } from "@mui/material";
 import { useMap } from "react-leaflet";
 import { useCallback } from "react";
 import PlusIcon from "@mui/icons-material/Add";
 import MinusIcon from "@mui/icons-material/Remove";
+import { StyledZoomControls } from "components/zoom-controls/ZoomControls.Styled.tsx";
 
 export default function ZoomControls() {
   const map = useMap();
@@ -24,13 +24,13 @@ export default function ZoomControls() {
   );
 
   return (
-    <Box display="flex" flexDirection="column">
-      <button onClick={() => zoom("in")}>
+    <StyledZoomControls>
+      <button className="btn" onClick={() => zoom("in")}>
         <PlusIcon />
       </button>
-      <button onClick={() => zoom("out")}>
+      <button className="btn" onClick={() => zoom("out")}>
         <MinusIcon />
       </button>
-    </Box>
+    </StyledZoomControls>
   );
 }

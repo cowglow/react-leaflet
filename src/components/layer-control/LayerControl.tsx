@@ -1,8 +1,7 @@
-import { Box, ClickAwayListener, Paper } from "@mui/material";
 import { PropsWithChildren, ReactNode, useEffect, useState } from "react";
-import LayersIcon from "@mui/icons-material/Layers";
-// import { useEventHandlers } from "@react-leaflet/core";
 import { useMap } from "react-leaflet";
+import LayersIcon from "@mui/icons-material/Layers";
+import { Box, ClickAwayListener } from "@mui/material";
 import { StyledIconButton } from "components/layer-control/LayerControl.Styled.ts";
 
 type ControlPosition = "topLeft" | "topRight" | "bottomRight" | "bottomLeft";
@@ -40,20 +39,24 @@ function LayerControl({
 }: LayerControlProps) {
   const [isOpen, setIsOpen] = useState(noIcon);
   const [isHovering, setIsHovering] = useState(false);
-
   const map = useMap();
 
   useEffect(() => {
     if (isOpen || isHovering) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Object.values(map["_handlers"]).forEach((handler) => handler.disable());
     } else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Object.values(map["_handlers"]).forEach((handler) => handler.enable());
     }
     return () => {
-      console.log("unmount", map);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Object.values(map["_handlers"]).forEach((handler) => handler.enable());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isHovering]);
 
   const padding = position === "bottomRight" ? 2 : 1;
@@ -62,10 +65,10 @@ function LayerControl({
       <Box className="leaflet-control" px={1} py={padding}>
         {!isOpen ? (
           <StyledIconButton
+            className="btn"
             onClick={() => setIsOpen(true)}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
-            size="small"
           >
             {icon}
           </StyledIconButton>
@@ -78,20 +81,7 @@ function LayerControl({
               }
             }}
           >
-            <Paper elevation={2}>
-              {/*<div className="window">*/}
-              {/*  <div className="title-bar">*/}
-              {/*    <button aria-label="Close" className="close"></button>*/}
-              {/*    <h1 className="title">Select Base Map</h1>*/}
-              {/*    <button*/}
-              {/*      aria-label="Resize"*/}
-              {/*      disabled*/}
-              {/*      className="hidden"*/}
-              {/*    ></button>*/}
-              {/*  </div>*/}
-              {children}
-              {/*</div>*/}
-            </Paper>
+            <Box>{children}</Box>
           </ClickAwayListener>
         )}
       </Box>

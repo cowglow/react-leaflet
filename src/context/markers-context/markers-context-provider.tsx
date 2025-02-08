@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { MarkersContext } from "./markers-context.tsx";
 import { useLocalStorage } from "hooks/use-local-storage.ts";
 
@@ -7,17 +7,18 @@ interface MarkerContextProviderProps {
 }
 
 export const MarkersContextProvider = ({
-                                         children
-                                       }: MarkerContextProviderProps) => {
+  children,
+}: MarkerContextProviderProps) => {
+  const [enable, setEnable] = useState(false);
   const [markers, setMarkers] = useLocalStorage<L.LatLng[]>({
     key: "MAP_MARKERS",
-    defaultValue: []
+    defaultValue: [],
   });
 
   const addMarker = ({ lat, lng }: L.LatLng) => {
     setMarkers((prevState: L.LatLng[]) => [
       ...prevState,
-      new L.LatLng(lat, lng)
+      new L.LatLng(lat, lng),
     ]);
   };
 
@@ -34,10 +35,12 @@ export const MarkersContextProvider = ({
   return (
     <MarkersContext.Provider
       value={{
+        enable,
+        setEnable,
         markers,
         addMarker,
         clearMarkers,
-        removeMarker
+        removeMarker,
       }}
     >
       {children}
