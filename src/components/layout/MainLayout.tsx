@@ -3,10 +3,11 @@ import styled from "styled-components";
 import { Sheet } from "@mui/joy";
 
 const StyledWrapper = styled(Sheet)`
+  border: thin solid red;
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
+  width: 100svw;
+  height: 100svh;
 `;
 
 const StyledMain = styled("main")`
