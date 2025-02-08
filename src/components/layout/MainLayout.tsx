@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Sheet } from "@mui/joy";
 
 const StyledWrapper = styled(Sheet)`
-  border: thin solid red;
   display: flex;
   flex-direction: column;
   width: 100svw;
