@@ -1,14 +1,12 @@
-type TileServer = {
-  label: string,
-  url: string
-}
+import { Dispatch, SetStateAction } from "react";
+
+export type TileServerName = string;
 
 interface TileServerContextProps {
-  tileServers: TileServer[];
-  tileServer: TileServer;
+  baseMaps: Record<TileServerName, L.TileLayer>;
+  selectedBaseMap: TileServerName;
 }
 
-type TileServerContextApi = {
-  setServer: (index: number) => void,
-  switchServer: () => void;
-} & TileServerContextProps
+export type TileServerContextApi = {
+  setSelectedBaseMap: Dispatch<SetStateAction<TileServerName>>;
+} & TileServerContextProps;

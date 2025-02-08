@@ -1,22 +1,39 @@
 import { useMap } from "react-leaflet";
-import { baseMaps } from "components/base-map-layers/lib/base-maps.ts";
-import { overlayMaps } from "components/base-map-layers/lib/overlay-maps.ts";
-import { memo, useEffect } from "react";
+import { useEffect } from "react";
+import { Paper } from "@mui/material";
+import "./style-overrides.css";
+import { useTileServer } from "context/tile-server-context/tile-server-context-hook.ts";
 
 function BaseMapsLayers() {
+  const { baseMaps, selectedBaseMap, setSelectedBaseMap } = useTileServer();
+  const layers = Object.keys(baseMaps);
   const map = useMap();
 
   useEffect(() => {
-    const layerControl = L.control.layers(baseMaps, overlayMaps, {
-      collapsed: false,
+    layers.forEach((layer) => {
+      if (map.hasLayer(baseMaps[layer])) {
+        map.removeLayer(baseMaps[layer]);
+      }
     });
-    map.addControl(layerControl);
-    return () => {
-      map.removeControl(layerControl);
-    };
-  }, []);
+    map.addLayer(baseMaps[selectedBaseMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBaseMap]);
 
-  return null;
+  return (
+    <Paper className="standard-dialog" elevation={2}>
+      {layers.map((key, index) => (
+        <div className="field-row">
+          <input
+            id={`base-layer-option-${index}`}
+            type="radio"
+            name="first-example"
+            onClick={() => setSelectedBaseMap(key)}
+          />
+          <label htmlFor={`base-layer-option-${index}`}>{key}</label>
+        </div>
+      ))}
+    </Paper>
+  );
 }
 
-export default memo(BaseMapsLayers);
+export default BaseMapsLayers;
