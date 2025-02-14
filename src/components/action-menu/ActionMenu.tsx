@@ -5,10 +5,14 @@ import {
   Divider,
 } from "components/action-menu/types.ts";
 import ActionMenuItem from "components/action-menu/ActionMenuItem.tsx";
+import useGeoLocation from "hooks/use-geo-location.ts";
+import { useMap } from "react-leaflet";
 
 function ActionMenu() {
   const { addMarker, clearMarkers, enable, setEnable } = useMarkers();
   const { getRandomCoordinates } = useCoordinates();
+  const { location } = useGeoLocation();
+  const map = useMap();
 
   const actionMenuConfig: Record<string, (ActionMenuDescription | Divider)[]> =
     {
@@ -55,6 +59,12 @@ function ActionMenu() {
             }
           },
         },
+        {
+          label: "Follow me",
+          action: () => {
+            map.flyTo({ lat: location.latitude, lng: location.longitude }, 16);
+          },
+        },
       ],
     };
   const topMenuNames = Object.keys(actionMenuConfig);
@@ -64,6 +74,7 @@ function ActionMenu() {
       role="menu-bar"
       className="standard-dialog"
       onMouseEnter={() => setEnable(false)}
+      onMouseLeave={() => setEnable(true)}
     >
       {topMenuNames.map((menuName) => (
         <li role="menu-item" tabIndex={0} aria-haspopup="true">
