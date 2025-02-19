@@ -2,9 +2,16 @@ import MapMarker from "feature/map/Map.Marker.tsx";
 import type { MapMarkerProps } from "feature/map/typing.ts";
 
 interface MarkerProps extends MapMarkerProps {
+  key?: number;
 }
 
-export default function MarkerDefault({ children, events, position, remove, alt = "" }: MarkerProps) {
+export default function MarkerDefault({
+  children,
+  events,
+  position,
+  remove,
+  alt = "",
+}: MarkerProps) {
   return (
     <MapMarker
       children={children}
@@ -14,6 +21,4 @@ export default function MarkerDefault({ children, events, position, remove, alt 
       alt={alt}
     />
   );
-
-
-};
+}
