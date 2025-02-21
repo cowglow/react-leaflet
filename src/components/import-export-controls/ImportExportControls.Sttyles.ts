@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const StyledZoomControls = styled("div")`
+export const StyledAction = styled("div")`
   display: flex;
   flex-direction: column;
   gap: 0.33rem;

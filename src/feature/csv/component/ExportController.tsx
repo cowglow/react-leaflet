@@ -1,5 +1,6 @@
 import useCsvData from "../hook/use-csv-data";
-import { StyledExportControllerButton } from "./ExportButton.Styled.ts";
+import ImportExportIcon from "@mui/icons-material/ImportExport";
+import { Tooltip } from "@mui/material";
 
 interface ExportControllerProps {
   label: string;
@@ -23,8 +24,10 @@ export default function ExportController({
   const isDisabled = data.length <= 0;
 
   return (
-    <StyledExportControllerButton onClick={clickHandler} disabled={isDisabled}>
-      {label}
-    </StyledExportControllerButton>
+    <Tooltip title={label} placement="right">
+      <button className="btn" onClick={clickHandler} disabled={isDisabled}>
+        <ImportExportIcon />
+      </button>
+    </Tooltip>
   );
 }

@@ -1,29 +1,24 @@
 import styled from "styled-components";
 
-export const StyledExportControllerButton = styled("button")`
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px;
-  letter-spacing: 2px;
-  text-decoration: none;
-  text-transform: uppercase;
-  color: #000;
-  cursor: pointer;
-  border: 3px solid;
-  padding: 0.25em 0.5em;
-  box-shadow:
-    1px 1px 0 0,
-    2px 2px 0 0,
-    3px 3px 0 0,
-    4px 4px 0 0,
-    5px 5px 0 0;
-  position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+export const StyledFileInput = styled("input")`
+  display: none;
+`;
+export const StyledFileInputLabel = styled("label")`
+  padding: 0;
+  margin: 0;
 
-  &:active {
-    box-shadow: 0 0 0 0;
-    top: 5px;
-    left: 5px;
+  & div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border: thin solid black;
+    width: 34px;
+    height: 34px;
+    border-radius: 20%;
+
+    & :hover {
+      cursor: pointer;
+    }
   }
 `;

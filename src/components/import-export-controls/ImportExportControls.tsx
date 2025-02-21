@@ -1,7 +1,7 @@
 import L from "leaflet";
 import { useMarkers } from "hooks/use-markers.ts";
-import { Paper } from "@mui/material";
 import { ExportController, ImportController } from "feature/csv";
+import { StyledAction } from "components/import-export-controls/ImportExportControls.Sttyles.ts";
 
 function ImportExportControls() {
   const { markers, addMarker } = useMarkers();
@@ -14,21 +14,13 @@ function ImportExportControls() {
   };
 
   return (
-    <Paper
-      className="standard-dialog"
-      elevation={2}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-      }}
-    >
+    <StyledAction>
       <ExportController label="Export Markers as CSV" data={markers} />
       <ImportController
         label="Import Markers from CSV"
         onLoad={dataImportHandler}
       />
-    </Paper>
+    </StyledAction>
   );
 }
 
