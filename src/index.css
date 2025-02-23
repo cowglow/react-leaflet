@@ -282,3 +282,13 @@ ul [role="menu-item"].divider::after {
     padding: 0;
     border-top: 1.5px dotted var(--secondary);
 }
+
+/* ul Override */
+ul[role="menu"] {
+    display: none;
+}
+
+ul[role="menu-bar"] > [role="menu-item"]:focus > ul[role="menu"],
+ul[role="menu-bar"] > [role="menu-item"]:hover > ul[role="menu"] {
+    display: block;
+}

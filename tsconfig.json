@@ -30,6 +30,9 @@
       "components/*": [
         "components/*"
       ],
+      "config/*": [
+        "config/*"
+      ],
       "context/*": [
         "context/*"
       ],

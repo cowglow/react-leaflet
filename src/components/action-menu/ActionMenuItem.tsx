@@ -5,10 +5,14 @@ import {
 
 interface ActionMenuItemProps {
   config: ActionMenuDescription | Divider;
+  onClick: (action: string) => void;
   key?: string;
 }
 
-export default function ActionMenuItem({ config }: ActionMenuItemProps) {
+export default function ActionMenuItem({
+  config,
+  onClick,
+}: ActionMenuItemProps) {
   if (config === "---") {
     return <hr />;
   }
@@ -17,9 +21,7 @@ export default function ActionMenuItem({ config }: ActionMenuItemProps) {
   return (
     <li role="menu-item">
       {"action" in rest && (
-        <a href="#" onClick={() => rest.action()}>
-          {label}
-        </a>
+        <button onClick={() => onClick(rest.action)}>{label}</button>
       )}
       {"href" in rest && (
         <a href={rest.href} target="_blank" rel="nofollow noreferrer">

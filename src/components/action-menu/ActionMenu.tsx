@@ -3,17 +3,18 @@ import { useMarkers } from "hooks/use-markers.ts";
 import ActionMenuItem from "components/action-menu/ActionMenuItem.tsx";
 // import useGeoLocation from "hooks/use-geo-location.ts";
 // import { useMap } from "react-leaflet";
-import { menuConfig } from "../../configs/menu-config.ts";
+import { menuConfig } from "config/menu-config.ts";
+import useActionMenu from "hooks/use-action-menu.ts";
 
 export default function ActionMenu() {
   // const { addMarker, clearMarkers, enable, setEnable } = useMarkers();
-  const { setEnable } = useMarkers();
   // const { getRandomCoordinates } = useCoordinates();
   // const { location } = useGeoLocation();
   // const map = useMap();
-
+  const { setEnable } = useMarkers();
   const actionMenuConfig = menuConfig();
   const topMenuNames = Object.keys(actionMenuConfig);
+  const { handleAction } = useActionMenu();
 
   return (
     <ul
@@ -21,6 +22,7 @@ export default function ActionMenu() {
       className="standard-dialog"
       onMouseEnter={() => setEnable(false)}
       onMouseLeave={() => setEnable(true)}
+      onClick={() => setEnable(true)}
     >
       {topMenuNames.map((menuName) => (
         <li
@@ -33,8 +35,9 @@ export default function ActionMenu() {
           <ul role="menu">
             {actionMenuConfig[menuName].map((config, index) => (
               <ActionMenuItem
-                key={`ation-menu-index-${index}`}
+                key={`action-menu-index-${index}`}
                 config={config}
+                onClick={handleAction}
               />
             ))}
           </ul>

@@ -2,30 +2,37 @@ import {
   ActionMenuDescription,
   Divider,
 } from "components/action-menu/types.ts";
+import {
+  DELETE_MARKER,
+  READ_MARKER,
+  UPDATE_MARKER,
+} from "context/redux-store/actions/marker/marker-action-types.ts";
+import { CREATE_MEMBER } from "context/redux-store/actions/member/member-action-types.ts";
 
 export function menuConfig() {
   const actionMenuConfig: Record<string, (ActionMenuDescription | Divider)[]> =
     {
       File: [
-        { label: "Open", action: () => console.log("Action") },
-        { label: "Save", action: () => console.log("Action") },
+        { label: "New", action: DELETE_MARKER },
+        { label: "Open", action: READ_MARKER },
+        { label: "Save", action: UPDATE_MARKER },
         "---",
         {
           label: "Language (Coming Soon)",
-          action: () => console.log("Action"),
+          action: "Action",
         },
       ],
       Edit: [
-        { label: "Add Marker", action: () => console.log("Edit") },
+        { label: "Add Marker", action: "Edit" },
         "---",
-        { label: "Add Member", action: () => console.log("Edit") },
-        { label: "Add Organization", action: () => console.log("Edit") },
+        { label: "Add Member", action: CREATE_MEMBER },
+        { label: "Add Organization", action: "Edit" },
       ],
       Actions: [
-        { label: "Fetch Markers", action: () => console.log("Action") },
-        { label: "Overlay Maps", action: () => console.log("Action") },
+        { label: "Fetch Markers", action: "Action" },
+        { label: "Overlay Maps", action: "Action" },
         "---",
-        { label: "Follow Me", action: () => console.log("Action") },
+        { label: "Follow Me", action: "Action" },
       ],
       View: [
         {
