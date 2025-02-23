@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import styled from "styled-components";
-import { Sheet } from "@mui/joy";
+import { Paper } from "@mui/material";
 
-const StyledWrapper = styled(Sheet)`
+const StyledWrapper = styled(Paper)`
   display: flex;
   flex-direction: column;
   width: 100svw;

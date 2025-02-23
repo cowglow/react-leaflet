@@ -8,6 +8,7 @@ import {
   UPDATE_MARKER,
 } from "context/redux-store/actions/marker/marker-action-types.ts";
 import { CREATE_MEMBER } from "context/redux-store/actions/member/member-action-types.ts";
+import { CREATE_ORGANIZATION } from "context/redux-store/actions/organization/organization-action-type.ts";
 
 export function menuConfig() {
   const actionMenuConfig: Record<string, (ActionMenuDescription | Divider)[]> =
@@ -26,7 +27,7 @@ export function menuConfig() {
         { label: "Add Marker", action: "Edit" },
         "---",
         { label: "Add Member", action: CREATE_MEMBER },
-        { label: "Add Organization", action: "Edit" },
+        { label: "Add Organization", action: CREATE_ORGANIZATION },
       ],
       Actions: [
         { label: "Fetch Markers", action: "Action" },
