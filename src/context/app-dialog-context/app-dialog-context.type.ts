@@ -1,4 +1,4 @@
-export type DialogType = null | "MEMBER_DIALOG" | "ORGANIZATION_DIALOG";
+export type DialogType = "MEMBER_DIALOG" | "ORGANIZATION_DIALOG";
 
 interface DialogContextProps {
   dialog: DialogType | null;

@@ -12,8 +12,7 @@ export default function ActionMenu() {
   // const { location } = useGeoLocation();
   // const map = useMap();
   const { setEnable } = useMarkers();
-  const actionMenuConfig = menuConfig();
-  const topMenuNames = Object.keys(actionMenuConfig);
+  const topMenuNames = Object.keys(menuConfig);
   const { handleAction } = useActionMenu();
 
   return (
@@ -33,7 +32,7 @@ export default function ActionMenu() {
         >
           {menuName}
           <ul role="menu">
-            {actionMenuConfig[menuName].map((config, index) => (
+            {menuConfig[menuName].map((config, index) => (
               <ActionMenuItem
                 key={`action-menu-index-${index}`}
                 config={config}
