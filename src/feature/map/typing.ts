@@ -8,3 +8,9 @@ export interface MapMarkerProps extends L.MarkerOptions, L.EventedProps {
 export interface MapLayerGroupProps {
   children?: React.ReactNode;
 }
+
+export type ControlPosition =
+  | "topLeft"
+  | "topRight"
+  | "bottomRight"
+  | "bottomLeft";

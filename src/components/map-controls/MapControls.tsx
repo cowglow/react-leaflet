@@ -12,7 +12,7 @@ function MapControls() {
       <LayerControl position="topLeft" noIcon={true}>
         <ActionMenu />
       </LayerControl>
-      <LayerControl position="topRight" noIcon={true}>
+      <LayerControl position="topRight">
         <Paper className="standard-dialog" elevation={2}>
           <MapLayerGroup>Map Layer Group</MapLayerGroup>
           <hr />

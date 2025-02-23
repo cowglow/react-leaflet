@@ -1,72 +1,18 @@
 import { useMarkers } from "hooks/use-markers.ts";
-import { useCoordinates } from "hooks/use-coordinates.ts";
-import {
-  ActionMenuDescription,
-  Divider,
-} from "components/action-menu/types.ts";
+// import { useCoordinates } from "hooks/use-coordinates.ts";
 import ActionMenuItem from "components/action-menu/ActionMenuItem.tsx";
-import useGeoLocation from "hooks/use-geo-location.ts";
-import { useMap } from "react-leaflet";
+// import useGeoLocation from "hooks/use-geo-location.ts";
+// import { useMap } from "react-leaflet";
+import { menuConfig } from "../../configs/menu-config.ts";
 
-function ActionMenu() {
-  const { addMarker, clearMarkers, enable, setEnable } = useMarkers();
-  const { getRandomCoordinates } = useCoordinates();
-  const { location } = useGeoLocation();
-  const map = useMap();
+export default function ActionMenu() {
+  // const { addMarker, clearMarkers, enable, setEnable } = useMarkers();
+  const { setEnable } = useMarkers();
+  // const { getRandomCoordinates } = useCoordinates();
+  // const { location } = useGeoLocation();
+  // const map = useMap();
 
-  const actionMenuConfig: Record<string, (ActionMenuDescription | Divider)[]> =
-    {
-      File: [
-        { label: "Action", action: () => console.log("Action") },
-        {
-          label: "Another Action",
-          action: () => console.log("Another Action"),
-        },
-        {
-          label: "Something else here",
-          action: () => console.log("Something else here"),
-        },
-        "---",
-        { label: "sakun's twitter", href: "https://x.com/sakofchit" },
-      ],
-      Edit: [
-        {
-          label: enable ? "...writable" : "Capture Markers",
-          action: () => setEnable(!enable),
-        },
-        "---",
-        { label: "Clear Markers", action: clearMarkers },
-      ],
-      View: [
-        {
-          label: "system.css",
-          href: "https://sakofchit.github.io/system.css/",
-        },
-        {
-          label: "GitHub Repo",
-          href: "https://github.com/cowglow/react-leaflet",
-        },
-      ],
-      Special: [
-        {
-          label: "Fetch Randoms",
-          action: async () => {
-            try {
-              const data = await getRandomCoordinates();
-              data.forEach(addMarker);
-            } catch (error) {
-              console.log("Fetch Error!! ", error);
-            }
-          },
-        },
-        {
-          label: "Follow me",
-          action: () => {
-            map.flyTo({ lat: location.latitude, lng: location.longitude }, 16);
-          },
-        },
-      ],
-    };
+  const actionMenuConfig = menuConfig();
   const topMenuNames = Object.keys(actionMenuConfig);
 
   return (
@@ -77,11 +23,19 @@ function ActionMenu() {
       onMouseLeave={() => setEnable(true)}
     >
       {topMenuNames.map((menuName) => (
-        <li role="menu-item" tabIndex={0} aria-haspopup="true">
+        <li
+          key={`action-menu-key-${menuName}`}
+          role="menu-item"
+          tabIndex={0}
+          aria-haspopup="true"
+        >
           {menuName}
           <ul role="menu">
-            {actionMenuConfig[menuName].map((config) => (
-              <ActionMenuItem config={config} />
+            {actionMenuConfig[menuName].map((config, index) => (
+              <ActionMenuItem
+                key={`ation-menu-index-${index}`}
+                config={config}
+              />
             ))}
           </ul>
         </li>
@@ -89,5 +43,3 @@ function ActionMenu() {
     </ul>
   );
 }
-
-export default ActionMenu;

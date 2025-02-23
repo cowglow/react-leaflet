@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-export const StyledAction = styled("div")`
+export const ImportExportContainer = styled("div")`
   display: flex;
-  flex-direction: column;
+  //flex-direction: column;
   gap: 0.33rem;
 
   & > button,

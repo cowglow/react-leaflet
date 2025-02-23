@@ -1,7 +1,7 @@
 import L from "leaflet";
 import { useMarkers } from "hooks/use-markers.ts";
 import { ExportController, ImportController } from "feature/csv";
-import { StyledAction } from "components/import-export-controls/ImportExportControls.Sttyles.ts";
+import { ImportExportContainer } from "components/import-export-controls/ImportExportControls.Sttyles.ts";
 
 function ImportExportControls() {
   const { markers, addMarker } = useMarkers();
@@ -14,13 +14,13 @@ function ImportExportControls() {
   };
 
   return (
-    <StyledAction>
+    <ImportExportContainer>
       <ExportController label="Export Markers as CSV" data={markers} />
       <ImportController
         label="Import Markers from CSV"
         onLoad={dataImportHandler}
       />
-    </StyledAction>
+    </ImportExportContainer>
   );
 }
 

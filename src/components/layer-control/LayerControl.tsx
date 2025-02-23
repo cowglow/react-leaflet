@@ -3,8 +3,8 @@ import { useMap } from "react-leaflet";
 import LayersIcon from "@mui/icons-material/Layers";
 import { Box, ClickAwayListener } from "@mui/material";
 import { StyledIconButton } from "components/layer-control/LayerControl.Styled.ts";
-
-type ControlPosition = "topLeft" | "topRight" | "bottomRight" | "bottomLeft";
+import { LayerControlWrapper } from "components/layer-control/LayerControlWrapper.tsx";
+import { ControlPosition } from "feature/map/typing.ts";
 
 interface BaseLayerControlProps extends PropsWithChildren {
   position?: ControlPosition;
@@ -24,14 +24,7 @@ type LayerControlProps =
   | LayerControlWithoutIconProps
   | LayerControlWithIconProps;
 
-const positionClass: Record<ControlPosition, string> = {
-  topLeft: "leaflet-top leaflet-left",
-  topRight: "leaflet-top leaflet-right",
-  bottomRight: "leaflet-bottom leaflet-right",
-  bottomLeft: "leaflet-bottom leaflet-left",
-};
-
-function LayerControl({
+export default function LayerControl({
   position = "topLeft",
   noIcon = false,
   icon = <LayersIcon />,
@@ -40,6 +33,13 @@ function LayerControl({
   const [isOpen, setIsOpen] = useState(noIcon);
   const [isHovering, setIsHovering] = useState(false);
   const map = useMap();
+
+  const clickAwayHandler = () => {
+    if (!noIcon) {
+      setIsOpen(false);
+      setIsHovering(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen || isHovering) {
@@ -60,33 +60,26 @@ function LayerControl({
   }, [isOpen, isHovering]);
 
   const padding = position === "bottomRight" ? 2 : 1;
+
+  if (isOpen)
+    return (
+      <LayerControlWrapper position={position} padding={padding}>
+        <ClickAwayListener onClickAway={clickAwayHandler}>
+          <Box>{children}</Box>
+        </ClickAwayListener>
+      </LayerControlWrapper>
+    );
+
   return (
-    <div className={positionClass[position]}>
-      <Box className="leaflet-control" px={1} py={padding}>
-        {!isOpen ? (
-          <StyledIconButton
-            className="btn"
-            onClick={() => setIsOpen(true)}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-          >
-            {icon}
-          </StyledIconButton>
-        ) : (
-          <ClickAwayListener
-            onClickAway={() => {
-              if (!noIcon) {
-                setIsOpen(false);
-                setIsHovering(false);
-              }
-            }}
-          >
-            <Box>{children}</Box>
-          </ClickAwayListener>
-        )}
-      </Box>
-    </div>
+    <LayerControlWrapper position={position} padding={padding}>
+      <StyledIconButton
+        className="btn"
+        onClick={() => setIsOpen(true)}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        {icon}
+      </StyledIconButton>
+    </LayerControlWrapper>
   );
 }
-
-export default LayerControl;

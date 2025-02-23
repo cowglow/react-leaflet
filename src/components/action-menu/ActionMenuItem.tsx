@@ -5,9 +5,10 @@ import {
 
 interface ActionMenuItemProps {
   config: ActionMenuDescription | Divider;
+  key?: string;
 }
 
-function ActionMenuItem({ config }: ActionMenuItemProps) {
+export default function ActionMenuItem({ config }: ActionMenuItemProps) {
   if (config === "---") {
     return <hr />;
   }
@@ -28,5 +29,3 @@ function ActionMenuItem({ config }: ActionMenuItemProps) {
     </li>
   );
 }
-
-export default ActionMenuItem;
