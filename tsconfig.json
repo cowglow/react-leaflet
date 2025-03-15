@@ -24,26 +24,8 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "assets/*": [
-        "assets/*"
-      ],
-      "components/*": [
-        "components/*"
-      ],
-      "config/*": [
-        "config/*"
-      ],
-      "context/*": [
-        "context/*"
-      ],
-      "feature/*": [
-        "feature/*"
-      ],
-      "hooks/*": [
-        "hooks/*"
-      ],
-      "utils/*": [
-        "utils/*"
+      "/*": [
+        "./*"
       ]
     }
   },

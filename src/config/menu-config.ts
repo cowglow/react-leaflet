@@ -6,9 +6,9 @@ import {
   DELETE_MARKER,
   READ_MARKER,
   UPDATE_MARKER,
-} from "context/redux-store/actions/marker/marker-action-types.ts";
-import { CREATE_MEMBER } from "context/redux-store/actions/member/member-action-types.ts";
-import { CREATE_ORGANIZATION } from "context/redux-store/actions/organization/organization-action-type.ts";
+} from "context/redux-store/state/marker/marker-action-types.ts";
+import { CREATE_MEMBER } from "context/redux-store/state/member/member-action-types.ts";
+import { CREATE_ORGANIZATION } from "context/redux-store/state/organization/organization-action-type.ts";
 
 export const menuConfig: Record<string, (ActionMenuDescription | Divider)[]> = {
   File: [
@@ -23,6 +23,7 @@ export const menuConfig: Record<string, (ActionMenuDescription | Divider)[]> = {
   ],
   Edit: [
     { label: "Add Marker", action: "Edit" },
+    { label: "Clear Markers", action: "CLEAR_MARKERS" },
     "---",
     { label: "Add Member", action: CREATE_MEMBER },
     { label: "Add Organization", action: CREATE_ORGANIZATION },
