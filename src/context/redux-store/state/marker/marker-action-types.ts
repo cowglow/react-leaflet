@@ -1,8 +1,0 @@
-// CREATE
-export const CREATE_MARKER = "CREATE_MARKERS";
-// READ
-export const READ_MARKER = "READ_MARKERS";
-// UPDATE
-export const UPDATE_MARKER = "UPDATE_MARKERS";
-// DELETE
-export const DELETE_MARKER = "DELETE_MARKERS";

@@ -1,11 +1,28 @@
-import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "./state/counter/counterSlice.ts";
+import createSagaMiddleware from "redux-saga";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import markerSlice from "context/redux-store/store/marker/marker-slice.ts";
+import { watchSaga } from "context/redux-store/sagas.ts";
 
-export const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-  },
+const sagaMiddleware = createSagaMiddleware();
+const rootReducer = combineReducers({
+  markers: markerSlice,
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export function setupStore(preloadedState: Partial<RootState>) {
+  const store = configureStore({
+    reducer: rootReducer,
+    preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        thunk: false,
+        serializableCheck: false,
+      }).concat(sagaMiddleware),
+    devTools: true,
+  });
+  sagaMiddleware.run(watchSaga);
+  return store;
+}
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppStore = ReturnType<typeof setupStore>;
+export type AppDispatch = AppStore["dispatch"];

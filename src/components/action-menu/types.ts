@@ -1,9 +1,5 @@
-type REDUX_ACTION = string;
-
-export type ActionMenuDescription = {
-  label: string;
-  action?: REDUX_ACTION;
-  href?: string;
-};
-
 export type Divider = "---";
+export type MenuConfigItem =
+  | { label: string; action: () => void }
+  | { label: string; href: string }
+  | Divider;

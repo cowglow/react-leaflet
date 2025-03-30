@@ -1,27 +1,20 @@
-import { useMarkers } from "hooks/use-markers.ts";
-// import { useCoordinates } from "hooks/use-coordinates.ts";
 import ActionMenuItem from "components/action-menu/ActionMenuItem.tsx";
-// import useGeoLocation from "hooks/use-geo-location.ts";
-// import { useMap } from "react-leaflet";
-import { menuConfig } from "config/menu-config.ts";
-import useActionMenu from "hooks/use-action-menu.ts";
+import { createMenuConfig } from "config/createMenuConfig.ts";
+import { useDispatch } from "react-redux";
+import { MenuConfigItem } from "/components/action-menu/types.ts";
 
 export default function ActionMenu() {
-  // const { addMarker, clearMarkers, enable, setEnable } = useMarkers();
-  // const { getRandomCoordinates } = useCoordinates();
-  // const { location } = useGeoLocation();
-  // const map = useMap();
-  const { setEnable } = useMarkers();
+  const dispatch = useDispatch();
+  const menuConfig = createMenuConfig(dispatch);
   const topMenuNames = Object.keys(menuConfig);
-  const { handleAction } = useActionMenu();
 
   return (
     <ul
       role="menu-bar"
       className="standard-dialog"
-      onMouseEnter={() => setEnable(false)}
-      onMouseLeave={() => setEnable(true)}
-      onClick={() => setEnable(true)}
+      // onMouseEnter={() => setEnable(false)}
+      // onMouseLeave={() => setEnable(true)}
+      // onClick={() => setEnable(true)}
     >
       {topMenuNames.map((menuName) => (
         <li
@@ -32,11 +25,10 @@ export default function ActionMenu() {
         >
           {menuName}
           <ul role="menu">
-            {menuConfig[menuName].map((config, index) => (
+            {(menuConfig[menuName] as MenuConfigItem[]).map((config, index) => (
               <ActionMenuItem
                 key={`action-menu-index-${index}`}
                 config={config}
-                onClick={handleAction}
               />
             ))}
           </ul>
