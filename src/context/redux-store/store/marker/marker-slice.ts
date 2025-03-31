@@ -21,18 +21,25 @@ const markerSlice = createSlice({
     openFile(state) {
       return { ...state, loading: true };
     },
-    openFileDone(state) {
-      return { ...state, loading: false };
+    openFileDone(
+      state,
+      action: PayloadAction<Pick<MarkerSliceState, "items">>,
+    ) {
+      return { ...state, loading: false, items: action.payload.items };
     },
     openFileError(state, action: PayloadAction<Error>) {
       return { ...state, loading: false, error: action.payload };
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    saveFile(state, _action: PayloadAction<{ filename: string }>) {
-      return { ...state };
+    saveFile(state) {
+      return { ...state, loading: true };
     },
-    // saveFileDone(state) {},
-    // saveFileError(state) {},
+    saveFileDone(state) {
+      return { ...state, loading: false };
+    },
+    saveFileError(state, action: PayloadAction<Error>) {
+      return { ...state, loading: false, error: action.payload };
+    },
     addMarker(state, action: PayloadAction<L.LatLng>) {
       return { ...state, items: [...state.items, action.payload] };
     },
@@ -50,6 +57,8 @@ export const {
   openFileDone,
   openFileError,
   saveFile,
+  saveFileDone,
+  saveFileError,
   addMarker,
   setEnabled,
   clearAllMarkers,

@@ -1,16 +1,19 @@
-import L from "leaflet";
-import { useMarkers } from "hooks/use-markers.ts";
 import { ExportController, ImportController } from "feature/csv";
 import { ImportExportContainer } from "components/import-export-controls/ImportExportControls.Sttyles.ts";
+import { useDispatch, useSelector } from "context/redux-store/hooks.ts";
+import { getMarkers } from "context/redux-store/store/marker/marker-selectors.ts";
+import { openFileDone } from "context/redux-store/store/marker/marker-slice.ts";
 
 function ImportExportControls() {
-  const { markers, addMarker } = useMarkers();
+  const dispatch = useDispatch();
+  const markers = useSelector(getMarkers);
 
   const dataImportHandler = (data: string[][]) => {
-    data.forEach(([lat, lng]) => {
-      const position = L.latLng([Number(lat), Number(lng)]);
-      addMarker(position);
-    });
+    dispatch(
+      openFileDone({
+        items: data.map(([lat, lng]) => L.latLng([Number(lat), Number(lng)])),
+      }),
+    );
   };
 
   return (

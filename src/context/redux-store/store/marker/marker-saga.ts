@@ -1,24 +1,32 @@
-import { put, takeLatest } from "redux-saga/effects";
+import { put, select, takeLatest } from "redux-saga/effects";
 import {
   openFile,
   openFileDone,
   openFileError,
+  saveFile,
 } from "context/redux-store/store/marker/marker-slice.ts";
+import { exportCSVFile, loadCSVFile } from "feature/csv";
 
-async function* openFileSaga() {
+function* openFileSaga() {
   try {
-    // const file = document.querySelector("#input-file-button")?.files?.[0];
-    // const reader = new FileReader();
-    // reader.onload = function (event) {
-    //   const content = event.target?.result;
-    //   console.log("File content:", content);
-    //   // Process the file content as needed
-    // };
-    // reader.readAsText(file);
-    console.log("Open file saga triggered with action:");
+    const fileContent: string = yield loadCSVFile();
+    const data: string[][] = JSON.parse(fileContent);
+    const items = data.map(([lat, lng]) =>
+      L.latLng([Number(lat), Number(lng)]),
+    );
     // Simulate an async operation
-    yield new Promise((resolve) => setTimeout(resolve, 1000));
-    yield put(openFileDone());
+    yield put(openFileDone({ items }));
+  } catch (error) {
+    yield put(openFileError(error));
+  }
+}
+
+function* saveFileSaga() {
+  try {
+    const markers = yield select((state) => state.markers.items);
+    const csvData: CSVData[] = markers.map(({ lat, lng }) => ({ lat, lng }));
+    yield exportCSVFile(csvData);
+    yield put(openFileDone({ items: markers }));
   } catch (error) {
     yield put(openFileError(error));
   }
@@ -26,4 +34,5 @@ async function* openFileSaga() {
 
 export function* watchMarkerSaga() {
   yield takeLatest(openFile, openFileSaga);
+  yield takeLatest(saveFile, saveFileSaga);
 }

@@ -21,7 +21,8 @@ export default function ExportController({
     exportCSVFile(csvData, file);
   };
 
-  const isDisabled = data.length <= 0;
+  // const isDisabled = data.length <= 0;
+  const isDisabled = false;
 
   return (
     <Tooltip title={label} placement="right">
