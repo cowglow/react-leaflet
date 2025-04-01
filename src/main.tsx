@@ -4,7 +4,6 @@ import ReactDOM from "react-dom/client";
 import App from "./components/App.tsx";
 import Dialogs from "components/Dialogs.tsx";
 import { ContextProviders } from "./context/context-providers.tsx";
-import "./index.css";
 import "@sakun/system.css";
 
 scan({

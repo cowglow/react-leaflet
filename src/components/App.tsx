@@ -26,8 +26,8 @@ export default function App() {
       <Map
         center={nbgCenter}
         zoom={8}
-        scrollWheelZoom={true}
-        bounceAtZoomLimits
+        // scrollWheelZoom={false}
+        // bounceAtZoomLimits
       >
         <Marker position={nbgCenter} />
         <MapControls />

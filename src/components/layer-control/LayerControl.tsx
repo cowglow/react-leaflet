@@ -1,5 +1,4 @@
-import { PropsWithChildren, ReactNode, useEffect, useState } from "react";
-import { useMap } from "react-leaflet";
+import { PropsWithChildren, ReactNode, useState } from "react";
 import LayersIcon from "@mui/icons-material/Layers";
 import { Box, ClickAwayListener } from "@mui/material";
 import { StyledIconButton } from "components/layer-control/LayerControl.Styled.ts";
@@ -31,33 +30,33 @@ export default function LayerControl({
   children,
 }: LayerControlProps) {
   const [isOpen, setIsOpen] = useState(noIcon);
-  const [isHovering, setIsHovering] = useState(false);
-  const map = useMap();
+  // const [isHovering, setIsHovering] = useState(false);
+  // const map = useMap();
 
   const clickAwayHandler = () => {
     if (!noIcon) {
       setIsOpen(false);
-      setIsHovering(false);
+      // setIsHovering(false);
     }
   };
 
-  useEffect(() => {
-    if (isOpen || isHovering) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Object.values(map["_handlers"]).forEach((handler) => handler.disable());
-    } else {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Object.values(map["_handlers"]).forEach((handler) => handler.enable());
-    }
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Object.values(map["_handlers"]).forEach((handler) => handler.enable());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, isHovering]);
+  // useEffect(() => {
+  //   if (isOpen || isHovering) {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     Object.values(map["_handlers"]).forEach((handler) => handler.disable());
+  //   } else {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     Object.values(map["_handlers"]).forEach((handler) => handler.enable());
+  //   }
+  //   return () => {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     Object.values(map["_handlers"]).forEach((handler) => handler.enable());
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isOpen, isHovering]);
 
   const padding = position === "bottomRight" ? 2 : 1;
 
@@ -75,8 +74,8 @@ export default function LayerControl({
       <StyledIconButton
         className="btn"
         onClick={() => setIsOpen(true)}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
+        // onMouseEnter={() => setIsHovering(true)}
+        // onMouseLeave={() => setIsHovering(false)}
       >
         {icon}
       </StyledIconButton>
