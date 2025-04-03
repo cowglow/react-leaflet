@@ -1,11 +1,15 @@
 import { put, select, takeLatest } from "redux-saga/effects";
 import {
+  addMarker,
+  addMarkerError,
+  addMarkerSuccess,
   openFile,
   openFileDone,
   openFileError,
   saveFile,
-} from "context/redux-store/store/marker/marker-slice.ts";
+} from "redux-store/store/marker/marker-slice.ts";
 import { exportCSVFile, loadCSVFile } from "feature/csv";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 function* openFileSaga() {
   try {
@@ -32,7 +36,18 @@ function* saveFileSaga() {
   }
 }
 
+function* addMarkerSaga(action: PayloadAction<L.LatLng>) {
+  try {
+    // yield new Promise((resolve) => setTimeout(resolve, 1000));
+    // yield call(saveData, action.payload.toString());
+    yield put(addMarkerSuccess(action.payload));
+  } catch (error) {
+    yield put(addMarkerError(error));
+  }
+}
+
 export function* watchMarkerSaga() {
   yield takeLatest(openFile, openFileSaga);
   yield takeLatest(saveFile, saveFileSaga);
+  yield takeLatest(addMarker, addMarkerSaga);
 }

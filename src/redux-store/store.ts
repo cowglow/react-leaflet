@@ -1,7 +1,7 @@
 import createSagaMiddleware from "redux-saga";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import markerSlice from "context/redux-store/store/marker/marker-slice.ts";
-import { watchSaga } from "context/redux-store/sagas.ts";
+import markerSlice from "redux-store/store/marker/marker-slice.ts";
+import { watchSaga } from "redux-store/sagas.ts";
 
 const sagaMiddleware = createSagaMiddleware();
 const rootReducer = combineReducers({

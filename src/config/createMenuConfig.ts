@@ -1,11 +1,11 @@
-import { AppDispatch } from "context/redux-store/store.ts";
+import { AppDispatch } from "redux-store/store.ts";
 import {
   clearAllMarkers,
   openFile,
   saveFile,
   setEnabled,
-} from "context/redux-store/store/marker/marker-slice.ts";
-import { MenuConfigItem } from "/components/action-menu/types.ts";
+} from "redux-store/store/marker/marker-slice.ts";
+import { MenuConfigItem } from "components/action-menu/types.ts";
 
 export type MenuConfig = Record<string, MenuConfigItem[]>;
 

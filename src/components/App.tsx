@@ -9,20 +9,24 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getMarkers,
   isEnabled,
-} from "context/redux-store/store/marker/marker-selectors.ts";
+  isLoading,
+} from "redux-store/store/marker/marker-selectors.ts";
 import MapEvents from "feature/map/Map.Events.tsx";
-import { addMarker } from "context/redux-store/store/marker/marker-slice.ts";
+import { addMarker } from "redux-store/store/marker/marker-slice.ts";
+import Loader from "./ui/Loader.tsx";
 
 export default function App() {
   const dispatch = useDispatch();
   const markers = useSelector(getMarkers);
   const isMarkersEnabled = useSelector(isEnabled);
+  const isMarkersLoading = useSelector(isLoading);
 
   const nbgCenter = new L.LatLng(49.4521, 11.0767);
 
   // noinspection TypeScriptValidateTypes
   return (
     <MainLayout>
+      <Loader open={isMarkersLoading} />
       <Map
         center={nbgCenter}
         zoom={8}

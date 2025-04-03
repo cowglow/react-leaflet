@@ -7,4 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   base: "/react-leaflet",
   plugins: [tsconfigPaths(), react(), checker({ typescript: true })],
+  server: {
+    port: 3000,
+  },
 });

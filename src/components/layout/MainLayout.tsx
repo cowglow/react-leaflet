@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import styled from "styled-components";
 
 const StyledWindow = styled("main")`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: auto;

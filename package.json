@@ -37,6 +37,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "leaflet": "^1.9.4",
+    "mongodb": "^6.15.0",
     "prettier": "^3.5.2",
     "react-leaflet": "^5.0.0",
     "react-redux": "^9.2.0",

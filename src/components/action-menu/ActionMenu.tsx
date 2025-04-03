@@ -2,7 +2,7 @@ import ActionMenuItem from "components/action-menu/ActionMenuItem.tsx";
 import { createMenuConfig } from "config/createMenuConfig.ts";
 import { useDispatch } from "react-redux";
 import { MenuConfigItem } from "components/action-menu/types.ts";
-import { setEnabled } from "context/redux-store/store/marker/marker-slice.ts";
+import { setEnabled } from "redux-store/store/marker/marker-slice.ts";
 
 export default function ActionMenu() {
   const dispatch = useDispatch();

@@ -24,8 +24,8 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "/*": [
-        "./*"
+      "src/*": [
+        "src/*"
       ]
     }
   },
