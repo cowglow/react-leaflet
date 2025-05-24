@@ -37,7 +37,7 @@ export default function App() {
         <MapControls />
         <MapBounds disableZoom={false} />
         {[...markers].map((marker: L.LatLng, index) => (
-          <MarkerDefault key={index} position={marker} />
+          <MarkerDefault key={index} position={marker}  />
         ))}
         <MapEvents
           enabled={isMarkersEnabled}

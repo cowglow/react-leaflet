@@ -1,24 +1,28 @@
 import MapMarker from "feature/map/Map.Marker.tsx";
-import type { MapMarkerProps } from "feature/map/typing.ts";
+import { PropsWithChildren } from "react";
+import { useDispatch } from "../../redux-store/hooks.ts";
+import { removeMarker } from "../../redux-store/store/marker/marker-slice.ts";
 
-interface MarkerProps extends MapMarkerProps {
-  key?: number;
+interface MarkerProps extends PropsWithChildren {
+  position: L.LatLng;
+  draggable?: boolean;
+  alt?: string;
 }
 
 export default function MarkerDefault({
   children,
-  events,
   position,
-  remove,
+  draggable = false,
   alt = "",
 }: MarkerProps) {
+  const dispatch = useDispatch();
   return (
     <MapMarker
       children={children}
-      events={events}
       position={position}
-      remove={remove}
+      draggable={draggable}
       alt={alt}
+      remove={(position) => dispatch(removeMarker(position))}
     />
   );
 }

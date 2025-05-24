@@ -43,6 +43,12 @@ const markerSlice = createSlice({
     addMarker(state, _action: PayloadAction<L.LatLng>) {
       return { ...state, loading: true };
     },
+    removeMarker(state, action: PayloadAction<L.LatLng>) {
+      return {
+        ...state,
+        items: state.items.filter(item => item !== action.payload),
+      }
+    },
     addMarkerSuccess(state, action: PayloadAction<L.LatLng>) {
       return {
         ...state,
@@ -70,6 +76,7 @@ export const {
   saveFileDone,
   saveFileError,
   addMarker,
+  removeMarker,
   addMarkerSuccess,
   addMarkerError,
   setEnabled,
