@@ -18,6 +18,6 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react(), checker({ typescript: true })],
   server: {
     port: 3000,
-    https,
+    https: import.meta.env.NODE_MODE === "development" ? test : undefined 
   },
 });
