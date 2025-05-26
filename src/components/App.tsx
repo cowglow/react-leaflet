@@ -3,7 +3,6 @@ import MainLayout from "components/layout/MainLayout.tsx";
 import Map from "feature/map/Map.tsx";
 import MapBounds from "components/layer-groups/MapBounds.ts";
 import MapControls from "components/map-controls/MapControls.tsx";
-import { Marker } from "react-leaflet";
 import MarkerDefault from "components/markers/Marker.Default.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,6 +13,7 @@ import {
 import MapEvents from "feature/map/Map.Events.tsx";
 import { addMarker } from "redux-store/store/marker/marker-slice.ts";
 import Loader from "./ui/Loader.tsx";
+import MarkerOwnPosition from "./markers/Marker.OwnPosition.tsx";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -33,11 +33,13 @@ export default function App() {
         // scrollWheelZoom={false}
         // bounceAtZoomLimits
       >
-        <Marker position={nbgCenter} />
+        <MarkerOwnPosition />
         <MapControls />
         <MapBounds disableZoom={false} />
         {[...markers].map((marker: L.LatLng, index) => (
-          <MarkerDefault key={index} position={marker}  />
+          <div key={index}>
+            <MarkerDefault position={marker} />
+          </div>
         ))}
         <MapEvents
           enabled={isMarkersEnabled}

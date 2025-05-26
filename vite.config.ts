@@ -2,6 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
+import * as path from "node:path";
+import * as fs from "node:fs";
+
+// Load self-signed certificates (adjust paths as needed)
+const certDir = path.resolve(__dirname, "cert");
+const https = {
+  key: fs.readFileSync(path.join(certDir, "localhost-key.pem")),
+  cert: fs.readFileSync(path.join(certDir, "localhost.pem")),
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,5 +18,6 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react(), checker({ typescript: true })],
   server: {
     port: 3000,
+    https,
   },
 });
