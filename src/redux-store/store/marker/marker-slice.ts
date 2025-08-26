@@ -2,16 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type MarkerSliceState = {
   enabled: boolean;
+  error: Error | null;
+  filteredLimit: number;
   items: L.LatLng[];
   loading: boolean;
-  error: Error | null;
 };
 
 const initialState: MarkerSliceState = {
   enabled: true,
+  error: null,
+  filteredLimit: 0,
   items: [],
   loading: false,
-  error: null,
 };
 
 const markerSlice = createSlice({
@@ -25,7 +27,12 @@ const markerSlice = createSlice({
       state,
       action: PayloadAction<Pick<MarkerSliceState, "items">>,
     ) {
-      return { ...state, loading: false, items: action.payload.items };
+      return {
+        ...state,
+        loading: false,
+        items: action.payload.items,
+        filteredLimit: action.payload.items.length,
+      };
     },
     openFileError(state, action: PayloadAction<Error>) {
       return { ...state, loading: false, error: action.payload };
@@ -46,8 +53,8 @@ const markerSlice = createSlice({
     removeMarker(state, action: PayloadAction<L.LatLng>) {
       return {
         ...state,
-        items: state.items.filter(item => item !== action.payload),
-      }
+        items: state.items.filter((item) => item !== action.payload),
+      };
     },
     addMarkerSuccess(state, action: PayloadAction<L.LatLng>) {
       return {
@@ -65,6 +72,9 @@ const markerSlice = createSlice({
     clearAllMarkers(state) {
       return { ...state, items: [] };
     },
+    setFilter(state, action: PayloadAction<number>) {
+      return { ...state, filteredLimit: action.payload };
+    },
   },
 });
 
@@ -81,6 +91,7 @@ export const {
   addMarkerError,
   setEnabled,
   clearAllMarkers,
+  setFilter,
 } = markerSlice.actions;
 
 export default markerSlice.reducer;

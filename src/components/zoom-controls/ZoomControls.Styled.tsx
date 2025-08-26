@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyledZoomControls = styled("div")`
   display: flex;
-  flex-direction: column;
+  //flex-direction: column;
   gap: 0.33rem;
 
   & > button,

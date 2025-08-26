@@ -6,7 +6,7 @@ import MapControls from "components/map-controls/MapControls.tsx";
 import MarkerDefault from "components/markers/Marker.Default.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getMarkers,
+  getFilteredMarkers,
   isEnabled,
   isLoading,
 } from "redux-store/store/marker/marker-selectors.ts";
@@ -17,7 +17,8 @@ import MarkerOwnPosition from "./markers/Marker.OwnPosition.tsx";
 
 export default function App() {
   const dispatch = useDispatch();
-  const markers = useSelector(getMarkers);
+  const markers = useSelector(getFilteredMarkers);
+
   const isMarkersEnabled = useSelector(isEnabled);
   const isMarkersLoading = useSelector(isLoading);
 
