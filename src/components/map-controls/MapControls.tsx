@@ -10,6 +10,7 @@ import { ChangeEvent } from "react";
 import { getMarkers } from "../../redux-store/store/marker/marker-selectors.ts";
 import { setFilter } from "../../redux-store/store/marker/marker-slice.ts";
 import { useMap } from "react-leaflet";
+import GyroscopeControl from "../gyroscope-control/GyroscopeControl.tsx";
 
 function MapControls() {
   const map = useMap();
@@ -57,10 +58,12 @@ function MapControls() {
             name="filterRange"
             onChange={handleRangeChange}
             //defaultValue={markers.length}
+            min={0}
             max={markers.length}
             onPointerDown={(e) => e.stopPropagation()}
           />
           <ZoomControls />
+          <GyroscopeControl />
         </Paper>
       </LayerControl>
     </>
