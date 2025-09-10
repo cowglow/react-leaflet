@@ -4,18 +4,9 @@ import { Box } from "@mui/material";
 
 export default function GyroscopeControl() {
   const map = useMap();
+  const hasGyroscope = "DeviceOrientationEvent" in window;
   const [isGyroscopeEnabled, setGyroscopeEnabled] = useState(false);
-  const [deviceOrientationEvent, setDeviceOrientationEvent] = useState(false);
   const [alpha, setAlpha] = useState(0);
-
-  useEffect(() => {
-    // Check if DeviceOrientationEvent is supported
-    if ("DeviceOrientationEvent" in window) {
-      setDeviceOrientationEvent(true);
-    } else {
-      setDeviceOrientationEvent(false);
-    }
-  }, []);
 
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
@@ -27,19 +18,19 @@ export default function GyroscopeControl() {
       }
     };
 
-    if (deviceOrientationEvent && isGyroscopeEnabled) {
+    if (hasGyroscope) {
       window.addEventListener("deviceorientation", handleOrientation);
     } else {
       console.warn("DeviceOrientationEvent is not supported on this device.");
     }
-  }, [deviceOrientationEvent, isGyroscopeEnabled, map]);
+  }, [hasGyroscope, isGyroscopeEnabled, map]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", py: 1 }}>
       <label>Gyroscope: {String(alpha)}</label>
       <button
         className="btn"
-        disabled={deviceOrientationEvent}
+        disabled={!hasGyroscope}
         onClick={() => setGyroscopeEnabled((prev) => !prev)}
       >
         {isGyroscopeEnabled ? "ON" : "OFF"}
