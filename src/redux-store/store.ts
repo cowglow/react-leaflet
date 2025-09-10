@@ -1,11 +1,13 @@
 import createSagaMiddleware from "redux-saga";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import markerSlice from "redux-store/store/marker/marker-slice.ts";
+import gyroscopeSlice from "redux-store/store/gyroscope/gyroscope-slice.ts";
 import { watchSaga } from "redux-store/sagas.ts";
 
 const sagaMiddleware = createSagaMiddleware();
 const rootReducer = combineReducers({
   markers: markerSlice,
+  gyroscope: gyroscopeSlice,
 });
 
 export function setupStore(preloadedState: Partial<RootState>) {

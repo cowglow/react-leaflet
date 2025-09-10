@@ -1,12 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { Box } from "@mui/material";
+import { useDispatch, useSelector } from "redux-store/hooks.ts";
+import {
+  getGyroscopeAlpha,
+  getGyroscopeEnabled,
+} from "redux-store/store/gyroscope/gyroscope-selectors.ts";
+import {
+  disableGyroscope,
+  enableGyroscope,
+  setAlpha,
+} from "redux-store/store/gyroscope/gyroscope-slice.ts";
 
 export default function GyroscopeControl() {
   const map = useMap();
+  const dispatch = useDispatch();
+
   const hasGyroscope = "DeviceOrientationEvent" in window;
-  const [isGyroscopeEnabled, setGyroscopeEnabled] = useState(false);
-  const [alpha, setAlpha] = useState(0);
+  const isGyroscopeEnabled = useSelector(getGyroscopeEnabled);
+  const alpha = useSelector(getGyroscopeAlpha);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isGyroscopeEnabled) {
+        map.getContainer().style.transform = `rotate(${alpha}deg)`;
+        dispatch(setAlpha(alpha + 1));
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  });
 
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
@@ -14,15 +39,16 @@ export default function GyroscopeControl() {
       if (alpha !== null) {
         // Apply rotation to the map
         map.getContainer().style.transform = `rotate(${alpha}deg)`;
-        setAlpha(alpha);
+        dispatch(setAlpha(alpha));
       }
     };
 
-    if (hasGyroscope) {
+    if (hasGyroscope && isGyroscopeEnabled) {
       window.addEventListener("deviceorientation", handleOrientation);
     } else {
       console.warn("DeviceOrientationEvent is not supported on this device.");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasGyroscope, isGyroscopeEnabled, map]);
 
   return (
@@ -31,7 +57,13 @@ export default function GyroscopeControl() {
       <button
         className="btn"
         disabled={!hasGyroscope}
-        onClick={() => setGyroscopeEnabled((prev) => !prev)}
+        onClick={() => {
+          if (!isGyroscopeEnabled) {
+            dispatch(enableGyroscope());
+          } else {
+            dispatch(disableGyroscope());
+          }
+        }}
       >
         {isGyroscopeEnabled ? "ON" : "OFF"}
       </button>
