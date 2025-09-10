@@ -20,18 +20,18 @@ export default function GyroscopeControl() {
   const isGyroscopeEnabled = useSelector(getGyroscopeEnabled);
   const alpha = useSelector(getGyroscopeAlpha);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (isGyroscopeEnabled) {
-        map.getContainer().style.transform = `rotate(${alpha}deg)`;
-        dispatch(setAlpha(alpha + 1));
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  });
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     if (isGyroscopeEnabled) {
+  //       map.getContainer().style.transform = `rotate(${alpha}deg)`;
+  //       dispatch(setAlpha(alpha + 1));
+  //     }
+  //   }, 1000);
+  //
+  //   return () => {
+  //     clearTimeout(timeout);
+  //   };
+  // });
 
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
