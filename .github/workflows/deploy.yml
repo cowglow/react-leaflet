@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "22" # Use the latest LTS version, or specify a specific version you want to use
+          node-version: "24" # Use the latest LTS version, or specify a specific version you want to use
 
       - name: Install Dependencies 📦
         run: npm install
