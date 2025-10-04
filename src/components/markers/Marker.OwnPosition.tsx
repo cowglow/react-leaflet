@@ -1,8 +1,9 @@
-import { Marker } from "react-leaflet";
+import { Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useState } from "react";
 
 export default function MarkerOwnPosition() {
+  const map = useMap()
   const defaultPosition = new L.LatLng(49.4521, 11.0767);
   const [position, setPosition] = useState<L.LatLng | null>(defaultPosition);
 
@@ -11,6 +12,7 @@ export default function MarkerOwnPosition() {
       (success) => {
         const { latitude, longitude } = success.coords;
         setPosition(new L.LatLng(latitude, longitude));
+        map.setView(new L.LatLng(latitude, longitude), 12);
       },
       (error) => {
         console.error("Geolocation error:", error);

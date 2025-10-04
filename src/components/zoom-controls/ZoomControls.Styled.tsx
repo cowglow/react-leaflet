@@ -5,6 +5,10 @@ export const StyledZoomControls = styled("div")`
   //flex-direction: column;
   gap: 0.33rem;
 
+  & > label:nth-child(1) {
+    flex: 1;
+  }
+
   & > button,
   button:disabled {
     display: flex;

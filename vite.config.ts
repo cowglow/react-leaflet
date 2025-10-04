@@ -4,7 +4,7 @@ import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 // import * as path from "node:path";
 // import * as fs from "node:fs";
-// import viteBasicSslPlugin from "@vitejs/plugin-basic-ssl";
+import viteBasicSslPlugin from "@vitejs/plugin-basic-ssl";
 
 // Load self-signed certificates (adjust paths as needed)
 /*
@@ -21,7 +21,7 @@ export default defineConfig({
     tsconfigPaths(),
     react(),
     checker({ typescript: true }),
-    // viteBasicSslPlugin(),
+    viteBasicSslPlugin(),
   ],
   server: {
     port: 3000,

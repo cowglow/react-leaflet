@@ -25,6 +25,9 @@ export default function ZoomControls() {
 
   return (
     <StyledZoomControls>
+      <label htmlFor="filterRange">
+        Zoom Controls
+      </label>
       <button className="btn" onClick={() => zoom("in")}>
         <PlusIcon />
       </button>
