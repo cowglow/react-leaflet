@@ -24,15 +24,14 @@ export default function App() {
 
   const nbgCenter = new L.LatLng(49.4521, 11.0767);
 
-  // noinspection TypeScriptValidateTypes
   return (
     <MainLayout>
       <Loader open={isMarkersLoading} />
       <Map
         center={nbgCenter}
         zoom={8}
-        // scrollWheelZoom={false}
-        // bounceAtZoomLimits
+        scrollWheelZoom={true}
+        bounceAtZoomLimits={true}
       >
         <MarkerOwnPosition />
         <MapControls />

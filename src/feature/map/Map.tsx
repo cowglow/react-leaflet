@@ -32,10 +32,12 @@ const GyroScopeMask = styled(Box)`
 export default function Map({
   children,
   center,
-  scrollWheelZoom,
-  zoom,
+  scrollWheelZoom = false,
+  bounceAtZoomLimits = false,
+  zoom = 3,
 }: MapContainerProps) {
   const isGyroscope = useSelector(getGyroscopeEnabled);
+  const bounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
   return (
     <MapWrapper>
       <GyroScopeMask display={isGyroscope ? "block" : "none"}>
@@ -46,7 +48,11 @@ export default function Map({
         center={center}
         zoom={zoom}
         scrollWheelZoom={scrollWheelZoom}
-        minZoom={2}
+        minZoom={3}
+        maxZoom={19}
+        maxBounds={bounds}
+        maxBoundsViscosity={0.15}
+        bounceAtZoomLimits={bounceAtZoomLimits}
       >
         <MapAttribution />
         {children}
