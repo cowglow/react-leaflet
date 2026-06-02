@@ -1,0 +1,7 @@
+.aircraft-marker {
+    width: 32px;
+    height: 24px;
+    border: thin solid black;
+    border-radius: 50%;
+    background-color: rgba(255, 0, 255, 0.6);
+}
