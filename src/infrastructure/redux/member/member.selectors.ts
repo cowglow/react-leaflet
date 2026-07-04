@@ -16,3 +16,7 @@ export function getMembersWithAddress(state: RootState): Member[] {
 export function getMemberById(state: RootState, id: string): Member | undefined {
   return state.member.items.find((member) => member.id === id);
 }
+
+export function getMemberError(state: RootState): string | null {
+  return state.member.error;
+}

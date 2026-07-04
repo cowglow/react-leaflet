@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { apiFetch } from "infrastructure/api/api-client.ts";
+import { apiFetch, NetworkError } from "infrastructure/api/api-client.ts";
 import { clearStoredToken, getStoredToken, setStoredToken } from "infrastructure/api/token-storage.ts";
 
 export type Role = "member" | "leader";
@@ -11,7 +11,7 @@ export type Account = {
 };
 
 export type AuthState = {
-  status: "idle" | "loading" | "authenticated" | "unauthenticated";
+  status: "idle" | "loading" | "authenticated" | "unauthenticated" | "offline";
   account: Account | null;
   error: string | null;
 };
@@ -22,13 +22,27 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const restoreSession = createAsyncThunk("auth/restoreSession", async () => {
+export const restoreSession = createAsyncThunk<
+  Account | null,
+  void,
+  { rejectValue: { network: boolean } }
+>("auth/restoreSession", async (_arg, { rejectWithValue }) => {
   const token = getStoredToken();
   if (!token) {
     return null;
   }
-  const { account } = await apiFetch<{ account: Account }>("/auth/me");
-  return account;
+  try {
+    const { account } = await apiFetch<{ account: Account }>("/auth/me");
+    return account;
+  } catch (error) {
+    if (error instanceof NetworkError) {
+      // Server unreachable, not "your session is invalid" — don't log the user out
+      // over a transient connection issue. Keep the stored token so a retry can
+      // pick the session back up once the server is reachable again.
+      return rejectWithValue({ network: true });
+    }
+    throw error;
+  }
 });
 
 export const requestMagicLink = createAsyncThunk("auth/requestMagicLink", async (email: string) => {
@@ -63,7 +77,14 @@ const authSlice = createSlice({
           ? { ...state, status: "authenticated" as const, account: action.payload }
           : { ...state, status: "unauthenticated" as const };
       })
-      .addCase(restoreSession.rejected, (state) => {
+      .addCase(restoreSession.rejected, (state, action) => {
+        if (action.payload?.network) {
+          return {
+            ...state,
+            status: "offline" as const,
+            error: "Unable to reach the server. Check your connection and try again.",
+          };
+        }
         clearStoredToken();
         return { ...state, status: "unauthenticated" as const, account: null };
       })

@@ -8,3 +8,7 @@ export function getOrganizations(state: RootState): Organization[] {
 export function getOrganizationById(state: RootState, id: string): Organization | undefined {
   return state.organization.items.find((organization) => organization.id === id);
 }
+
+export function getOrganizationError(state: RootState): string | null {
+  return state.organization.error;
+}

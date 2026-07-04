@@ -1,12 +1,13 @@
 import { PropsWithChildren, useEffect } from "react";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { getAuthStatus } from "infrastructure/redux/auth/auth.selectors.ts";
+import { getAuthError, getAuthStatus } from "infrastructure/redux/auth/auth.selectors.ts";
 import { restoreSession, verifyMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
 import LoginForm from "ports/components/auth/LoginForm.tsx";
 
 export default function AuthGate({ children }: PropsWithChildren) {
   const dispatch = useDispatch();
   const status = useSelector(getAuthStatus);
+  const error = useSelector(getAuthError);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -26,6 +27,18 @@ export default function AuthGate({ children }: PropsWithChildren) {
 
   if (status === "idle" || status === "loading") {
     return <p>Loading…</p>;
+  }
+
+  if (status === "offline") {
+    return (
+      <div className="standard-dialog" style={{ maxWidth: "320px", margin: "10vh auto" }}>
+        <h2>Can&apos;t connect</h2>
+        <p>{error}</p>
+        <button type="button" className="btn" onClick={() => dispatch(restoreSession())}>
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (status !== "authenticated") {

@@ -5,6 +5,10 @@ export function getAuthStatus(state: RootState) {
   return state.auth.status;
 }
 
+export function getAuthError(state: RootState): string | null {
+  return state.auth.error;
+}
+
 export function getAccount(state: RootState): Account | null {
   return state.auth.account;
 }

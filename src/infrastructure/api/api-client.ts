@@ -11,6 +11,15 @@ export class ApiError extends Error {
   }
 }
 
+// Thrown when the request never got a response at all (server down, offline, DNS
+// failure, CORS misconfiguration) — distinct from ApiError, which means the server
+// was reachable and responded but rejected the request (bad auth, validation, etc.).
+export class NetworkError extends Error {
+  constructor() {
+    super("Unable to reach the server. Check your connection and try again.");
+  }
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getStoredToken();
   const headers: Record<string, string> = {
@@ -21,7 +30,12 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  } catch {
+    throw new NetworkError();
+  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}) as { error?: string });
