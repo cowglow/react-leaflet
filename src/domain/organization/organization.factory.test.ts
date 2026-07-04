@@ -3,10 +3,19 @@ import {
   createAreaOrganization,
   createDistrictOrganization,
   createHeadquartersOrganization,
+  createOrganization,
   createRegionOrganization,
 } from "domain/organization/organization.factory.ts";
 
 describe("Create Organizations", () => {
+  test("Create a flat Organization entity with a unique id", () => {
+    const a = createOrganization("District A", "District");
+    const b = createOrganization("District B", "District");
+    expect(a.id).toEqual(expect.any(String));
+    expect(a.id).not.toEqual(b.id);
+    expect(a.members).toEqual([]);
+  });
+
   test("Create District", () => {
     const result = createDistrictOrganization("District A", []);
     expect(result.type).toBe("District");

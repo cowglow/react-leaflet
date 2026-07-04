@@ -1,9 +1,14 @@
+import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
+
 export type DialogType = "MEMBER_DIALOG" | "ORGANIZATION_DIALOG";
 
-interface DialogContextProps {
-  dialog: DialogType | null;
-}
+export type DialogPayload = {
+  coordinates?: GeoCoordinate;
+  memberId?: string;
+};
 
 export type DialogContextApi = {
-  openDialog: (dialog: DialogType) => void;
-} & DialogContextProps;
+  dialog: DialogType | null;
+  payload: DialogPayload | null;
+  openDialog: (dialog: DialogType | null, payload?: DialogPayload | null) => void;
+};

@@ -2,9 +2,9 @@ import ExportController from "ports/components/import-export/ExportController.ts
 import ImportController from "ports/components/import-export/ImportController.tsx";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { getMarkers } from "infrastructure/redux/marker/marker.selectors.ts";
-import { openFileDone } from "infrastructure/redux/marker/marker.slice.ts";
-import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
+import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
+import { loadMembers } from "infrastructure/redux/member/member.slice.ts";
+import { csvRowsToMembers } from "application/csv/member.csv.ts";
 
 const ImportExportContainer = styled("div")`
   display: flex;
@@ -22,21 +22,17 @@ const ImportExportContainer = styled("div")`
 
 function ImportExportControls() {
   const dispatch = useDispatch();
-  const markers = useSelector(getMarkers);
+  const members = useSelector(getMembers);
 
-  const dataImportHandler = (data: string[][]) => {
-    const items: GeoCoordinate[] = data.map(([lat, lng]) => ({
-      lat: Number(lat),
-      lng: Number(lng),
-    }));
-    dispatch(openFileDone({ items }));
+  const dataImportHandler = (rows: string[][]) => {
+    dispatch(loadMembers(csvRowsToMembers(rows)));
   };
 
   return (
     <ImportExportContainer>
-      <ExportController label="Export Markers as CSV" data={markers} />
+      <ExportController label="Export Members as CSV" data={members} />
       <ImportController
-        label="Import Markers from CSV"
+        label="Import Members from CSV"
         onLoad={dataImportHandler}
       />
     </ImportExportContainer>

@@ -24,9 +24,17 @@ export type MemberResponsibilityRole = {
   type: DepartmentType;
 };
 
+export type MemberStatus =
+  | { kind: "active" }
+  | { kind: "lost-contact"; lastActiveDate: string };
+
 export type Member = {
+  id: string;
   name: MemberName;
   address?: MemberAddress;
   contact?: Partial<MemberContact>;
   responsibility?: MemberResponsibilityRole;
+  organizationId?: string;
+  signupDate: string;
+  status: MemberStatus;
 };

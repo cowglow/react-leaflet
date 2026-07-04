@@ -1,48 +1,36 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { Organization } from "domain/organization/organization.types.ts";
 
-const initialState = {
-  organizations: [],
-  organization: {},
-  loading: false,
-  error: null,
+export type OrganizationSliceState = {
+  items: Organization[];
+};
+
+const initialState: OrganizationSliceState = {
+  items: [],
 };
 
 const organizationSlice = createSlice({
   name: "organization",
   initialState,
   reducers: {
-    getOrganizations: (state) => {
-      state.loading = true;
+    addOrganization(state, action: PayloadAction<Organization>) {
+      return { ...state, items: [...state.items, action.payload] };
     },
-    getOrganizationsSuccess: (state, action) => {
-      state.organizations = action.payload;
-      state.loading = false;
+    updateOrganization(state, action: PayloadAction<Organization>) {
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.id ? action.payload : item,
+        ),
+      };
     },
-    getOrganizationsError: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
-    getOrganization: (state) => {
-      state.loading = true;
-    },
-    getOrganizationSuccess: (state, action) => {
-      state.organization = action.payload;
-      state.loading = false;
-    },
-    getOrganizationError: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
+    removeOrganization(state, action: PayloadAction<string>) {
+      return { ...state, items: state.items.filter((item) => item.id !== action.payload) };
     },
   },
 });
 
-export const {
-  getOrganizations,
-  getOrganizationsSuccess,
-  getOrganizationsError,
-  getOrganization,
-  getOrganizationSuccess,
-  getOrganizationError,
-} = organizationSlice.actions;
+export const { addOrganization, updateOrganization, removeOrganization } =
+  organizationSlice.actions;
 
 export default organizationSlice.reducer;

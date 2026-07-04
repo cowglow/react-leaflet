@@ -1,6 +1,5 @@
-import { all, fork } from "redux-saga/effects";
-import { watchMarkerSaga } from "infrastructure/redux/marker/marker.saga.ts";
+import { all } from "redux-saga/effects";
 
 export function* watchSaga() {
-  yield all([fork(watchMarkerSaga)]);
+  yield all([]);
 }

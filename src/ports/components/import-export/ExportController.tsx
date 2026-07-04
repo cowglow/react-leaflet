@@ -1,23 +1,24 @@
 import useCsvData from "ports/components/import-export/use-csv-data.ts";
 import ImportExportIcon from "@mui/icons-material/ImportExport";
 import { Tooltip } from "@mui/material";
-import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
+import type { Member } from "domain/member/member.types.ts";
+import { memberToCSVRow } from "application/csv/member.csv.ts";
 
 interface ExportControllerProps {
   label: string;
   file?: string;
-  data: GeoCoordinate[];
+  data: Member[];
 }
 
 export default function ExportController({
   label,
-  file = "output.csv",
+  file = "members.csv",
   data,
 }: ExportControllerProps) {
   const { exportCSVFile } = useCsvData();
   const clickHandler = () => {
     if (!data) return;
-    exportCSVFile(data, file);
+    exportCSVFile(data.map(memberToCSVRow), file);
   };
 
   const isDisabled = false;

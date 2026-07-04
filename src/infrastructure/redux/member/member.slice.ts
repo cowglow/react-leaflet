@@ -1,20 +1,48 @@
-export const CREATE_MEMBER = "CREATE_MEMBER";
-export const READ_MEMBER = "READ_MEMBER";
-export const UPDATE_MEMBER = "UPDATE_MEMBER";
-export const DELETE_MEMBER = "DELETE_MEMBER";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { Member } from "domain/member/member.types.ts";
 
-export const createMemberAction = (payload) => ({ type: CREATE_MEMBER, payload });
-export const readMemberAction = (payload) => ({ type: READ_MEMBER, payload });
-export const updateMemberAction = (payload) => ({ type: UPDATE_MEMBER, payload });
-export const deleteMemberAction = (payload) => ({ type: DELETE_MEMBER, payload });
-
-const initialState = { members: [] };
-
-export const memberReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case CREATE_MEMBER:
-      return { ...state, members: [...state.members, action.payload] };
-    default:
-      return state;
-  }
+export type MemberSliceState = {
+  items: Member[];
+  filteredLimit: number;
 };
+
+const initialState: MemberSliceState = {
+  items: [],
+  filteredLimit: 0,
+};
+
+const memberSlice = createSlice({
+  name: "member",
+  initialState,
+  reducers: {
+    addMember(state, action: PayloadAction<Member>) {
+      return {
+        ...state,
+        items: [...state.items, action.payload],
+        filteredLimit: state.filteredLimit + 1,
+      };
+    },
+    updateMember(state, action: PayloadAction<Member>) {
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.id ? action.payload : item,
+        ),
+      };
+    },
+    removeMember(state, action: PayloadAction<string>) {
+      return { ...state, items: state.items.filter((item) => item.id !== action.payload) };
+    },
+    setFilter(state, action: PayloadAction<number>) {
+      return { ...state, filteredLimit: action.payload };
+    },
+    loadMembers(state, action: PayloadAction<Member[]>) {
+      return { ...state, items: action.payload, filteredLimit: action.payload.length };
+    },
+  },
+});
+
+export const { addMember, updateMember, removeMember, setFilter, loadMembers } =
+  memberSlice.actions;
+
+export default memberSlice.reducer;

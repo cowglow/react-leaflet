@@ -3,28 +3,21 @@ import MainLayout from "ports/components/layout/MainLayout.tsx";
 import Map from "ports/components/map/Map.tsx";
 import MapBounds from "ports/components/layer-groups/MapBounds.ts";
 import MapControls from "ports/components/controls/MapControls.tsx";
-import MarkerDefault from "ports/components/markers/Marker.Default.tsx";
-import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import {
-  getFilteredMarkers,
-  isLoading,
-} from "infrastructure/redux/marker/marker.selectors.ts";
+import MemberMarker from "ports/components/markers/Marker.Member.tsx";
+import { useSelector } from "infrastructure/redux/hooks.ts";
+import { getFilteredMembers } from "infrastructure/redux/member/member.selectors.ts";
 import MapEvents from "ports/components/map/Map.Events.tsx";
-import { addMarker } from "infrastructure/redux/marker/marker.slice.ts";
-import Loader from "ports/components/ui/Loader.tsx";
+import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
-import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
 
 export default function App() {
-  const dispatch = useDispatch();
-  const markers = useSelector(getFilteredMarkers);
-  const isMarkersLoading = useSelector(isLoading);
+  const members = useSelector(getFilteredMembers);
+  const { openDialog } = useDialogContext();
 
   const nbgCenter = new L.LatLng(49.4521, 11.0767);
 
   return (
     <MainLayout>
-      <Loader open={isMarkersLoading} />
       <Map
         center={nbgCenter}
         zoom={8}
@@ -34,14 +27,14 @@ export default function App() {
         <MarkerOwnPosition />
         <MapControls />
         <MapBounds disableZoom={false} />
-        {[...markers].map((marker: GeoCoordinate, index) => (
-          <div key={index}>
-            <MarkerDefault position={marker} />
-          </div>
-        ))}
+        {members
+          .filter((member) => Boolean(member.address))
+          .map((member) => (
+            <MemberMarker key={member.id} member={member} />
+          ))}
         <MapEvents
           onClick={({ latlng: { lat, lng } }) => {
-            dispatch(addMarker({ lat, lng }));
+            openDialog("MEMBER_DIALOG", { coordinates: { lat, lng } });
           }}
         />
       </Map>

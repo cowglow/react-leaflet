@@ -1,23 +1,24 @@
 import { useMap } from "react-leaflet";
 import { useEffect } from "react";
 import { useSelector } from "infrastructure/redux/hooks.ts";
-import { getMarkers } from "infrastructure/redux/marker/marker.selectors.ts";
+import { getMembersWithAddress } from "infrastructure/redux/member/member.selectors.ts";
 
 interface MapBoundsProps {
   disableZoom: boolean;
 }
 
 export default function MapBounds({ disableZoom = false }: MapBoundsProps) {
-  const markers = useSelector(getMarkers);
+  const members = useSelector(getMembersWithAddress);
   const map = useMap();
 
   useEffect(() => {
-    const bounds = L.latLngBounds(markers);
-    if (bounds.isValid() && !disableZoom && markers.length > 5) {
+    const coordinates = members.map((member) => member.address!.coordinates);
+    const bounds = L.latLngBounds(coordinates);
+    if (bounds.isValid() && !disableZoom && coordinates.length > 5) {
       map.fitBounds(bounds);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markers]);
+  }, [members]);
 
   return null;
 }

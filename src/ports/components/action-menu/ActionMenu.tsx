@@ -1,11 +1,11 @@
 import ActionMenuItem from "ports/components/action-menu/ActionMenuItem.tsx";
 import { createMenuConfig } from "ports/config/menu.config.ts";
-import { useDispatch } from "react-redux";
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
+import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 
 export default function ActionMenu() {
-  const dispatch = useDispatch();
-  const menuConfig = createMenuConfig(dispatch);
+  const { openDialog } = useDialogContext();
+  const menuConfig = createMenuConfig(openDialog);
   const topMenuNames = Object.keys(menuConfig);
 
   return (

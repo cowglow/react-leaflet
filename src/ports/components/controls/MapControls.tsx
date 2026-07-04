@@ -3,12 +3,14 @@ import ZoomControls from "ports/components/controls/ZoomControls.tsx";
 import BaseMapsLayers from "ports/components/base-maps/BaseMapsLayers.tsx";
 import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
 import { Paper } from "@mui/material";
+import StraightenIcon from "@mui/icons-material/Straighten";
 import MapLayerGroup from "ports/components/map/Map.LayerGroup.tsx";
 import ImportExportControls from "ports/components/import-export/ImportExportControls.tsx";
+import DistanceControl from "ports/components/controls/DistanceControl.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { ChangeEvent, MouseEventHandler, useState } from "react";
-import { getMarkers } from "infrastructure/redux/marker/marker.selectors.ts";
-import { setFilter } from "infrastructure/redux/marker/marker.slice.ts";
+import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
+import { setFilter } from "infrastructure/redux/member/member.slice.ts";
 import { useMap } from "react-leaflet";
 
 export default function MapControls() {
@@ -16,7 +18,7 @@ export default function MapControls() {
   const [filterState, setFilterState] = useState(false);
   const [filterValue, setFilterValue] = useState(0);
   const dispatch = useDispatch();
-  const markers = useSelector(getMarkers);
+  const members = useSelector(getMembers);
 
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     dispatch(setFilter(Number(event.target.value)));
@@ -33,7 +35,7 @@ export default function MapControls() {
 
   const toggleFilter: MouseEventHandler<HTMLButtonElement> = () => {
     setFilterState((prevState) => {
-      dispatch(prevState ? setFilter(filterValue) : dispatch(setFilter(markers.length)));
+      dispatch(prevState ? setFilter(filterValue) : dispatch(setFilter(members.length)));
       return !prevState;
     });
   };
@@ -52,6 +54,9 @@ export default function MapControls() {
       </LayerControl>
       <LayerControl position="bottomRight" noIcon={true}>
         <ImportExportControls />
+      </LayerControl>
+      <LayerControl position="topRight" icon={<StraightenIcon />}>
+        <DistanceControl />
       </LayerControl>
       <LayerControl position="bottomLeft" noIcon={true}>
         <Paper
@@ -72,7 +77,7 @@ export default function MapControls() {
               onChange={handleRangeChange}
               value={filterValue}
               min={0}
-              max={markers.length}
+              max={members.length}
               disabled={filterState}
             />
             &nbsp;

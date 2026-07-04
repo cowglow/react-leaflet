@@ -3,6 +3,7 @@ import { createContext } from "react";
 
 const defaultValues: DialogContextApi = {
   dialog: null,
+  payload: null,
   openDialog: () => {
     throw Error("ERROR:: Open Dialog | Uninitialized ");
   },
