@@ -26,12 +26,13 @@ dist-ssr
 
 *storybook.log
 cert/
-/coverage/base.css
-/coverage/block-navigation.js
-/coverage/coverage-final.json
-/coverage/favicon.png
-/coverage/index.html
-/coverage/prettify.css
-/coverage/prettify.js
-/coverage/sort-arrow-sprite.png
-/coverage/sorter.js
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Test coverage output (now that vitest.config.ts's coverage.include is fixed to
+# actually measure source files, this generates a full nested report, not just a
+# handful of top-level files)
+coverage/

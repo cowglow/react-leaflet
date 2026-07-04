@@ -10,7 +10,8 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html"],
       reportsDirectory: "./coverage",
-      include: ["**/*.test.ts"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.ts", "src/vite-env.d.ts"],
     },
   },
 });

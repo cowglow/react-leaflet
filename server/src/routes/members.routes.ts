@@ -3,6 +3,7 @@ import type { Member as PrismaMember, DepartmentType, OrganizationType } from "@
 import { prisma } from "../db/prisma.js";
 import { requireAuth, requireRole } from "../auth/middleware.js";
 import { appendAuditLog } from "../audit/audit-log.js";
+import { asyncHandler } from "../lib/async-handler.js";
 
 export const membersRouter = Router();
 
@@ -82,73 +83,92 @@ function fromApiMember(input: ApiMemberInput) {
   };
 }
 
-membersRouter.get("/", requireAuth, async (_req, res) => {
-  const members = await prisma.member.findMany({ orderBy: { createdAt: "asc" } });
-  res.json({ members: members.map(toApiMember) });
-});
+membersRouter.get(
+  "/",
+  requireAuth,
+  asyncHandler(async (_req, res) => {
+    const members = await prisma.member.findMany({ orderBy: { createdAt: "asc" } });
+    res.json({ members: members.map(toApiMember) });
+  }),
+);
 
-membersRouter.post("/", requireAuth, requireRole("leader"), async (req, res) => {
-  const input = req.body as ApiMemberInput;
-  const data = fromApiMember(input);
+membersRouter.post(
+  "/",
+  requireAuth,
+  requireRole("leader"),
+  asyncHandler(async (req, res) => {
+    const input = req.body as ApiMemberInput;
+    const data = fromApiMember(input);
 
-  const member = await prisma.$transaction(async (tx) => {
-    const created = await tx.member.create({
-      data: { ...data, ...(input.id ? { id: input.id } : {}) },
+    const member = await prisma.$transaction(async (tx) => {
+      const created = await tx.member.create({
+        data: { ...data, ...(input.id ? { id: input.id } : {}) },
+      });
+      await appendAuditLog(tx, {
+        actorAccountId: req.account!.accountId,
+        entity: "member",
+        entityId: created.id,
+        diff: { type: "create", after: data },
+      });
+      return created;
     });
-    await appendAuditLog(tx, {
-      actorAccountId: req.account!.accountId,
-      entity: "member",
-      entityId: created.id,
-      diff: { type: "create", after: data },
+
+    res.status(201).json({ member: toApiMember(member) });
+  }),
+);
+
+membersRouter.put(
+  "/:id",
+  requireAuth,
+  requireRole("leader"),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const input = req.body as ApiMemberInput;
+    const data = fromApiMember(input);
+
+    const existing = await prisma.member.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: "Member not found" });
+      return;
+    }
+
+    const member = await prisma.$transaction(async (tx) => {
+      const updated = await tx.member.update({ where: { id }, data });
+      await appendAuditLog(tx, {
+        actorAccountId: req.account!.accountId,
+        entity: "member",
+        entityId: id,
+        diff: { type: "update", before: existing, after: data },
+      });
+      return updated;
     });
-    return created;
-  });
 
-  res.status(201).json({ member: toApiMember(member) });
-});
+    res.json({ member: toApiMember(member) });
+  }),
+);
 
-membersRouter.put("/:id", requireAuth, requireRole("leader"), async (req, res) => {
-  const { id } = req.params;
-  const input = req.body as ApiMemberInput;
-  const data = fromApiMember(input);
+membersRouter.delete(
+  "/:id",
+  requireAuth,
+  requireRole("leader"),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const existing = await prisma.member.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: "Member not found" });
+      return;
+    }
 
-  const existing = await prisma.member.findUnique({ where: { id } });
-  if (!existing) {
-    res.status(404).json({ error: "Member not found" });
-    return;
-  }
-
-  const member = await prisma.$transaction(async (tx) => {
-    const updated = await tx.member.update({ where: { id }, data });
-    await appendAuditLog(tx, {
-      actorAccountId: req.account!.accountId,
-      entity: "member",
-      entityId: id,
-      diff: { type: "update", before: existing, after: data },
+    await prisma.$transaction(async (tx) => {
+      await tx.member.delete({ where: { id } });
+      await appendAuditLog(tx, {
+        actorAccountId: req.account!.accountId,
+        entity: "member",
+        entityId: id,
+        diff: { type: "delete", before: existing },
+      });
     });
-    return updated;
-  });
 
-  res.json({ member: toApiMember(member) });
-});
-
-membersRouter.delete("/:id", requireAuth, requireRole("leader"), async (req, res) => {
-  const { id } = req.params;
-  const existing = await prisma.member.findUnique({ where: { id } });
-  if (!existing) {
-    res.status(404).json({ error: "Member not found" });
-    return;
-  }
-
-  await prisma.$transaction(async (tx) => {
-    await tx.member.delete({ where: { id } });
-    await appendAuditLog(tx, {
-      actorAccountId: req.account!.accountId,
-      entity: "member",
-      entityId: id,
-      diff: { type: "delete", before: existing },
-    });
-  });
-
-  res.status(204).send();
-});
+    res.status(204).send();
+  }),
+);
