@@ -1,32 +1,82 @@
 [![Publish Site](https://github.com/cowglow/react-leaflet/actions/workflows/deploy.yml/badge.svg)](https://github.com/cowglow/react-leaflet/actions/workflows/deploy.yml)
 
-# React-Leaflet
-![image](https://github.com/user-attachments/assets/37bcf706-a268-4525-9aa0-44437352a722)
+# Visual Contact Book
 
-# React + TypeScript + Vite
+A map-based contact book for leadership organizations: leaders add members by
+clicking their location on the map, assign them to organizations, mark lost contact,
+and see distance between members. See `docs/PLAN.md` for the full product plan and
+`docs/USER_MANUAL.md` for how to actually use the app.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Repo layout
 
-Currently, two official plugins are available:
+- **`src/`** — the frontend: React + TypeScript + Vite, deployed as a static site to
+  GitHub Pages. Talks to the backend only over its REST API. See `CLAUDE.md` for the
+  architecture (it's mid-migration to a layered domain/application/infrastructure/
+  ports structure).
+- **`server/`** — the backend: Node/Express + Prisma + Postgres. A separate,
+  independently deployable service — not a workspace member of the frontend.
+- **`e2e/`** — Playwright end-to-end tests driving the real frontend against the real
+  backend. See `e2e/README.md`.
+- **`docs/`** — `PLAN.md` (the product plan), `CLEAR_ARCHITECTURE.md` (the frontend's
+  architectural style), `PHASE_*_REPORT.md` (what was built in each phase and how it
+  was verified), `USER_MANUAL.md`, `HETZNER_DEPLOY.md` (production deployment guide).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Quick start
 
-## Expanding the ESLint configuration
+Frontend only (map UI, no login/backend features will work):
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```bash
+pnpm install
+pnpm dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Full stack, for anything involving login, members, or organizations:
+
+```bash
+# Backend
+cd server
+pnpm install
+cp .env.example .env               # edit DATABASE_URL etc. as needed
+docker compose up -d db            # or run your own local Postgres
+pnpm prisma:deploy
+SEED_LEADER_EMAIL=you@example.com pnpm seed
+pnpm dev
+
+# Frontend, in another terminal
+cd ..
+cp .env.example .env               # VITE_API_URL should point at the backend above
+pnpm dev
+```
+
+Magic-link logins are logged to the backend's own console — there's no real email
+sending yet (see `docs/PHASE_3_REPORT.md`).
+
+## Commands
+
+Frontend (repo root):
+
+```bash
+pnpm dev          # start dev server
+pnpm build        # tsc && vite build
+pnpm lint         # eslint src e2e
+pnpm test         # vitest --coverage (unit tests)
+pnpm test:e2e     # playwright test (requires the backend running — see e2e/README.md)
+pnpm format       # prettier . --write
+```
+
+Backend (`server/`):
+
+```bash
+pnpm dev              # tsx watch src/index.ts
+pnpm build            # tsc
+pnpm prisma:migrate   # create a new migration (dev)
+pnpm prisma:deploy    # apply existing migrations
+pnpm seed             # bootstrap the first leader account (SEED_LEADER_EMAIL=...)
+pnpm test             # vitest run
+```
+
+## Deploying
+
+Frontend deploys automatically to GitHub Pages on push to `main`
+(`.github/workflows/deploy.yml`). Backend deployment is manual — see
+`docs/HETZNER_DEPLOY.md`.
