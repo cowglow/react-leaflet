@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
 
 export type MarkerSliceState = {
-  enabled: boolean;
   error: Error | null;
   filteredLimit: number;
   items: GeoCoordinate[];
@@ -10,7 +9,6 @@ export type MarkerSliceState = {
 };
 
 const initialState: MarkerSliceState = {
-  enabled: true,
   error: null,
   filteredLimit: 0,
   items: [],
@@ -66,9 +64,6 @@ const markerSlice = createSlice({
     addMarkerError(state, action: PayloadAction<Error>) {
       return { ...state, loading: false, error: action.payload };
     },
-    setEnabled(state, action: PayloadAction<boolean>) {
-      return { ...state, enabled: action.payload };
-    },
     clearAllMarkers(state) {
       return { ...state, items: [] };
     },
@@ -89,7 +84,6 @@ export const {
   removeMarker,
   addMarkerSuccess,
   addMarkerError,
-  setEnabled,
   clearAllMarkers,
   setFilter,
 } = markerSlice.actions;

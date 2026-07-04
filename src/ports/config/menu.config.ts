@@ -3,7 +3,6 @@ import {
   clearAllMarkers,
   openFile,
   saveFile,
-  setEnabled,
 } from "infrastructure/redux/marker/marker.slice.ts";
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
 
@@ -17,12 +16,7 @@ export function createMenuConfig(dispatch: AppDispatch): MenuConfig {
       "---",
       { label: "Language (Coming Soon)", href: "#" },
     ],
-    Edit: [
-      { label: "Enable Markers", action: () => dispatch(setEnabled(true)) },
-      { label: "Disable Markers", action: () => dispatch(setEnabled(false)) },
-      "---",
-      { label: "Clear Markers", action: () => dispatch(clearAllMarkers()) },
-    ],
+    Edit: [{ label: "Clear Markers", action: () => dispatch(clearAllMarkers()) }],
     Actions: ["---"],
     View: [
       { label: "system.css", href: "https://sakofchit.github.io/system.css/" },

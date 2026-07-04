@@ -19,7 +19,6 @@ export default function MapControls() {
   const markers = useSelector(getMarkers);
 
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    L.DomEvent.disableClickPropagation(event.target);
     dispatch(setFilter(Number(event.target.value)));
     setFilterValue(Number(event.target.value));
   };
@@ -32,8 +31,7 @@ export default function MapControls() {
     }
   };
 
-  const toggleFilter: MouseEventHandler<HTMLButtonElement> = (event) => {
-    L.DomEvent.disableClickPropagation(event.currentTarget);
+  const toggleFilter: MouseEventHandler<HTMLButtonElement> = () => {
     setFilterState((prevState) => {
       dispatch(prevState ? setFilter(filterValue) : dispatch(setFilter(markers.length)));
       return !prevState;

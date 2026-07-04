@@ -2,7 +2,6 @@ import ActionMenuItem from "ports/components/action-menu/ActionMenuItem.tsx";
 import { createMenuConfig } from "ports/config/menu.config.ts";
 import { useDispatch } from "react-redux";
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
-import { setEnabled } from "infrastructure/redux/marker/marker.slice.ts";
 
 export default function ActionMenu() {
   const dispatch = useDispatch();
@@ -10,11 +9,7 @@ export default function ActionMenu() {
   const topMenuNames = Object.keys(menuConfig);
 
   return (
-    <ul
-      role="menu-bar"
-      className="standard-dialog"
-      onMouseEnter={() => dispatch(setEnabled(false))}
-    >
+    <ul role="menu-bar" className="standard-dialog">
       {topMenuNames.map((menuName) => (
         <li
           key={`action-menu-key-${menuName}`}

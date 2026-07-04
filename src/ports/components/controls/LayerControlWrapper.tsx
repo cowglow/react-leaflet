@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import { ControlPosition } from "ports/components/map/map.types.ts";
 
 const positionClass: Record<ControlPosition, string> = {
@@ -16,8 +16,16 @@ interface LayerControlWrapperProps extends PropsWithChildren {
 
 export function LayerControlWrapper(props: LayerControlWrapperProps) {
   const { position, padding, children } = props;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      L.DomEvent.disableClickPropagation(containerRef.current);
+    }
+  }, []);
+
   return (
-    <div className={positionClass[position]}>
+    <div ref={containerRef} className={positionClass[position]}>
       <Box className="leaflet-control" px={1} py={padding}>
         {children}
       </Box>

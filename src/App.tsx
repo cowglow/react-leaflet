@@ -7,7 +7,6 @@ import MarkerDefault from "ports/components/markers/Marker.Default.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import {
   getFilteredMarkers,
-  isEnabled,
   isLoading,
 } from "infrastructure/redux/marker/marker.selectors.ts";
 import MapEvents from "ports/components/map/Map.Events.tsx";
@@ -19,8 +18,6 @@ import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
 export default function App() {
   const dispatch = useDispatch();
   const markers = useSelector(getFilteredMarkers);
-
-  const isMarkersEnabled = useSelector(isEnabled);
   const isMarkersLoading = useSelector(isLoading);
 
   const nbgCenter = new L.LatLng(49.4521, 11.0767);
@@ -43,7 +40,6 @@ export default function App() {
           </div>
         ))}
         <MapEvents
-          enabled={isMarkersEnabled}
           onClick={({ latlng: { lat, lng } }) => {
             dispatch(addMarker({ lat, lng }));
           }}
