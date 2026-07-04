@@ -14,6 +14,7 @@ export function createMenuConfig(
       ? {
           Actions: [
             { label: "Add Organization", action: () => openDialog("ORGANIZATION_DIALOG") },
+            { label: "Invite Account", action: () => openDialog("INVITE_DIALOG") },
           ] as MenuConfigItem[],
         }
       : {}),
