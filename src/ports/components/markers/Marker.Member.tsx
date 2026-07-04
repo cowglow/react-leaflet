@@ -32,7 +32,11 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const latLng = new L.LatLng(coordinates.lat, coordinates.lng);
 
   return (
-    <MapMarker position={latLng} events={{}}>
+    <MapMarker
+      position={latLng}
+      events={{}}
+      alt={`${member.name.firstName} ${member.name.lastName}`}
+    >
       <Popup>
         <strong>
           {member.name.firstName} {member.name.lastName}

@@ -5,6 +5,7 @@ import { uniqueEmail, uniqueName } from "./helpers/test-data.ts";
 
 test("a member-role account can read data but has no write UI", async ({ page }) => {
   const firstName = uniqueName("Dana");
+  const fullName = `${firstName} Lee`;
   const memberEmail = uniqueEmail("readonly");
 
   // Leader: add a member to have something visible, then invite a member-role account
@@ -34,8 +35,8 @@ test("a member-role account can read data but has no write UI", async ({ page })
 
   await expect(page.locator('ul[role="menu-bar"] >> text=Actions')).toHaveCount(0);
 
-  await page.locator(".leaflet-marker-icon").last().click();
-  await expect(page.locator(`text=${firstName} Lee`)).toBeVisible({ timeout: 5000 });
+  await page.locator(`img[alt="${fullName}"]`).dispatchEvent("click");
+  await expect(page.locator(`text=${fullName}`)).toBeVisible({ timeout: 5000 });
   await expect(page.locator('button:has-text("Edit")')).toHaveCount(0);
   await expect(page.locator('button:has-text("Remove")')).toHaveCount(0);
 
