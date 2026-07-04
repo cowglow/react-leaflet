@@ -1,8 +1,0 @@
-// CREATE
-export const CREATE_MEMBER = "CREATE_MEMBER";
-// READ
-export const READ_MEMBER = "READ_MEMBER";
-// UPDATE
-export const UPDATE_MEMBER = "UPDATE_MEMBER";
-// DELETE
-export const DELETE_MEMBER = "DELETE_MEMBER";

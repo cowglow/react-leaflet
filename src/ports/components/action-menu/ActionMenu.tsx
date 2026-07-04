@@ -1,5 +1,5 @@
 import ActionMenuItem from "ports/components/action-menu/ActionMenuItem.tsx";
-import { createMenuConfig } from "config/menu.config.ts";
+import { createMenuConfig } from "ports/config/menu.config.ts";
 import { useDispatch } from "react-redux";
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
 import { setEnabled } from "infrastructure/redux/marker/marker.slice.ts";

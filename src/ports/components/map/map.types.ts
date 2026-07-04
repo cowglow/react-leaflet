@@ -5,6 +5,10 @@ export interface MapMarkerProps extends L.MarkerOptions, L.EventedProps {
   remove?: (position: L.LatLng) => void;
 }
 
+export interface MapLayerGroupProps {
+  children?: React.ReactNode;
+}
+
 export type ControlPosition =
   | "topLeft"
   | "topRight"
