@@ -43,7 +43,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
   const [lostContact, setLostContact] = useState(existingMember?.status.kind === "lost-contact");
   const [lastActiveDate, setLastActiveDate] = useState(
     existingMember?.status.kind === "lost-contact"
-      ? existingMember.status.lastActiveDate
+      ? existingMember.status.lastActiveDate.slice(0, 10)
       : new Date().toISOString().slice(0, 10),
   );
 
@@ -51,7 +51,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
     return <p>No location selected. Close this and click the map to place a new member.</p>;
   }
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
     let member: Member = existingMember ? { ...existingMember } : createMember(firstName, lastName);
@@ -64,15 +64,25 @@ export default function MemberForm({ payload }: MemberFormProps) {
     member = organizationId ? assignOrganization(member, organizationId) : member;
     member = lostContact ? markLostContact(member, lastActiveDate) : reactivateMember(member);
 
-    dispatch(isEditMode ? updateMember(member) : addMember(member));
-    openDialog(null);
+    try {
+      await dispatch(isEditMode ? updateMember(member) : addMember(member)).unwrap();
+      openDialog(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to save member");
+    }
   };
 
-  const handleRemove = () => {
-    if (existingMember) {
-      dispatch(removeMember(existingMember.id));
+  const handleRemove = async () => {
+    if (!existingMember) {
+      openDialog(null);
+      return;
     }
-    openDialog(null);
+    try {
+      await dispatch(removeMember(existingMember.id)).unwrap();
+      openDialog(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to remove member");
+    }
   };
 
   return (

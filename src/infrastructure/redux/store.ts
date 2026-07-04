@@ -1,5 +1,6 @@
 import createSagaMiddleware from "redux-saga";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import authSlice from "infrastructure/redux/auth/auth.slice.ts";
 import gyroscopeSlice from "infrastructure/redux/gyroscope/gyroscope.slice.ts";
 import memberSlice from "infrastructure/redux/member/member.slice.ts";
 import organizationSlice from "infrastructure/redux/organization/organization.slice.ts";
@@ -7,6 +8,7 @@ import { watchSaga } from "infrastructure/redux/sagas.ts";
 
 const sagaMiddleware = createSagaMiddleware();
 const rootReducer = combineReducers({
+  auth: authSlice,
   gyroscope: gyroscopeSlice,
   member: memberSlice,
   organization: organizationSlice,
@@ -18,7 +20,6 @@ export function setupStore(preloadedState: Partial<RootState>) {
     preloadedState,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
-        thunk: false,
         serializableCheck: false,
       }).concat(sagaMiddleware),
     devTools: true,

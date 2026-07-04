@@ -2,10 +2,13 @@ import ActionMenuItem from "ports/components/action-menu/ActionMenuItem.tsx";
 import { createMenuConfig } from "ports/config/menu.config.ts";
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { useSelector } from "infrastructure/redux/hooks.ts";
+import { getRole } from "infrastructure/redux/auth/auth.selectors.ts";
 
 export default function ActionMenu() {
   const { openDialog } = useDialogContext();
-  const menuConfig = createMenuConfig(openDialog);
+  const role = useSelector(getRole);
+  const menuConfig = createMenuConfig(openDialog, role);
   const topMenuNames = Object.keys(menuConfig);
 
   return (

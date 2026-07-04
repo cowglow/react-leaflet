@@ -13,3 +13,45 @@ services:
       - ./:/app/
     stdin_open: true
     tty: true
+
+  db:
+    image: postgres:16
+    container_name: contact-book-db
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: contact_book
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  api:
+    container_name: contact-book-api
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/contact_book
+      JWT_SECRET: dev-secret-change-me
+      PORT: 4000
+      CLIENT_ORIGIN: http://localhost:3000
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  adminer:
+    image: adminer
+    container_name: contact-book-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres-data:

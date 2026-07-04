@@ -3,7 +3,7 @@ import ImportController from "ports/components/import-export/ImportController.ts
 import styled from "styled-components";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
-import { loadMembers } from "infrastructure/redux/member/member.slice.ts";
+import { addMember } from "infrastructure/redux/member/member.slice.ts";
 import { csvRowsToMembers } from "application/csv/member.csv.ts";
 
 const ImportExportContainer = styled("div")`
@@ -24,8 +24,18 @@ function ImportExportControls() {
   const dispatch = useDispatch();
   const members = useSelector(getMembers);
 
-  const dataImportHandler = (rows: string[][]) => {
-    dispatch(loadMembers(csvRowsToMembers(rows)));
+  const dataImportHandler = async (rows: string[][]) => {
+    const imported = csvRowsToMembers(rows);
+    const results = await Promise.allSettled(
+      imported.map((member) => dispatch(addMember(member)).unwrap()),
+    );
+    const failed = results.filter((result) => result.status === "rejected").length;
+    if (failed > 0) {
+      alert(
+        `Imported ${imported.length - failed} of ${imported.length} members ` +
+          `(${failed} failed — likely already existed).`,
+      );
+    }
   };
 
   return (

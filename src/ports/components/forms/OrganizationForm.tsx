@@ -13,10 +13,14 @@ export default function OrganizationForm() {
   const [name, setName] = useState("");
   const [type, setType] = useState<OrganizationType>("District");
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    dispatch(addOrganization(createOrganization(name, type)));
-    openDialog(null);
+    try {
+      await dispatch(addOrganization(createOrganization(name, type))).unwrap();
+      openDialog(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to save organization");
+    }
   };
 
   return (
