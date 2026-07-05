@@ -11,7 +11,9 @@ const MY_LOCATION = "__my_location__";
 export default function DistanceControl() {
   const members = useSelector(getMembersWithAddress);
   const [originId, setOriginId] = useState("");
-  const { location: myLocation, error: geoError, loading: geoLoading } = useGeoLocation();
+  const { location: myLocation, error: geoError, loading: geoLoading } = useGeoLocation(
+    originId === MY_LOCATION,
+  );
 
   const origin: GeoCoordinate | undefined =
     originId === MY_LOCATION
