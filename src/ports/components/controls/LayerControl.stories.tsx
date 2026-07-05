@@ -22,5 +22,5 @@ export const CollapsedWithCustomIcon: Story = {
 };
 
 export const AlwaysOpen: Story = {
-  args: { noIcon: true, icon: undefined },
+  args: { noIcon: true },
 };
