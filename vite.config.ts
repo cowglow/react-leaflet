@@ -16,7 +16,7 @@ const https = {
 */
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/react-leaflet",
+  base: "/visual-directory",
   plugins: [
     tsconfigPaths(),
     react(),

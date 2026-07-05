@@ -74,7 +74,7 @@ From here on, SSH in as `ssh deploy@YOUR_SERVER_IP` instead of root.
 Simplest approach — clone the repo directly on the box:
 
 ```bash
-git clone https://github.com/cowglow/react-leaflet.git ~/app
+git clone https://github.com/cowglow/visual-directory.git ~/app
 cd ~/app
 ```
 
@@ -131,7 +131,7 @@ Add a `caddy` service to `docker-compose.yml`:
 ```yaml
   caddy:
     image: caddy:2
-    container_name: contact-book-caddy
+    container_name: visual-directory-caddy
     ports:
       - "80:80"
       - "443:443"
@@ -164,7 +164,7 @@ cd ~/app
 docker compose up -d db api caddy
 ```
 
-(Leaving `adminer` and the frontend's `react-leaflet` dev service out of the
+(Leaving `adminer` and the frontend's `frontend` dev service out of the
 production `up` — Adminer per the security note above; the frontend service is dev
 tooling, not how the real frontend gets served.)
 

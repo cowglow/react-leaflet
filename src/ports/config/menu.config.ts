@@ -22,7 +22,7 @@ export function createMenuConfig(
       { label: "system.css", href: "https://sakofchit.github.io/system.css/" },
       { label: "sakun's twitter", href: "https://x.com/sakofchit" },
       "---",
-      { label: "GitHub Repo", href: "https://github.com/cowglow/react-leaflet" },
+      { label: "GitHub Repo", href: "https://github.com/cowglow/visual-directory" },
     ],
   };
 }

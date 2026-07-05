@@ -1,8 +1,8 @@
-[![Publish Site](https://github.com/cowglow/react-leaflet/actions/workflows/deploy.yml/badge.svg)](https://github.com/cowglow/react-leaflet/actions/workflows/deploy.yml)
+[![Publish Site](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml/badge.svg)](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml)
 
-# Visual Contact Book
+# Visual Directory
 
-A map-based contact book for leadership organizations: leaders add members by
+A map-based contact directory for leadership organizations: leaders add members by
 clicking their location on the map, assign them to organizations, mark lost contact,
 and see distance between members. See `docs/PLAN.md` for the full product plan and
 `docs/USER_MANUAL.md` for how to actually use the app.

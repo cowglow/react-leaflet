@@ -1,11 +1,11 @@
 {
-  "name": "react-leaflet",
+  "name": "visual-directory",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host --port 3000",
-    "docker:dev": "docker compose run --service-ports react-leaflet bash",
+    "docker:dev": "docker compose run --service-ports frontend bash",
     "build": "tsc && vite build",
     "lint": "eslint src e2e --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

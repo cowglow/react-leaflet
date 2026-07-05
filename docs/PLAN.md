@@ -1,7 +1,7 @@
-# Project Plan: Visual Contact Book
+# Project Plan: Visual Directory
 
 This document is the working plan for turning this map prototype into a real tool: a
-visual contact book where leadership can create members, assign them to organizations,
+visual directory where leadership can create members, assign them to organizations,
 see where everyone lives on a map, and see how far members are from each other. It
 covers three things that need to happen together: finishing the "Clear Architecture"
 migration already underway, building the actual member/organization features, and
@@ -122,7 +122,7 @@ Prerequisite hygiene before building new features on top of a broken/duplicated 
 - Re-scope the "Edit" and "Actions" menus around real actions once the member/org data
   model lands in Phase 2 (e.g. "Add Member", "Add Organization", "Mark Lost Contact").
 
-## Phase 2 — Member & Organization features (the actual contact book)
+## Phase 2 — Member & Organization features (the actual directory)
 
 - Extend `domain/member/member.types.ts` with a signup date and a status field, e.g.:
   ```ts

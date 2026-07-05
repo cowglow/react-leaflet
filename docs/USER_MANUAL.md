@@ -1,6 +1,6 @@
 # User Manual
 
-This is a map-based contact book for keeping track of members and where they live.
+This is a map-based visual directory for keeping track of members and where they live.
 Leaders can add and edit members, organize them into groups, and see how far apart
 people are. Everyone who's logged in can see the full directory — you don't need to
 be a leader to look people up, only to make changes.
