@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useDispatch } from "infrastructure/redux/hooks.ts";
-import { requestMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
+import { requestMagicLink, verifyMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
 
 export default function LoginForm() {
   const dispatch = useDispatch();
@@ -9,7 +9,17 @@ export default function LoginForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await dispatch(requestMagicLink(email));
+    try {
+      const result = await dispatch(requestMagicLink(email)).unwrap();
+      if (result.devToken) {
+        // No real email provider outside production — skip straight to signed-in
+        // instead of making the developer go find the token in the console.
+        await dispatch(verifyMagicLink(result.devToken));
+        return;
+      }
+    } catch {
+      // fall through to the generic "sent" message below
+    }
     setSent(true);
   };
 

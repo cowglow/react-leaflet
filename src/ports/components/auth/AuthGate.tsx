@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getAuthError, getAuthStatus } from "infrastructure/redux/auth/auth.selectors.ts";
 import { restoreSession, verifyMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
@@ -8,8 +8,18 @@ export default function AuthGate({ children }: PropsWithChildren) {
   const dispatch = useDispatch();
   const status = useSelector(getAuthStatus);
   const error = useSelector(getAuthError);
+  // Magic-link tokens are single-use: React StrictMode's dev-mode double-invoke of
+  // this effect would otherwise fire a second /auth/verify with the same token,
+  // which the server rejects and which then clobbers the first request's successful
+  // login back to unauthenticated.
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) {
+      return;
+    }
+    hasRun.current = true;
+
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 

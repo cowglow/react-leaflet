@@ -12,8 +12,8 @@ type Story = StoryObj<typeof LoginForm>;
 
 export const Default: Story = {};
 
-// requestMagicLink() isn't unwrap()'d, so the form always shows the "sent" confirmation
-// once the dispatch settles, whether or not the real network request succeeds.
+// There's no real backend in Storybook, so the request fails and falls through to the
+// generic "sent" confirmation rather than the dev auto-login shortcut.
 export const Sent: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

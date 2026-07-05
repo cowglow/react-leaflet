@@ -46,7 +46,10 @@ export const restoreSession = createAsyncThunk<
 });
 
 export const requestMagicLink = createAsyncThunk("auth/requestMagicLink", async (email: string) => {
-  await apiFetch("/auth/magic-link", { method: "POST", body: JSON.stringify({ email }) });
+  return await apiFetch<{ message: string; devToken?: string }>("/auth/magic-link", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
 });
 
 export const verifyMagicLink = createAsyncThunk("auth/verifyMagicLink", async (token: string) => {

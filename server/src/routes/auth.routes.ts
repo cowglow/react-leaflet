@@ -19,16 +19,26 @@ authRouter.post(
       return;
     }
 
+    let devToken: string | undefined;
     const account = await prisma.account.findUnique({ where: { email } });
     if (account) {
       const token = await createMagicLinkToken(account.id);
       const url = `${CLIENT_ORIGIN}/?token=${token}`;
       await consoleMailer.sendMagicLink(email, url);
+      // Outside production there's no real email provider wired up (see
+      // docs/PHASE_3_REPORT.md), so hand the token back directly to let local dev
+      // skip the "go find it in the console" step. Never do this in production.
+      if (process.env.NODE_ENV !== "production") {
+        devToken = token;
+      }
     }
 
     // Always respond the same way regardless of whether the account exists,
     // so this endpoint can't be used to enumerate registered emails.
-    res.json({ message: "If that email has an account, a login link has been sent." });
+    res.json({
+      message: "If that email has an account, a login link has been sent.",
+      ...(devToken ? { devToken } : {}),
+    });
   }),
 );
 
