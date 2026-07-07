@@ -6,9 +6,11 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    setError(null);
     try {
       const result = await dispatch(requestMagicLink(email)).unwrap();
       if (result.devToken) {
@@ -17,10 +19,13 @@ export default function LoginForm() {
         await dispatch(verifyMagicLink(result.devToken));
         return;
       }
-    } catch {
-      // fall through to the generic "sent" message below
+      // The API always responds the same way whether or not the account exists
+      // (to avoid leaking which emails are registered), so reaching here is a
+      // genuine success — only a thrown error below means the request itself failed.
+      setSent(true);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong. Please try again.");
     }
-    setSent(true);
   };
 
   return (
@@ -46,6 +51,11 @@ export default function LoginForm() {
           <button type="submit" className="btn">
             Send login link
           </button>
+          {error ? (
+            <p role="alert" style={{ color: "firebrick" }}>
+              {error}
+            </p>
+          ) : null}
         </form>
       )}
     </div>
