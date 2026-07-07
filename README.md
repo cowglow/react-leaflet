@@ -57,13 +57,18 @@ pnpm install
 pnpm dev
 ```
 
-Full stack, for anything involving login, members, or organizations — see
-[Running the backend in Docker](#running-the-backend-in-docker-for-development) below
-for the `db`/`api` half, then in another terminal:
+Full stack, for anything involving login, members, or organizations — one-time setup
+(see [Running the backend in Docker](#running-the-backend-in-docker-for-development)
+below for what these do), then a single command to boot everything day-to-day:
 
 ```bash
-cp .env.example .env               # VITE_API_URL should point at the backend above
-pnpm dev
+cp .env.example .env               # VITE_API_URL should point at the backend
+cd server && cp .env.example .env && cd ..
+pnpm backend:up
+pnpm backend:migrate
+SEED_LEADER_EMAIL=you@example.com pnpm backend:seed   # first time only
+
+pnpm dev:all               # backend (already up) + frontend dev server + Storybook, one terminal
 ```
 
 Magic-link logins are logged to the backend's own console — there's no real email
@@ -75,12 +80,19 @@ Frontend (repo root):
 
 ```bash
 pnpm dev          # start dev server
+pnpm dev:all      # backend up + dev server + Storybook together, one terminal (see below)
 pnpm build        # tsc && vite build
 pnpm lint         # eslint src e2e
 pnpm test         # vitest --coverage (unit tests)
 pnpm test:e2e     # playwright test (requires the backend running — see e2e/README.md)
 pnpm format       # prettier . --write
 pnpm docker:dev   # open a shell in a containerized frontend dev environment (see below)
+
+pnpm backend:up       # docker compose up -d db api adminer
+pnpm backend:down     # docker compose down
+pnpm backend:logs     # tail the api container's logs
+pnpm backend:migrate  # apply pending Prisma migrations inside the api container
+pnpm backend:seed     # bootstrap the first leader account (SEED_LEADER_EMAIL=... pnpm backend:seed)
 ```
 
 Backend (`server/`):
@@ -118,7 +130,7 @@ From the repo root:
 cd server
 cp .env.example .env               # dev defaults are fine locally, edit if you need to
 cd ..
-docker compose up -d db api adminer
+pnpm backend:up
 ```
 
 This builds the `api` image (see `server/Dockerfile` — a two-stage build that compiles
@@ -135,8 +147,8 @@ Then run migrations and seed the first leader account (only needed once, or afte
 schema change):
 
 ```bash
-docker compose exec api pnpm prisma:deploy
-docker compose exec api sh -c "SEED_LEADER_EMAIL=you@example.com pnpm seed"
+pnpm backend:migrate
+SEED_LEADER_EMAIL=you@example.com pnpm backend:seed
 ```
 
 Confirm it's up:
@@ -158,12 +170,15 @@ cp .env.example .env               # VITE_API_URL=http://localhost:4000 by defau
 pnpm dev
 ```
 
+Or, once the one-time setup above is done, `pnpm dev:all` brings the backend up (if
+not already) and runs the frontend dev server and Storybook together in one terminal.
+
 Useful day-to-day commands:
 
 ```bash
-docker compose logs -f api        # tail API logs
-docker compose down               # stop everything (keeps the Postgres volume)
-docker compose down -v            # stop everything AND wipe the Postgres volume
+pnpm backend:logs            # tail API logs
+pnpm backend:down            # stop everything (keeps the Postgres volume)
+docker compose down -v       # stop everything AND wipe the Postgres volume
 ```
 
 ### Running the frontend in Docker (optional)
