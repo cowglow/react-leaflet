@@ -13,6 +13,8 @@ services:
       - "4173:4173"
     volumes:
       - ./:/app/
+      - /app/node_modules # anonymous volume: keeps container-installed (Linux) deps
+      # from overwriting the host's own node_modules through the bind mount above
     stdin_open: true
     tty: true
 
