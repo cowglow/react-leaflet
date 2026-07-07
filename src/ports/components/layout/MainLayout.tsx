@@ -17,7 +17,7 @@ export default function MainLayout({ children }: PropsWithChildren) {
   return (
     <StyledWindow className="window scale-down">
       <div className="title-bar">
-        <h1 className="title">React Leaflet (Vite + React + TS)</h1>
+        <h1 className="title">Visual Directory (Vite + React + TS)</h1>
       </div>
       <div className="separator" />
       <StyledWindowContent>{children}</StyledWindowContent>
