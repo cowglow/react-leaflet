@@ -1,10 +1,9 @@
 # Deploying the backend to Hetzner
 
-This is a manual, one-time setup guide for standing up the backend (`db` + `api` +
-`adminer` from `docker-compose.yml`) on a Hetzner Cloud VPS, per `docs/PLAN.md`'s
-Phase 3 deployment decision: the frontend deploy stays exactly as-is (GitHub Pages,
-`.github/workflows/deploy.yml`), and backend deploy is manual (`docker compose up` on
-the box) — no CI/CD for the backend yet, by design.
+This guide covers the one-time server setup for running the backend (`db` + `api`)
+on a Hetzner Cloud VPS. The frontend stays on GitHub Pages. Once the server is set up
+per steps 1–8 below, subsequent deploys are fully automated via GitHub Actions — see
+the [Automated CI/CD](#automated-cicd) section.
 
 Replace `YOUR_DOMAIN` and `YOUR_SERVER_IP` below with your actual values throughout.
 
@@ -200,12 +199,58 @@ at the real API. Without this, the production build silently falls back to
 `http://localhost:4000` (see `src/infrastructure/api/api-client.ts`) and every API
 call from the live site will fail.
 
+## Automated CI/CD
+
+After the one-time setup above is complete, every push to `main` triggers the
+`deploy_server` job in `.github/workflows/deploy.yml`, which:
+
+1. Builds the API image from `server/Dockerfile` and pushes it to
+   `ghcr.io/cowglow/visual-directory-api:latest`.
+2. SCPs `docker-compose.prod.yml` to `/opt/visual-directory/` on the server.
+3. SSHes in, writes secrets to `/opt/visual-directory/.env` (mode `600`), pulls the
+   new image, and restarts the stack with `docker compose up -d`.
+4. Runs `pnpm prisma:deploy` inside the running `api` container to apply any pending
+   migrations.
+
+### GitHub Secrets required
+
+Add these in `Settings → Secrets and variables → Actions`:
+
+| Secret | Description |
+|---|---|
+| `HETZNER_HOST` | Server IP or domain |
+| `HETZNER_USER` | SSH user (e.g. `deploy`) |
+| `HETZNER_SSH_KEY` | Full private key (`-----BEGIN...-----END...`) |
+| `POSTGRES_USER` | Database username |
+| `POSTGRES_PASSWORD` | Database password |
+| `POSTGRES_DB` | Database name (e.g. `contact_book`) |
+| `JWT_SECRET` | Random secret string for JWT signing |
+| `CLIENT_ORIGIN` | GitHub Pages URL (e.g. `https://cowglow.github.io/visual-directory`) |
+| `GHCR_PAT` | GitHub PAT with `read:packages` scope — lets the server pull the image |
+
+To create `GHCR_PAT`: `github.com → Settings → Developer settings → Personal access
+tokens → Fine-grained` with `read:packages` scope.
+
+### Production compose file
+
+`docker-compose.prod.yml` (in the repo root) is the production-only stack — no dev
+frontend service, no Adminer. It uses the pre-built image from `ghcr.io` rather than
+building on the server:
+
+- `db` — Postgres 16, data in the `postgres-data` named volume, with a healthcheck.
+- `api` — pulls `ghcr.io/cowglow/visual-directory-api:latest`; waits for `db` to be
+  healthy before starting.
+
+The workflow copies this file to the server on every deploy, so changes to it are
+picked up automatically.
+
 ## 9. Ongoing operations
 
 - **Logs**: `docker compose logs -f api` (or `db`, `caddy`).
-- **Redeploy after a code change**: `git pull && docker compose up -d --build api`.
-- **New migrations**: `git pull && docker compose exec api pnpm prisma:deploy`, then
-  restart the `api` service if the schema change requires it.
+- **Redeploy after a code change**: push to `main` — CI/CD handles it automatically.
+  To redeploy manually: `docker compose -f docker-compose.prod.yml pull api && docker compose -f docker-compose.prod.yml up -d`.
+- **New migrations**: CI/CD runs `pnpm prisma:deploy` automatically on every deploy.
+  To run manually: `docker compose -f docker-compose.prod.yml exec api pnpm prisma:deploy`.
 - **Backups**: `postgres-data` is a named Docker volume with no backup mechanism of
   its own. At minimum, periodically:
   `docker compose exec db pg_dump -U app contact_book > backup-$(date +%F).sql`,

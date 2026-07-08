@@ -6,26 +6,96 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
-    name: Build and Deploy Update
+  deploy_client:
+    name: Build and Deploy Client
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      - name: Install Dependencies 📦
+      - name: Install Dependencies
         run: pnpm install
 
-      - name: Build 🚧
+      - name: Build
         run: pnpm run build
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: dist/
+
+  deploy_server:
+    name: Build and Deploy API to Hetzner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: ghcr.io/cowglow/visual-directory-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Copy compose file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: docker-compose.prod.yml
+          target: /opt/visual-directory/
+
+      - name: Deploy on Hetzner
+        uses: appleboy/ssh-action@v1
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,JWT_SECRET,CLIENT_ORIGIN,GHCR_PAT
+          script: |
+            set -e
+            mkdir -p /opt/visual-directory
+            cd /opt/visual-directory
+
+            # Write secrets to .env (600 perms so only owner can read)
+            cat > .env << EOF
+            POSTGRES_USER=${POSTGRES_USER}
+            POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            POSTGRES_DB=${POSTGRES_DB}
+            JWT_SECRET=${JWT_SECRET}
+            CLIENT_ORIGIN=${CLIENT_ORIGIN}
+            EOF
+            chmod 600 .env
+
+            # Pull latest image and restart
+            echo "${GHCR_PAT}" | docker login ghcr.io -u cowglow --password-stdin
+            docker compose -f docker-compose.prod.yml pull api
+            docker compose -f docker-compose.prod.yml up -d
+
+            # Run pending migrations
+            docker compose -f docker-compose.prod.yml exec -T api pnpm prisma:deploy
