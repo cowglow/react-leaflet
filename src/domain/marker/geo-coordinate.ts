@@ -1,0 +1,1 @@
+export type GeoCoordinate = { lat: number; lng: number };

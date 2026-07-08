@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  member
+  leader
+}
+
+enum OrganizationType {
+  Region
+  Headquarter
+  Area
+  District
+}
+
+enum DepartmentType {
+  MD
+  WD
+  JMD
+  JWD
+}
+
+enum MemberStatusKind {
+  active
+  lost_contact
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      Role
+  memberId  String?  @unique
+  member    Member?  @relation(fields: [memberId], references: [id])
+  createdAt DateTime @default(now())
+
+  magicLinkTokens MagicLinkToken[]
+  auditLogEntries AuditLogEntry[]
+}
+
+model MagicLinkToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  accountId String
+  account   Account   @relation(fields: [accountId], references: [id])
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Organization {
+  id        String           @id @default(uuid())
+  name      String
+  type      OrganizationType
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  members Member[]
+}
+
+model Member {
+  id                  String            @id @default(uuid())
+  firstName           String
+  lastName            String
+  street              String?
+  number              String?
+  zip                 Int?
+  city                String?
+  lat                 Float?
+  lng                 Float?
+  telephone           String?
+  email               String?
+  responsibilityLevel OrganizationType?
+  responsibilityType  DepartmentType?
+  organizationId      String?
+  organization        Organization?     @relation(fields: [organizationId], references: [id])
+  signupDate          DateTime          @default(now())
+  statusKind          MemberStatusKind  @default(active)
+  lastActiveDate      DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  account Account?
+}
+
+model AuditLogEntry {
+  id             String   @id @default(uuid())
+  sequence       Int      @default(autoincrement())
+  timestamp      DateTime @default(now())
+  actorAccountId String
+  actorAccount   Account  @relation(fields: [actorAccountId], references: [id])
+  entity         String
+  entityId       String
+  diff           Json
+  prevHash       String
+  hash           String   @unique
+
+  @@index([sequence])
+}

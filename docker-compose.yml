@@ -1,6 +1,8 @@
+name: visual-directory
+
 services:
-  react-leaflet:
-    container_name: react-leaflet-dev
+  frontend:
+    container_name: visual-directory-dev
     working_dir: /app
     build:
       context: .
@@ -11,27 +13,52 @@ services:
       - "4173:4173"
     volumes:
       - ./:/app/
+      - /app/node_modules # anonymous volume: keeps container-installed (Linux) deps
+      # from overwriting the host's own node_modules through the bind mount above
     stdin_open: true
     tty: true
 
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    ports:
-      - "8081:8081"
+  db:
+    image: postgres:16
+    container_name: visual-directory-db
+    restart: unless-stopped
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_MONGODB_PORT=27017
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-contact_book}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  api:
+    container_name: visual-directory-api
+    restart: unless-stopped
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-contact_book}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      PORT: 4000
+      # https, not http — the frontend's own vite.config.ts always serves over TLS
+      # (vite-plugin-basic-ssl), so this must match or the browser's CORS check
+      # silently blocks every request from the real dev server.
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-https://localhost:3000}
+    depends_on:
+      - db
+
+  adminer:
+    image: adminer
+    container_name: visual-directory-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
 
 volumes:
-  mongo-data:
+  postgres-data:

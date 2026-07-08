@@ -8,9 +8,11 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.pnpm-store
 dist
 dist-ssr
 *.local
+.env
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +27,13 @@ dist-ssr
 
 *storybook.log
 cert/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Test coverage output (now that vitest.config.ts's coverage.include is fixed to
+# actually measure source files, this generates a full nested report, not just a
+# handful of top-level files)
+coverage/

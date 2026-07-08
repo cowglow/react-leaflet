@@ -1,0 +1,62 @@
+import type { MapContainerProps } from "react-leaflet";
+import { MapContainer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import styled from "styled-components";
+import MapAttribution from "ports/components/map/MapAttribution.tsx";
+import { Box } from "@mui/material";
+import { useSelector } from "infrastructure/redux/hooks.ts";
+import { getGyroscopeEnabled } from "infrastructure/redux/gyroscope/gyroscope.selectors.ts";
+
+const MapWrapper = styled(Box)`
+  flex: 1;
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+const StyledMapContainer = styled(MapContainer)`
+  display: block;
+  width: 100%;
+  height: 100%;
+`;
+const GyroScopeMask = styled(Box)`
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  mask-image: radial-gradient(circle at 50% 50%, transparent 50%, black 50%);
+  background-color: wheat;
+  overflow: hidden;
+`;
+
+export default function Map({
+  children,
+  center,
+  scrollWheelZoom = false,
+  bounceAtZoomLimits = false,
+  zoom = 3,
+}: MapContainerProps) {
+  const isGyroscope = useSelector(getGyroscopeEnabled);
+  const bounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
+  return (
+    <MapWrapper>
+      <GyroScopeMask display={isGyroscope ? "block" : "none"}>
+        &nbsp;
+      </GyroScopeMask>
+      <StyledMapContainer
+        zoomControl={false}
+        center={center}
+        zoom={zoom}
+        scrollWheelZoom={scrollWheelZoom}
+        minZoom={3}
+        maxZoom={19}
+        maxBounds={bounds}
+        maxBoundsViscosity={0.15}
+        bounceAtZoomLimits={bounceAtZoomLimits}
+      >
+        <MapAttribution />
+        {children}
+      </StyledMapContainer>
+    </MapWrapper>
+  );
+}
