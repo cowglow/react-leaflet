@@ -4,9 +4,9 @@ import { API_URL, BASE_URL, PORT } from "./e2e/helpers/config.ts";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
-  // Login relies on reading "the most recent matching magic-link token" out of the
-  // API's log — concurrent tests requesting links for the same email would race
-  // each other for that log line, so the whole suite runs as a single worker.
+  // Tests share one persistent Postgres instance and, in several specs, the same
+  // seeded leader account — not safe to run concurrently without further per-test
+  // data isolation, so the whole suite runs as a single worker (see e2e/README.md).
   workers: 1,
   retries: 0,
   reporter: [["list"]],

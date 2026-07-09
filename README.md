@@ -71,8 +71,11 @@ SEED_LEADER_EMAIL=you@example.com pnpm backend:seed   # first time only
 pnpm dev:all               # backend (already up) + frontend dev server + Storybook, one terminal
 ```
 
-Magic-link logins are logged to the backend's own console — there's no real email
-sending yet (see `docs/PHASE_3_REPORT.md`).
+Magic-link logins are sent via [Resend](https://resend.com) in production
+(`RESEND_API_KEY`/`EMAIL_FROM`, see `server/.env.example` and
+`docs/HETZNER_DEPLOY.md`). In local/dev environments (`NODE_ENV !== "production"`),
+links are logged to the backend's own console instead, so nothing needs a real email
+account to test.
 
 ## Commands
 

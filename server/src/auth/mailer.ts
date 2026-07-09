@@ -2,11 +2,14 @@ export interface Mailer {
   sendMagicLink(email: string, url: string): Promise<void>;
 }
 
-// Dev-only stand-in: no email provider account exists yet, so real sending can't be
-// verified end-to-end regardless. Logging the link keeps the flow fully testable
-// locally; swap this for a real Mailer implementation once a provider is chosen.
+// Dev-only stand-in — logs the raw link instead of sending real email, so the flow
+// stays testable without hitting a provider. Never used in production (see
+// getMailer() in ../email.ts), but the NODE_ENV check here is defense in depth in
+// case something calls this directly.
 export const consoleMailer: Mailer = {
   async sendMagicLink(email, url) {
-    console.log(`[mailer] magic link for ${email}: ${url}`);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[mailer] magic link for ${email}: ${url}`);
+    }
   },
 };

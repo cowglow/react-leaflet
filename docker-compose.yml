@@ -48,6 +48,13 @@ services:
       # (vite-plugin-basic-ssl), so this must match or the browser's CORS check
       # silently blocks every request from the real dev server.
       CLIENT_ORIGIN: ${CLIENT_ORIGIN:-https://localhost:3000}
+      # Overrides the image's baked-in `ENV NODE_ENV=production` (server/Dockerfile) so
+      # this dev/e2e stack actually behaves like dev: magic links log to the console
+      # instead of going through Resend. Set NODE_ENV=production before `docker compose
+      # up` to test real Resend delivery locally (see RESEND_API_KEY/EMAIL_FROM below).
+      NODE_ENV: ${NODE_ENV:-development}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
     depends_on:
       - db
 

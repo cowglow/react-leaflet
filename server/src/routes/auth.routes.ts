@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma.js";
 import { createMagicLinkToken, consumeMagicLinkToken } from "../auth/magic-link.js";
-import { consoleMailer } from "../auth/mailer.js";
+import { getMailer } from "../email.js";
 import { signSession } from "../auth/jwt.js";
 import { requireAuth, requireRole } from "../auth/middleware.js";
 import { asyncHandler } from "../lib/async-handler.js";
@@ -24,10 +24,19 @@ authRouter.post(
     if (account) {
       const token = await createMagicLinkToken(account.id);
       const url = `${CLIENT_ORIGIN}/?token=${token}`;
-      await consoleMailer.sendMagicLink(email, url);
-      // Outside production there's no real email provider wired up (see
-      // docs/PHASE_3_REPORT.md), so hand the token back directly to let local dev
-      // skip the "go find it in the console" step. Never do this in production.
+
+      try {
+        await getMailer().sendMagicLink(email, url);
+      } catch (err) {
+        // Log the failure, not the link/token — see getMailer() for the
+        // production-vs-dev mailer choice.
+        console.error(`[mailer] failed to send magic-link email to ${email}:`, err);
+        res.status(502).json({ error: "Couldn't send the login email. Please try again." });
+        return;
+      }
+
+      // Outside production, hand the token back directly to let local dev skip the
+      // "go find it in the console" step. Never do this in production.
       if (process.env.NODE_ENV !== "production") {
         devToken = token;
       }

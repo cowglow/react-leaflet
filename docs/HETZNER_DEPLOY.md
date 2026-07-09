@@ -97,8 +97,16 @@ cat > .env <<'EOF'
 POSTGRES_PASSWORD=<generate with: openssl rand -hex 24>
 JWT_SECRET=<generate with: openssl rand -hex 32>
 CLIENT_ORIGIN=https://cowglow.github.io
+RESEND_API_KEY=<from https://resend.com/api-keys>
+EMAIL_FROM=Visual Directory <login@yourdomain.com>
 EOF
 ```
+
+`RESEND_API_KEY`/`EMAIL_FROM` are how magic-link login emails actually get sent in
+production (see `server/src/email.ts`) — the free Resend tier is enough for this
+app's scale. `EMAIL_FROM` must be an address on a domain you've verified with Resend
+(their dashboard walks you through the DNS records); an unverified sender gets
+rejected.
 
 `CLIENT_ORIGIN` must exactly match the origin your deployed frontend is served
 from (protocol + host, no trailing path) — this is what the API's CORS check
@@ -226,6 +234,8 @@ Add these in `Settings → Secrets and variables → Actions`:
 | `POSTGRES_DB` | Database name (e.g. `contact_book`) |
 | `JWT_SECRET` | Random secret string for JWT signing |
 | `CLIENT_ORIGIN` | GitHub Pages URL (e.g. `https://cowglow.github.io/visual-directory`) |
+| `RESEND_API_KEY` | API key from [resend.com/api-keys](https://resend.com/api-keys), for sending magic-link emails |
+| `EMAIL_FROM` | Sender address for magic-link emails, e.g. `Visual Directory <login@yourdomain.com>` — domain must be verified in Resend |
 | `GHCR_PAT` | GitHub PAT with `read:packages` scope — lets the server pull the image |
 
 To create `GHCR_PAT`: `github.com → Settings → Developer settings → Personal access

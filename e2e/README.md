@@ -11,10 +11,19 @@ up the docker-compose stack, migrated and seeded (same steps as
 `docs/HETZNER_DEPLOY.md`):
 
 ```bash
-docker compose up -d db api
+CLIENT_ORIGIN=https://localhost:5050 docker compose up -d db api
 docker compose exec api pnpm prisma:deploy
 docker compose exec api sh -c "SEED_LEADER_EMAIL=leader@example.com pnpm seed"
 ```
+
+`CLIENT_ORIGIN` must be set to `https://localhost:5050` (the e2e suite's own dedicated
+frontend port, see `helpers/config.ts`) — not the default `https://localhost:3000` —
+or the API's CORS check silently blocks every request the e2e frontend makes and
+every login-dependent test fails with "Something went wrong." `docker compose up`
+picks up the new value and recreates the `api` container automatically, even if it
+was already running with a different `CLIENT_ORIGIN` for normal dev use; switching
+back to normal dev afterwards just means re-running `pnpm backend:up` (or
+`docker compose up -d db api` with no override) to restore the `:3000` default.
 
 Then run the suite:
 
@@ -29,15 +38,17 @@ out mysteriously.
 
 ## How login works in tests
 
-There's no real email provider wired up yet (see `docs/PHASE_3_REPORT.md`), so magic
-links are only ever logged to the API's own console. `helpers/magic-link.ts` reads
-them out of `docker compose logs api`. This means:
+This suite runs the api container with `NODE_ENV=development` (see `docker-compose.yml`),
+so the `POST /auth/magic-link` response includes a `devToken` field (see
+`server/src/routes/auth.routes.ts`) — a convenience so nobody has to go dig the link
+out of an email/console by hand outside production. `LoginForm.tsx` auto-verifies with
+it immediately, so `helpers/auth.ts`'s `loginAs` just waits for the authenticated map
+view rather than reading a link out of `docker compose logs api` or clicking one.
 
-- Tests must run against the docker-compose stack specifically (not some other way
-  of running the API) — that's how login tokens get retrieved.
-- The suite runs as a single worker (`workers: 1` in `playwright.config.ts`):
-  concurrent tests requesting a magic link for the same email would race each other
-  reading "the most recently logged token," so everything runs sequentially.
+The suite still runs as a single worker (`workers: 1` in `playwright.config.ts`) —
+tests share the same persistent Postgres instance and, in several specs, the same
+seeded leader account, so running them concurrently isn't safe without further
+per-test data isolation.
 
 ## Test data
 

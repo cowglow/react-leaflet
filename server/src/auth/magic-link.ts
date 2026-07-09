@@ -1,7 +1,7 @@
 import { randomBytes, createHash } from "node:crypto";
 import { prisma } from "../db/prisma.js";
 
-const TOKEN_TTL_MS = 15 * 60 * 1000;
+export const TOKEN_TTL_MS = 15 * 60 * 1000;
 
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");

@@ -72,12 +72,14 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
-          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,JWT_SECRET,CLIENT_ORIGIN,GHCR_PAT
+          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,JWT_SECRET,CLIENT_ORIGIN,RESEND_API_KEY,EMAIL_FROM,GHCR_PAT
           script: |
             set -e
             mkdir -p /opt/visual-directory
@@ -90,6 +92,8 @@ jobs:
             POSTGRES_DB=${POSTGRES_DB}
             JWT_SECRET=${JWT_SECRET}
             CLIENT_ORIGIN=${CLIENT_ORIGIN}
+            RESEND_API_KEY=${RESEND_API_KEY}
+            EMAIL_FROM=${EMAIL_FROM}
             EOF
             chmod 600 .env
 
