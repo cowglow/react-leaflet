@@ -1,9 +1,9 @@
 import MapMarker from "ports/components/map/Map.Marker.tsx";
 import { Popup } from "react-leaflet";
 import L from "leaflet";
-import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
+import { useSelector } from "infrastructure/redux/hooks.ts";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
-import { removeMember } from "infrastructure/redux/member/member.slice.ts";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
 
@@ -12,17 +12,9 @@ interface MemberMarkerProps {
 }
 
 export default function MemberMarker({ member }: MemberMarkerProps) {
-  const dispatch = useDispatch();
   const canWrite = useSelector(isLeader);
   const { openDialog } = useDialogContext();
-
-  const handleRemove = async () => {
-    try {
-      await dispatch(removeMember(member.id)).unwrap();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to remove member");
-    }
-  };
+  const { t } = useTranslation();
 
   if (!member.address) {
     return null;
@@ -30,23 +22,18 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
 
   const { street, number, zip, city, coordinates } = member.address;
   const latLng = new L.LatLng(coordinates.lat, coordinates.lng);
+  const fullName = `${member.name.firstName} ${member.name.lastName}`;
 
   return (
-    <MapMarker
-      position={latLng}
-      events={{}}
-      alt={`${member.name.firstName} ${member.name.lastName}`}
-    >
+    <MapMarker position={latLng} events={{}} alt={fullName}>
       <Popup>
-        <strong>
-          {member.name.firstName} {member.name.lastName}
-        </strong>
+        <strong>{fullName}</strong>
         <br />
         {street} {number}, {zip} {city}
         <br />
         {member.status.kind === "lost-contact"
-          ? `Lost contact since ${member.status.lastActiveDate.slice(0, 10)}`
-          : "Active"}
+          ? t.memberMarker.lostContactSince(member.status.lastActiveDate.slice(0, 10))
+          : t.memberMarker.active}
         {canWrite && (
           <>
             <br />
@@ -54,11 +41,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
               className="btn"
               onClick={() => openDialog("MEMBER_DIALOG", { memberId: member.id })}
             >
-              Edit
-            </button>
-            &nbsp;
-            <button className="btn" onClick={handleRemove}>
-              Remove
+              {t.common.edit}
             </button>
           </>
         )}

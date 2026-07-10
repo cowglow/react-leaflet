@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { addMember } from "infrastructure/redux/member/member.slice.ts";
 import { csvRowsToMembers } from "application/csv/member.csv.ts";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
 const ImportExportContainer = styled("div")`
   display: flex;
@@ -22,6 +23,7 @@ const ImportExportContainer = styled("div")`
 
 function ImportExportControls() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const members = useSelector(getMembers);
 
   const dataImportHandler = async (rows: string[][]) => {
@@ -31,20 +33,14 @@ function ImportExportControls() {
     );
     const failed = results.filter((result) => result.status === "rejected").length;
     if (failed > 0) {
-      alert(
-        `Imported ${imported.length - failed} of ${imported.length} members ` +
-          `(${failed} failed — likely already existed).`,
-      );
+      alert(t.importExport.importResult(imported.length - failed, imported.length, failed));
     }
   };
 
   return (
     <ImportExportContainer>
-      <ExportController label="Export Members as CSV" data={members} />
-      <ImportController
-        label="Import Members from CSV"
-        onLoad={dataImportHandler}
-      />
+      <ExportController label={t.importExport.exportLabel} data={members} />
+      <ImportController label={t.importExport.importLabel} onLoad={dataImportHandler} />
     </ImportExportContainer>
   );
 }

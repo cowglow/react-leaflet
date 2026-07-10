@@ -26,3 +26,16 @@ export const DividerItem: Story = {
     config: "---",
   },
 };
+
+export const SubmenuItem: Story = {
+  args: {
+    config: {
+      label: "Language",
+      items: [
+        { label: "English", action: () => alert("English selected") },
+        { label: "Deutsch", action: () => alert("Deutsch selected") },
+        { label: "Español", action: () => alert("Español selected") },
+      ],
+    },
+  },
+};

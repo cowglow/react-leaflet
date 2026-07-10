@@ -18,6 +18,19 @@ export default function ActionMenuItem({ config }: ActionMenuItemProps) {
     }
   };
 
+  if ("items" in rest) {
+    return (
+      <li role="menu-item" tabIndex={0} aria-haspopup="true">
+        {label}
+        <ul role="menu">
+          {rest.items.map((item, index) => (
+            <ActionMenuItem key={`action-menu-submenu-item-${index}`} config={item} />
+          ))}
+        </ul>
+      </li>
+    );
+  }
+
   return (
     <li role="menu-item">
       {"action" in rest && <button onClick={clickHandler}>{label}</button>}

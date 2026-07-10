@@ -1,0 +1,25 @@
+.org-tree,
+.org-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.org-tree ul {
+  padding-left: 1.25rem;
+  border-left: 1px solid #000;
+  margin-left: 0.4rem;
+}
+
+.org-tree > li + li {
+  margin-top: 0.75rem;
+}
+
+.org-tree summary {
+  cursor: pointer;
+}
+
+.org-tree-empty {
+  margin: 0.25rem 0 0.25rem 1.25rem;
+  font-style: italic;
+}

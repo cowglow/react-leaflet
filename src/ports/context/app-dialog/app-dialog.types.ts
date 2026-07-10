@@ -1,6 +1,10 @@
 import type { GeoCoordinate } from "domain/marker/geo-coordinate.ts";
 
-export type DialogType = "MEMBER_DIALOG" | "ORGANIZATION_DIALOG" | "INVITE_DIALOG";
+export type DialogType =
+  | "MEMBER_DIALOG"
+  | "ORGANIZATION_DIALOG"
+  | "INVITE_DIALOG"
+  | "ORGANIZATION_TREE_DIALOG";
 
 export type DialogPayload = {
   coordinates?: GeoCoordinate;

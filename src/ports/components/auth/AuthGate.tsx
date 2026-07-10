@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getAuthError, getAuthStatus } from "infrastructure/redux/auth/auth.selectors.ts";
 import { restoreSession, verifyMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
 import LoginForm from "ports/components/auth/LoginForm.tsx";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
 export default function AuthGate({ children }: PropsWithChildren) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const status = useSelector(getAuthStatus);
   const error = useSelector(getAuthError);
   // Magic-link tokens are single-use: React StrictMode's dev-mode double-invoke of
@@ -36,16 +38,16 @@ export default function AuthGate({ children }: PropsWithChildren) {
   }, []);
 
   if (status === "idle" || status === "loading") {
-    return <p>Loading…</p>;
+    return <p>{t.auth.loading}</p>;
   }
 
   if (status === "offline") {
     return (
       <div className="standard-dialog" style={{ maxWidth: "320px", margin: "10vh auto" }}>
-        <h2>Can&apos;t connect</h2>
+        <h2>{t.auth.cantConnect}</h2>
         <p>{error}</p>
         <button type="button" className="btn" onClick={() => dispatch(restoreSession())}>
-          Retry
+          {t.common.retry}
         </button>
       </div>
     );

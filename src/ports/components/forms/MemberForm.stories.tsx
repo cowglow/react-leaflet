@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent, within } from "@storybook/test";
 import MemberForm from "ports/components/forms/MemberForm.tsx";
 import { sampleMembers, sampleOrganizations } from "ports/testing/story-fixtures.ts";
 
@@ -30,4 +31,12 @@ export const EditMode: Story = {
 
 export const EditModeLostContact: Story = {
   args: { payload: { memberId: "member-2" } },
+};
+
+export const ConfirmRemove: Story = {
+  args: { payload: { memberId: "member-1" } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Remove" }));
+  },
 };

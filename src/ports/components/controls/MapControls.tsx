@@ -11,11 +11,13 @@ import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { ChangeEvent, MouseEventHandler, useState } from "react";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { setFilter } from "infrastructure/redux/member/member.slice.ts";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { useMap } from "react-leaflet";
 
 export default function MapControls() {
   const map = useMap();
-  const [filterState, setFilterState] = useState(false);
+  const { t } = useTranslation();
+  const [filterState, setFilterState] = useState(true);
   const [filterValue, setFilterValue] = useState(0);
   const dispatch = useDispatch();
   const members = useSelector(getMembers);
@@ -35,7 +37,7 @@ export default function MapControls() {
 
   const toggleFilter: MouseEventHandler<HTMLButtonElement> = () => {
     setFilterState((prevState) => {
-      dispatch(prevState ? setFilter(filterValue) : dispatch(setFilter(members.length)));
+      dispatch(setFilter(prevState ? filterValue : members.length));
       return !prevState;
     });
   };
@@ -47,7 +49,7 @@ export default function MapControls() {
       </LayerControl>
       <LayerControl position="topRight">
         <Paper className="standard-dialog" elevation={2}>
-          <MapLayerGroup>Map Layer Group</MapLayerGroup>
+          <MapLayerGroup>{t.mapControls.mapLayerGroup}</MapLayerGroup>
           <hr />
           <BaseMapsLayers />
         </Paper>
@@ -68,7 +70,7 @@ export default function MapControls() {
         >
           <div>
             <label htmlFor="filterRange" aria-disabled={filterState}>
-              Filter Range
+              {t.mapControls.filterRange}
             </label>
             <br />
             <input
@@ -82,7 +84,7 @@ export default function MapControls() {
             />
             &nbsp;
             <button className="btn" onClick={toggleFilter}>
-              {filterState ? "Enable" : "Disable"}
+              {filterState ? t.mapControls.enable : t.mapControls.disable}
             </button>
           </div>
           <ZoomControls />

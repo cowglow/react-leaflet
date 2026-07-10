@@ -1,9 +1,11 @@
 import { FormEvent, useState } from "react";
 import { useDispatch } from "infrastructure/redux/hooks.ts";
 import { requestMagicLink, verifyMagicLink } from "infrastructure/redux/auth/auth.slice.ts";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
 export default function LoginForm() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,21 +26,18 @@ export default function LoginForm() {
       // genuine success — only a thrown error below means the request itself failed.
       setSent(true);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong. Please try again.");
+      setError(caught instanceof Error ? caught.message : t.auth.genericError);
     }
   };
 
   return (
     <div className="standard-dialog" style={{ maxWidth: "320px", margin: "10vh auto" }}>
-      <h2>Sign in</h2>
+      <h2>{t.auth.signIn}</h2>
       {sent ? (
-        <p>
-          If that email has an account, a login link has been sent. Check your inbox
-          (or the server console in dev).
-        </p>
+        <p>{t.auth.linkSent}</p>
       ) : (
         <form onSubmit={handleSubmit}>
-          <label htmlFor="login-email">Email</label>
+          <label htmlFor="login-email">{t.auth.email}</label>
           <br />
           <input
             id="login-email"
@@ -49,7 +48,7 @@ export default function LoginForm() {
           />
           <br />
           <button type="submit" className="btn">
-            Send login link
+            {t.auth.sendLoginLink}
           </button>
           {error ? (
             <p role="alert" style={{ color: "firebrick" }}>

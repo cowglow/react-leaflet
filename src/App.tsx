@@ -15,6 +15,7 @@ import MapEvents from "ports/components/map/Map.Events.tsx";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function App() {
   const organizationError = useSelector(getOrganizationError);
   const canWrite = useSelector(isLeader);
   const { openDialog } = useDialogContext();
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(fetchMembers());
@@ -36,7 +38,7 @@ export default function App() {
     <MainLayout>
       {connectionError && (
         <ConnectionErrorBanner
-          message={`Couldn't load data: ${connectionError}`}
+          message={t.connectionError(connectionError)}
           onRetry={() => {
             dispatch(fetchMembers());
             dispatch(fetchOrganizations());

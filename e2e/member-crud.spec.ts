@@ -84,6 +84,10 @@ test("leader can remove a member", async ({ page }) => {
 
   await page.locator(`img[alt="${fullName}"]`).dispatchEvent("click");
   await expect(page.locator(`text=${fullName}`)).toBeVisible({ timeout: 5000 });
+  await page.click('button:has-text("Edit")');
+  await expect(page.locator("text=Edit Member")).toBeVisible({ timeout: 5000 });
+  await page.click('button:has-text("Remove")');
+  await expect(page.locator("text=Remove Member?")).toBeVisible({ timeout: 5000 });
   await page.click('button:has-text("Remove")');
   await page.waitForTimeout(500);
 

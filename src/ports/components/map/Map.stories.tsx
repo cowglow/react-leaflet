@@ -20,6 +20,15 @@ const meta: Meta<typeof Map> = {
   component: Map,
   // Map renders its own MapContainer internally, so this does NOT use the
   // `map: true` decorator parameter (that would nest a second MapContainer).
+  // Map's wrapper relies on height:100% cascading down from its parent, which
+  // collapses to 0 in the story canvas unless we give it a concrete height here.
+  decorators: [
+    (Story) => (
+      <div style={{ height: "400px", width: "100%" }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     center: new L.LatLng(49.4521, 11.0767),
     zoom: 13,
