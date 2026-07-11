@@ -26,18 +26,31 @@ to restrict:
 
 ## 1. Create (or confirm) a non-root deploy user
 
-If you already followed step 3 of `HETZNER_DEPLOY.md`, this user exists. If
-not, as `root`:
+If you already followed step 3 of `HETZNER_DEPLOY.md`, this user (and the
+sudoers rule below) already exists — skip to step 2. If not, as `root`:
 
 ```bash
-adduser deploy
+adduser --disabled-password --gecos "" deploy
 usermod -aG docker deploy
 usermod -aG sudo deploy
+echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy
+chmod 0440 /etc/sudoers.d/deploy
+visudo -cf /etc/sudoers.d/deploy
 ```
 
 `docker` group membership lets it run `docker compose` without `sudo`; `sudo`
 group is for occasional admin tasks (editing `sshd_config`, installing
-packages).
+packages) — including the `sshd_config` edit in step 5 below.
+
+Use `--disabled-password --gecos ""` rather than plain `adduser deploy`: this
+account only ever authenticates over SSH via key (step 2), so it doesn't need
+a working Unix password, and `adduser` otherwise prompts interactively for one
+(easy to Ctrl-C out of, which leaves a half-created user blocking a retry —
+`deluser --remove-home deploy` cleans that up if it happens). That also means
+`deploy` can't satisfy an interactive `sudo` password prompt, which is exactly
+why the `sudoers.d` drop-in above grants it passwordless sudo instead —
+`visudo -cf` validates the file's syntax before it takes effect, so a typo
+can't lock `sudo` out entirely.
 
 ## 2. Authorize the deploy key for `deploy`, not `root`
 
