@@ -1,0 +1,21 @@
+name: Backend Down
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stop:
+    name: Stop API + Caddy on Hetzner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stop backend services
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/visual-directory
+            docker compose -f docker-compose.prod.yml stop api caddy
+            docker compose -f docker-compose.prod.yml ps
