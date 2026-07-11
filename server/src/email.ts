@@ -44,5 +44,5 @@ export const resendMailer: Mailer = {
 };
 
 export function getMailer(): Mailer {
-  return process.env.NODE_ENV === "production" ? resendMailer : consoleMailer;
+  return process.env.RESEND_API_KEY && process.env.EMAIL_FROM ? resendMailer : consoleMailer;
 }

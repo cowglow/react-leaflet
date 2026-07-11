@@ -29,7 +29,7 @@ authRouter.post(
         await getMailer().sendMagicLink(email, url);
       } catch (err) {
         // Log the failure, not the link/token — see getMailer() for the
-        // production-vs-dev mailer choice.
+        // Resend-vs-console mailer choice.
         console.error(`[mailer] failed to send magic-link email to ${email}:`, err);
         res.status(502).json({ error: "Couldn't send the login email. Please try again." });
         return;
