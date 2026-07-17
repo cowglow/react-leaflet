@@ -8,7 +8,10 @@ import MemberMarker from "ports/components/markers/Marker.Member.tsx";
 import ConnectionErrorBanner from "ports/components/ui/ConnectionErrorBanner.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { fetchMembers } from "infrastructure/redux/member/member.slice.ts";
-import { getFilteredMembers, getMemberError } from "infrastructure/redux/member/member.selectors.ts";
+import {
+  getFilteredMembers,
+  getMemberError,
+} from "infrastructure/redux/member/member.selectors.ts";
 import { fetchOrganizations } from "infrastructure/redux/organization/organization.slice.ts";
 import { getOrganizationError } from "infrastructure/redux/organization/organization.selectors.ts";
 import MapEvents from "ports/components/map/Map.Events.tsx";
@@ -16,6 +19,7 @@ import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
+import { Alert } from "@mui/material";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -36,6 +40,23 @@ export default function App() {
 
   return (
     <MainLayout>
+      {/***
+       Alert for demo purpose only
+       */}
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+          zIndex: 9999,
+        }}
+      >
+        <div style={{ position: "absolute", padding: "0.48rem" }}>
+          <Alert severity="warning" sx={{ fontWeight: "600" }}>
+            Do Not Enter Real Data | DEMO ONLY | Do Not Enter Real Data
+          </Alert>
+        </div>
+      </div>
       {connectionError && (
         <ConnectionErrorBanner
           message={t.connectionError(connectionError)}
