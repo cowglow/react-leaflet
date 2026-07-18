@@ -1,4 +1,5 @@
 [![Publish Site](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml/badge.svg)](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml)
+[![Tests](https://github.com/cowglow/visual-directory/actions/workflows/test.yml/badge.svg)](https://github.com/cowglow/visual-directory/actions/workflows/test.yml)
 
 # Visual Directory
 
@@ -18,7 +19,9 @@ and see distance between members. See `docs/PLAN.md` for the full product plan a
 - **`server/`** — the backend: Node/Express + Prisma + Postgres. A separate,
   independently deployable service — not a workspace member of the frontend.
 - **`e2e/`** — Playwright end-to-end tests driving the real frontend against the real
-  backend. See `e2e/README.md`.
+  backend. See `e2e/README.md`. Every push to `main` runs the frontend/server unit
+  tests and this e2e suite via `.github/workflows/test.yml` and publishes a combined
+  report to [cowglow.github.io/visual-directory/test-report/](https://cowglow.github.io/visual-directory/test-report/).
 - **`docs/`** — `PLAN.md` (the product plan), `CLEAR_ARCHITECTURE.md` (the frontend's
   architectural style), `PHASE_*_REPORT.md` (what was built in each phase and how it
   was verified), `USER_MANUAL.md`, `HETZNER_DEPLOY.md` (production deployment guide).

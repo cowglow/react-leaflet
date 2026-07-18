@@ -1,0 +1,95 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    # deploy.yml's deploy_client job also publishes to the gh-pages branch (the app
+    # itself); scoping concurrency to just these two jobs (not the whole workflows)
+    # serializes their pushes to gh-pages without slowing down deploy_server or
+    # anything else.
+    concurrency:
+      group: gh-pages-publish
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Install server dependencies
+        run: cd server && pnpm install
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start backend (Postgres + API)
+        run: CLIENT_ORIGIN=https://localhost:5050 docker compose up -d db api
+
+      - name: Run database migrations
+        run: docker compose exec -T api pnpm prisma:deploy
+
+      - name: Seed leader account
+        run: docker compose exec -T api sh -c "SEED_LEADER_EMAIL=leader@example.com pnpm seed"
+
+      - name: Run frontend unit tests
+        id: frontend-unit
+        continue-on-error: true
+        run: pnpm exec vitest run --coverage
+
+      - name: Run server unit tests
+        id: server-unit
+        continue-on-error: true
+        run: cd server && pnpm exec vitest run --coverage
+
+      - name: Run e2e tests
+        id: e2e
+        continue-on-error: true
+        env:
+          CI: true
+        run: CLIENT_ORIGIN=https://localhost:5050 pnpm exec playwright test
+
+      # Runs even if a suite above failed, so the report always reflects the actual
+      # (possibly failing) run instead of silently disappearing when it's most needed.
+      - name: Assemble combined test report
+        if: always()
+        run: |
+          mkdir -p test-report/unit-frontend test-report/unit-server
+          [ -d coverage ] && mv coverage test-report/unit-frontend/coverage
+          [ -d server/coverage ] && mv server/coverage test-report/unit-server/coverage
+          cat > test-report/index.html << HTML
+          <!doctype html>
+          <html>
+          <head><meta charset="utf-8"><title>Visual Directory — Test Report</title></head>
+          <body style="font-family: sans-serif; max-width: 40rem; margin: 3rem auto;">
+            <h1>Test Report</h1>
+            <p>Commit ${{ github.sha }} — ${{ github.event.head_commit.timestamp }}</p>
+            <ul>
+              <li><a href="./e2e/">E2E test report (Playwright)</a></li>
+              <li><a href="./unit-frontend/coverage/">Frontend unit test coverage</a></li>
+              <li><a href="./unit-server/coverage/">Server unit test coverage</a></li>
+            </ul>
+          </body>
+          </html>
+          HTML
+
+      - name: Publish test report to GitHub Pages
+        if: always()
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: test-report
+          target-folder: test-report
+
+      - name: Fail the job if any test suite failed
+        if: steps.frontend-unit.outcome == 'failure' || steps.server-unit.outcome == 'failure' || steps.e2e.outcome == 'failure'
+        run: exit 1

@@ -4,7 +4,7 @@ import L from "leaflet";
 import { useSelector } from "infrastructure/redux/hooks.ts";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
-import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
 
 interface MemberMarkerProps {
@@ -12,7 +12,9 @@ interface MemberMarkerProps {
 }
 
 export default function MemberMarker({ member }: MemberMarkerProps) {
-  const canWrite = useSelector(isLeader);
+  const leader = useSelector(isLeader);
+  const ownMemberId = useSelector(getMemberId);
+  const canWrite = leader || ownMemberId === member.id;
   const { openDialog } = useDialogContext();
   const { t } = useTranslation();
 

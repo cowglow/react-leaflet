@@ -37,3 +37,8 @@ cert/
 # actually measure source files, this generates a full nested report, not just a
 # handful of top-level files)
 coverage/
+server/coverage/
+
+# Combined test report assembled in CI (unit coverage + e2e), published to
+# gh-pages/test-report/ — see .github/workflows/test.yml
+/test-report/

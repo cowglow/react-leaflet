@@ -9,6 +9,12 @@ jobs:
   deploy_client:
     name: Build and Deploy Client
     runs-on: ubuntu-latest
+    # test.yml's test job also publishes to the gh-pages branch (the test report,
+    # under test-report/); this shared group serializes the two so their pushes to
+    # gh-pages never race each other. See test.yml for the other half.
+    concurrency:
+      group: gh-pages-publish
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +35,11 @@ jobs:
         with:
           branch: gh-pages
           folder: dist/
+          # Without this, the app's own clean deploy (there's no target-folder here,
+          # so it cleans the whole branch root) would delete test.yml's test-report/
+          # subfolder on every app deploy.
+          clean-exclude: |
+            test-report
 
   deploy_server:
     name: Build and Deploy API to Hetzner

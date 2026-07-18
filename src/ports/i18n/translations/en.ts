@@ -77,6 +77,8 @@ const en = {
     role: "Role",
     roleMember: "Member (read-only)",
     roleLeader: "Leader (read + write)",
+    linkToMember: "Link to directory entry",
+    noMemberLink: "None",
     sendInvite: "Send invite",
     invited: (email: string, role: string) =>
       `Invited ${email} as ${role}. They can now request a login link with that email.`,

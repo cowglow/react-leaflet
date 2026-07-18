@@ -120,9 +120,12 @@ membersRouter.post(
 membersRouter.put(
   "/:id",
   requireAuth,
-  requireRole("leader"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
+    if (req.account!.role !== "leader" && req.account!.memberId !== id) {
+      res.status(403).json({ error: "Requires leader role or editing your own linked record" });
+      return;
+    }
     const input = req.body as ApiMemberInput;
     const data = fromApiMember(input);
 

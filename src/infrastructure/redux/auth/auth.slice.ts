@@ -8,6 +8,7 @@ export type Account = {
   id: string;
   email: string;
   role: Role;
+  memberId: string | null;
 };
 
 export type AuthState = {

@@ -20,3 +20,7 @@ export function getRole(state: RootState): Role | null {
 export function isLeader(state: RootState): boolean {
   return state.auth.account?.role === "leader";
 }
+
+export function getMemberId(state: RootState): string | null {
+  return state.auth.account?.memberId ?? null;
+}

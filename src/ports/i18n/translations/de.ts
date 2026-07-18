@@ -13,8 +13,8 @@ const de: Translations = {
   },
   organizationTypes: {
     Region: "Region",
-    Headquarter: "Hauptquartier",
-    Area: "Gebiet",
+    Headquarter: "Hauptstelle",
+    Area: "Bereich",
     District: "Bezirk",
   },
   layout: {
@@ -42,7 +42,8 @@ const de: Translations = {
     loading: "Lädt…",
     cantConnect: "Verbindung fehlgeschlagen",
   },
-  connectionError: (message: string) => `Daten konnten nicht geladen werden: ${message}`,
+  connectionError: (message: string) =>
+    `Daten konnten nicht geladen werden: ${message}`,
   connectionErrorBanner: {
     retry: "Erneut versuchen",
   },
@@ -81,6 +82,8 @@ const de: Translations = {
     role: "Rolle",
     roleMember: "Mitglied (nur Lesen)",
     roleLeader: "Leiter (Lesen + Schreiben)",
+    linkToMember: "Mit Verzeichniseintrag verknüpfen",
+    noMemberLink: "Keiner",
     sendInvite: "Einladung senden",
     invited: (email: string, role: string) =>
       `${email} als ${role} eingeladen. Die Person kann nun mit dieser E-Mail einen Login-Link anfordern.`,

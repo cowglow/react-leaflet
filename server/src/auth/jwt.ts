@@ -15,6 +15,7 @@ export interface SessionPayload {
   accountId: string;
   email: string;
   role: Role;
+  memberId: string | null;
 }
 
 export function signSession(payload: SessionPayload): string {

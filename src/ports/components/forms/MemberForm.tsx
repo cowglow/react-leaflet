@@ -4,6 +4,7 @@ import { DialogPayload } from "ports/context/app-dialog/app-dialog.types.ts";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberById } from "infrastructure/redux/member/member.selectors.ts";
+import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import { addMember, removeMember, updateMember } from "infrastructure/redux/member/member.slice.ts";
 import {
@@ -29,6 +30,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
   const { openDialog } = useDialogContext();
   const { t } = useTranslation();
   const organizations = useSelector(getOrganizations);
+  const leader = useSelector(isLeader);
   const existingMember = useSelector((state) =>
     payload?.memberId ? getMemberById(state, payload.memberId) : undefined,
   );
@@ -256,7 +258,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
           >
             {t.common.cancel}
           </button>
-          {isEditMode && (
+          {isEditMode && leader && (
             <button
               type="button"
               className="btn"

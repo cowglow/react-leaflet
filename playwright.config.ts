@@ -9,7 +9,11 @@ export default defineConfig({
   // data isolation, so the whole suite runs as a single worker (see e2e/README.md).
   workers: 1,
   retries: 0,
-  reporter: [["list"]],
+  // The HTML report is only worth generating in CI, where it gets published
+  // alongside the unit test coverage reports — see .github/workflows/test.yml.
+  reporter: process.env.CI
+    ? [["list"], ["html", { outputFolder: "test-report/e2e", open: "never" }]]
+    : [["list"]],
   globalSetup: "./e2e/global-setup.ts",
   use: {
     baseURL: BASE_URL,

@@ -1,22 +1,33 @@
 import { FormEvent, useState } from "react";
 import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
+import { useSelector } from "infrastructure/redux/hooks.ts";
 import { apiFetch } from "infrastructure/api/api-client.ts";
 import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
+import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import DialogWindow from "ports/components/dialogs/DialogWindow.tsx";
 import "./forms.css";
 
 export default function InviteForm() {
   const { openDialog } = useDialogContext();
   const { t } = useTranslation();
+  const members = useSelector(getMembers);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("member");
+  const [memberId, setMemberId] = useState("");
   const [sent, setSent] = useState(false);
+
+  const sortedMembers = [...members].sort((a, b) =>
+    `${a.name.lastName} ${a.name.firstName}`.localeCompare(`${b.name.lastName} ${b.name.firstName}`),
+  );
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     try {
-      await apiFetch("/auth/invite", { method: "POST", body: JSON.stringify({ email, role }) });
+      await apiFetch("/auth/invite", {
+        method: "POST",
+        body: JSON.stringify({ email, role, ...(memberId ? { memberId } : {}) }),
+      });
       setSent(true);
     } catch (error) {
       alert(error instanceof Error ? error.message : t.inviteForm.inviteFailed);
@@ -58,6 +69,22 @@ export default function InviteForm() {
             >
               <option value="member">{t.inviteForm.roleMember}</option>
               <option value="leader">{t.inviteForm.roleLeader}</option>
+            </select>
+          </div>
+
+          <div className="field-stack">
+            <label htmlFor="invite-member">{t.inviteForm.linkToMember}</label>
+            <select
+              id="invite-member"
+              value={memberId}
+              onChange={(event) => setMemberId(event.target.value)}
+            >
+              <option value="">{t.inviteForm.noMemberLink}</option>
+              {sortedMembers.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.name.firstName} {member.name.lastName}
+                </option>
+              ))}
             </select>
           </div>
 

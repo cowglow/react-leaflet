@@ -69,10 +69,15 @@ authRouter.post(
       return;
     }
 
-    const session = signSession({ accountId: account.id, email: account.email, role: account.role });
+    const session = signSession({
+      accountId: account.id,
+      email: account.email,
+      role: account.role,
+      memberId: account.memberId,
+    });
     res.json({
       token: session,
-      account: { id: account.id, email: account.email, role: account.role },
+      account: { id: account.id, email: account.email, role: account.role, memberId: account.memberId },
     });
   }),
 );
@@ -86,7 +91,11 @@ authRouter.post(
   requireAuth,
   requireRole("leader"),
   asyncHandler(async (req, res) => {
-    const { email, role } = req.body as { email?: string; role?: "member" | "leader" };
+    const { email, role, memberId } = req.body as {
+      email?: string;
+      role?: "member" | "leader";
+      memberId?: string;
+    };
     if (!email || !role) {
       res.status(400).json({ error: "email and role are required" });
       return;
@@ -98,7 +107,22 @@ authRouter.post(
       return;
     }
 
-    const account = await prisma.account.create({ data: { email, role } });
-    res.status(201).json({ account: { id: account.id, email: account.email, role: account.role } });
+    if (memberId) {
+      const member = await prisma.member.findUnique({ where: { id: memberId } });
+      if (!member) {
+        res.status(404).json({ error: "Member not found" });
+        return;
+      }
+      const alreadyLinked = await prisma.account.findUnique({ where: { memberId } });
+      if (alreadyLinked) {
+        res.status(409).json({ error: "That member is already linked to another account" });
+        return;
+      }
+    }
+
+    const account = await prisma.account.create({ data: { email, role, memberId: memberId ?? null } });
+    res.status(201).json({
+      account: { id: account.id, email: account.email, role: account.role, memberId: account.memberId },
+    });
   }),
 );
