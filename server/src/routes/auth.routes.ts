@@ -7,6 +7,9 @@ import { requireAuth, requireRole } from "../auth/middleware.js";
 import { asyncHandler } from "../lib/async-handler.js";
 
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:3000";
+// Must match vite.config.ts's `base` — the SPA is served from this subpath
+// (a GitHub Pages project page), not from CLIENT_ORIGIN's root.
+const CLIENT_APP_PATH = "/visual-directory";
 
 export const authRouter = Router();
 
@@ -23,7 +26,7 @@ authRouter.post(
     const account = await prisma.account.findUnique({ where: { email } });
     if (account) {
       const token = await createMagicLinkToken(account.id);
-      const url = `${CLIENT_ORIGIN}/?token=${token}`;
+      const url = `${CLIENT_ORIGIN}${CLIENT_APP_PATH}?token=${token}`;
 
       try {
         await getMailer().sendMagicLink(email, url);
