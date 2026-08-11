@@ -11,7 +11,9 @@ const StyledWindow = styled("main")`
 `;
 
 const StyledWindowContent = styled("div")`
+  position: relative;
   flex: 1;
+  overflow: hidden;
 `;
 
 export default function MainLayout({ children }: PropsWithChildren) {

@@ -20,6 +20,9 @@ const de: Translations = {
   layout: {
     title: "Visual Directory (Vite + React + TS)",
   },
+  mapWindow: {
+    title: "Karte",
+  },
   menu: {
     file: "Datei",
     actions: "Aktionen",

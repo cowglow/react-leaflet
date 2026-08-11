@@ -18,6 +18,9 @@ const en = {
   layout: {
     title: "Visual Directory (Vite + React + TS)",
   },
+  mapWindow: {
+    title: "Map",
+  },
   menu: {
     file: "File",
     actions: "Actions",

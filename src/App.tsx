@@ -1,6 +1,7 @@
 import L from "leaflet";
 import { useEffect } from "react";
 import MainLayout from "ports/components/layout/MainLayout.tsx";
+import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import Map from "ports/components/map/Map.tsx";
 import MapBounds from "ports/components/layer-groups/MapBounds.ts";
 import MapControls from "ports/components/controls/MapControls.tsx";
@@ -19,6 +20,7 @@ import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
 import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
+import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -39,6 +41,7 @@ export default function App() {
 
   return (
     <MainLayout>
+      <ActionMenu />
       {connectionError && (
         <ConnectionErrorBanner
           message={t.connectionError(connectionError)}
@@ -48,28 +51,30 @@ export default function App() {
           }}
         />
       )}
-      <Map
-        center={nbgCenter}
-        zoom={8}
-        scrollWheelZoom={true}
-        bounceAtZoomLimits={true}
-      >
-        <MarkerOwnPosition />
-        <MapControls />
-        <MapBounds disableZoom={false} />
-        {members
-          .filter((member) => Boolean(member.address))
-          .map((member) => (
-            <MemberMarker key={member.id} member={member} />
-          ))}
-        <MapEvents
-          onClick={({ latlng: { lat, lng } }) => {
-            if (canWrite) {
-              openDialog("MEMBER_DIALOG", { coordinates: { lat, lng } });
-            }
-          }}
-        />
-      </Map>
+      <DesktopWindow title={t.mapWindow.title}>
+        <Map
+          center={nbgCenter}
+          zoom={8}
+          scrollWheelZoom={true}
+          bounceAtZoomLimits={true}
+        >
+          <MarkerOwnPosition />
+          <MapControls />
+          <MapBounds disableZoom={false} />
+          {members
+            .filter((member) => Boolean(member.address))
+            .map((member) => (
+              <MemberMarker key={member.id} member={member} />
+            ))}
+          <MapEvents
+            onClick={({ latlng: { lat, lng } }) => {
+              if (canWrite) {
+                openDialog("MEMBER_DIALOG", { coordinates: { lat, lng } });
+              }
+            }}
+          />
+        </Map>
+      </DesktopWindow>
     </MainLayout>
   );
 }

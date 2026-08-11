@@ -173,9 +173,32 @@ Prerequisite hygiene before building new features on top of a broken/duplicated 
 
 - Leaders get accounts first: they do the data entry, edits, and lost-contact flagging.
 - Technical members introduced next, read-only by default.
-- General/older members are not a requirement to onboard directly — the UI (map-first,
-  OS-menu affordance) should stay simple enough that they *could*, but adoption isn't
-  forced.
+- General/older members are not a requirement to onboard directly — the UI (OS-menu
+  affordance, now a desktop-window metaphor per Phase 5) should stay simple enough
+  that they *could*, but adoption isn't forced.
+
+## Phase 5 — Desktop window UI
+
+Supersedes the "map-first" framing implicit above: instead of the map filling the
+whole content area, the System.css chrome (`.window`/`.title-bar`, already used for
+`MainLayout` and every dialog) becomes a real desktop — the map is a draggable window
+launched on top of it, like an app, and other views (the org/member phone-book list,
+today's single-instance modal dialogs) become windows of their own later. Staged so
+each step ships independently:
+
+- **5a (current)** — Build a generic draggable window component (drag via the
+  title-bar using pointer events; System.css supplies the chrome but no JS behavior of
+  its own). Convert the map from a full-bleed child of `MainLayout` into the first
+  instance of this window, auto-launched on load. Existing modal dialogs
+  (`DialogWindow`, `Dialogs.tsx`) are untouched in this step.
+- **5b (later)** — Turn `OrganizationTree` (today's "View → Organizations" modal,
+  already a phone-book-style list nested under org titles) into a non-modal draggable
+  window, and generalize `app-dialog.context.tsx` from a single `dialog: DialogType |
+  null` into a window stack so more than one window can be open at once (list + map
+  simultaneously, z-index bring-to-front on focus).
+- **5c (later)** — Rework the "File/Actions/View" menu bar (`menu.config.ts`,
+  `ActionMenu.tsx`) around the desktop metaphor — launching/reopening/focusing windows
+  rather than opening a single modal.
 
 ## Explicitly deferred (not blocking, revisit later)
 

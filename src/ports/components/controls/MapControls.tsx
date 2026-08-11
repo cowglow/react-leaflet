@@ -1,7 +1,6 @@
 import LayerControl from "ports/components/controls/LayerControl.tsx";
 import ZoomControls from "ports/components/controls/ZoomControls.tsx";
 import BaseMapsLayers from "ports/components/base-maps/BaseMapsLayers.tsx";
-import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
 import { Paper } from "@mui/material";
 import StraightenIcon from "@mui/icons-material/Straighten";
 import MapLayerGroup from "ports/components/map/Map.LayerGroup.tsx";
@@ -44,9 +43,6 @@ export default function MapControls() {
 
   return (
     <>
-      <LayerControl position="topLeft" noIcon={true}>
-        <ActionMenu />
-      </LayerControl>
       <LayerControl position="topRight">
         <Paper className="standard-dialog" elevation={2}>
           <MapLayerGroup>{t.mapControls.mapLayerGroup}</MapLayerGroup>
