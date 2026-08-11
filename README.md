@@ -24,7 +24,8 @@ and see distance between members. See `docs/PLAN.md` for the full product plan a
   report to [cowglow.github.io/visual-directory/test-report/](https://cowglow.github.io/visual-directory/test-report/).
 - **`docs/`** — `PLAN.md` (the product plan), `CLEAR_ARCHITECTURE.md` (the frontend's
   architectural style), `PHASE_*_REPORT.md` (what was built in each phase and how it
-  was verified), `USER_MANUAL.md`, `HETZNER_DEPLOY.md` (production deployment guide).
+  was verified), `USER_MANUAL.md`, `HETZNER_DEPLOY.md` (production deployment guide),
+  `VALIDATE_PRODUCTION.md` (checklist for confirming a production deploy is healthy).
 
 ## How the frontend is hosted
 
