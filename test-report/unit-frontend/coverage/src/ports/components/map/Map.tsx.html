@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/43</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/43</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -133,7 +133,14 @@
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -161,6 +168,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -186,6 +196,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -193,6 +204,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -204,7 +218,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useCallback, useMemo, type ReactNode } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { Map as MapLibreMap } from "@vis.gl/react-maplibre";</span>
+<span class="cstat-no" title="statement not covered" >import { Map as MapLibreMap, type MapLayerMouseEvent } from "@vis.gl/react-maplibre";</span>
 <span class="cstat-no" title="statement not covered" >import "maplibre-gl/dist/maplibre-gl.css";</span>
 <span class="cstat-no" title="statement not covered" >import styled from "styled-components";</span>
 <span class="cstat-no" title="statement not covered" >import { Box } from "@mui/material";</span>
@@ -227,7 +241,10 @@ interface MapProps {
   scrollZoom?: boolean;
   minZoom?: number;
   maxZoom?: number;
-  onMapClick?: (coordinates: { lat: number; lng: number }) =&gt; void;
+  onMapClick?: (
+    coordinates: { lat: number; lng: number },
+    modifiers: { shift: boolean },
+  ) =&gt; void;
   children?: ReactNode;
 }
 &nbsp;
@@ -251,8 +268,9 @@ interface MapProps {
 <span class="cstat-no" title="statement not covered" >  );</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  const handleClick = useCallback(</span>
-<span class="cstat-no" title="statement not covered" >    ({ lngLat }: { lngLat: { lat: number; lng: number } }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      onMapClick?.({ lat: lngLat.lat, lng: lngLat.lng });</span>
+<span class="cstat-no" title="statement not covered" >    (event: MapLayerMouseEvent) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      const { lat, lng } = event.lngLat;</span>
+<span class="cstat-no" title="statement not covered" >      onMapClick?.({ lat, lng }, { shift: event.originalEvent.shiftKey });</span>
 <span class="cstat-no" title="statement not covered" >    },</span>
 <span class="cstat-no" title="statement not covered" >    [onMapClick],</span>
 <span class="cstat-no" title="statement not covered" >  );</span>
@@ -264,6 +282,9 @@ interface MapProps {
 <span class="cstat-no" title="statement not covered" >        minZoom={minZoom}</span>
 <span class="cstat-no" title="statement not covered" >        maxZoom={maxZoom}</span>
 <span class="cstat-no" title="statement not covered" >        scrollZoom={scrollZoom}</span>
+        // Shift is our quick-pin modifier; free it from MapLibre's shift-drag
+        // box-zoom, which otherwise swallows the click event.
+<span class="cstat-no" title="statement not covered" >        boxZoom={false}</span>
 <span class="cstat-no" title="statement not covered" >        mapStyle={mapStyle}</span>
 <span class="cstat-no" title="statement not covered" >        style={FILL}</span>
 <span class="cstat-no" title="statement not covered" >        onClick={onMapClick ? handleClick : undefined}</span>
@@ -280,7 +301,7 @@ interface MapProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-10T15:51:54.280Z
+                at 2026-09-10T16:24:24.329Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

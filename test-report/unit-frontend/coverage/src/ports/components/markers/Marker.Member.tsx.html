@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/46</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/46</span>
             </div>
         
             
@@ -113,7 +113,19 @@
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -140,11 +152,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -155,7 +165,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -188,6 +212,23 @@ interface MemberMarkerProps {
 <span class="cstat-no" title="statement not covered" >  const { street, number, zip, city, coordinates } = member.address;</span>
 <span class="cstat-no" title="statement not covered" >  const fullName = `${member.name.firstName} ${member.name.lastName}`;</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >  const openForm = () =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }));</span>
+&nbsp;
+  // Incomplete pin (Shift+click placeholder): amber, smaller, and clicking it
+  // jumps straight to the form to fill in the details.
+<span class="cstat-no" title="statement not covered" >  if (member.incomplete) {</span>
+<span class="cstat-no" title="statement not covered" >    return (</span>
+<span class="cstat-no" title="statement not covered" >      &lt;MapMarker</span>
+<span class="cstat-no" title="statement not covered" >        longitude={coordinates.lng}</span>
+<span class="cstat-no" title="statement not covered" >        latitude={coordinates.lat}</span>
+<span class="cstat-no" title="statement not covered" >        color="#d98a00"</span>
+<span class="cstat-no" title="statement not covered" >        scale={0.85}</span>
+<span class="cstat-no" title="statement not covered" >        onActivate={canWrite ? openForm : undefined}</span>
+<span class="cstat-no" title="statement not covered" >      /&gt;</span>
+    );
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
 <span class="cstat-no" title="statement not covered" >    &lt;MapMarker longitude={coordinates.lng} latitude={coordinates.lat}&gt;</span>
 <span class="cstat-no" title="statement not covered" >      &lt;strong&gt;{fullName}&lt;/strong&gt;</span>
@@ -200,12 +241,7 @@ interface MemberMarkerProps {
 <span class="cstat-no" title="statement not covered" >      {canWrite &amp;&amp; (</span>
 <span class="cstat-no" title="statement not covered" >        &lt;&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >          &lt;button</span>
-<span class="cstat-no" title="statement not covered" >            className="btn"</span>
-<span class="cstat-no" title="statement not covered" >            onClick={() =&gt;</span>
-<span class="cstat-no" title="statement not covered" >              dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }))</span>
-            }
-          &gt;
+<span class="cstat-no" title="statement not covered" >          &lt;button className="btn" onClick={openForm}&gt;</span>
 <span class="cstat-no" title="statement not covered" >            {t.common.edit}</span>
 <span class="cstat-no" title="statement not covered" >          &lt;/button&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;/&gt;</span>
@@ -220,7 +256,7 @@ interface MemberMarkerProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-10T15:51:54.280Z
+                at 2026-09-10T16:24:24.329Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
