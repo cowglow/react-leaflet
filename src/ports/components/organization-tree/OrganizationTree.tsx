@@ -50,7 +50,8 @@ export default function OrganizationTree() {
                             <ul>
                               {organizationMembers.map((member) => (
                                 <li key={member.id}>
-                                  {member.name.firstName} {member.name.lastName}
+                                  {`${member.name.firstName} ${member.name.lastName}`.trim() ||
+                                    t.member.untitled}
                                 </li>
                               ))}
                             </ul>

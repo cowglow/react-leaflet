@@ -2,7 +2,7 @@ import { convertToCSV } from "application/csv/csv.helpers.ts";
 import type { Member, MemberStatus } from "domain/member/member.types.ts";
 import type { DepartmentType, OrganizationType } from "domain/shared/types.ts";
 
-const COLUMN_COUNT = 17;
+const COLUMN_COUNT = 18;
 
 export type MemberCSVRow = {
   id: string;
@@ -22,6 +22,7 @@ export type MemberCSVRow = {
   signupDate: string;
   statusKind: string;
   lastActiveDate: string;
+  incomplete: string;
 };
 
 export function memberToCSVRow(member: Member): MemberCSVRow {
@@ -43,6 +44,7 @@ export function memberToCSVRow(member: Member): MemberCSVRow {
     signupDate: member.signupDate,
     statusKind: member.status.kind,
     lastActiveDate: member.status.kind === "lost-contact" ? member.status.lastActiveDate : "",
+    incomplete: member.incomplete ? "true" : "false",
   };
 }
 
@@ -65,12 +67,19 @@ export function csvRowToMember(row: string[]): Member {
     signupDate,
     statusKind,
     lastActiveDate,
+    incomplete,
   ] = row;
 
   const status: MemberStatus =
     statusKind === "lost-contact" ? { kind: "lost-contact", lastActiveDate } : { kind: "active" };
 
-  let member: Member = { id, name: { firstName, lastName }, signupDate, status };
+  let member: Member = {
+    id,
+    name: { firstName, lastName },
+    signupDate,
+    status,
+    incomplete: incomplete === "true",
+  };
 
   if (street || number || zip || city || lat || lng) {
     member = {

@@ -95,9 +95,13 @@ const en = {
     empty: "No organizations yet.",
     noMembers: "No members",
   },
+  member: {
+    untitled: "Untitled member",
+  },
   memberMarker: {
     active: "Active",
     lostContactSince: (date: string) => `Lost contact since ${date}`,
+    incomplete: "Incomplete — Shift+click dropped this pin; click it to add details",
   },
   importExport: {
     importResult: (imported: number, total: number, failed: number) =>

@@ -5,7 +5,9 @@ import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getFilteredMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { addMember } from "infrastructure/redux/member/member.slice.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { createIncompleteMember } from "domain/member/member.factory.ts";
 
 const NBG_CENTER = { longitude: 11.0767, latitude: 49.4521 };
 
@@ -19,8 +21,12 @@ export default function MembersMap() {
       center={NBG_CENTER}
       zoom={8}
       scrollZoom
-      onMapClick={({ lat, lng }) => {
-        if (canWrite) {
+      onMapClick={({ lat, lng }, { shift }) => {
+        if (!canWrite) return;
+        if (shift) {
+          // Quick pin — drop a placeholder member, fill in details later.
+          dispatch(addMember(createIncompleteMember({ lat, lng })));
+        } else {
           dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { coordinates: { lat, lng } } }));
         }
       }}

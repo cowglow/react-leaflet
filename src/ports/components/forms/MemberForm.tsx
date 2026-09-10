@@ -9,6 +9,7 @@ import { addMember, removeMember, updateMember } from "infrastructure/redux/memb
 import {
   assignOrganization,
   createMember,
+  markComplete,
   markLostContact,
   reactivateMember,
   updateMemberAddress,
@@ -75,6 +76,8 @@ export default function MemberForm({ payload }: MemberFormProps) {
     member = updateMemberEmail(member, email);
     member = organizationId ? assignOrganization(member, organizationId) : member;
     member = lostContact ? markLostContact(member, lastActiveDate) : reactivateMember(member);
+    // Saving the form means the details are filled in now.
+    member = markComplete(member);
 
     try {
       await dispatch(isEditMode ? updateMember(member) : addMember(member)).unwrap();

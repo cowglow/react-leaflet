@@ -98,9 +98,13 @@ const de: Translations = {
     empty: "Noch keine Organisationen.",
     noMembers: "Keine Mitglieder",
   },
+  member: {
+    untitled: "Unbenanntes Mitglied",
+  },
   memberMarker: {
     active: "Aktiv",
     lostContactSince: (date: string) => `Kontakt verloren seit ${date}`,
+    incomplete: "Unvollständig — per Umschalt+Klick gesetzt; zum Ergänzen anklicken",
   },
   importExport: {
     importResult: (imported: number, total: number, failed: number) =>

@@ -82,6 +82,7 @@ model Member {
   signupDate          DateTime          @default(now())
   statusKind          MemberStatusKind  @default(active)
   lastActiveDate      DateTime?
+  incomplete          Boolean           @default(false)
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

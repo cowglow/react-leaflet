@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import {
   assignOrganization,
+  createIncompleteMember,
   createMember,
+  markComplete,
   markLostContact,
   reactivateMember,
   updateMemberAddress,
@@ -78,5 +80,26 @@ describe("Create Member", () => {
     expect(testMember.status).toEqual({ kind: "lost-contact", lastActiveDate: "2026-01-01" });
     testMember = reactivateMember(testMember);
     expect(testMember.status).toEqual({ kind: "active" });
+  });
+
+  test("createMember is not incomplete", () => {
+    expect(testMember.incomplete).toBe(false);
+  });
+});
+
+describe("Incomplete Member", () => {
+  test("createIncompleteMember: flagged, no name, active, located at the given point", () => {
+    const member = createIncompleteMember({ lat: 49.45, lng: 11.08 });
+    expect(member.incomplete).toBe(true);
+    expect(member.name).toEqual({ firstName: "", lastName: "" });
+    expect(member.status).toEqual({ kind: "active" });
+    expect(member.address?.coordinates).toEqual({ lat: 49.45, lng: 11.08 });
+    expect(member.id).toEqual(expect.any(String));
+    expect(member.signupDate).toEqual(expect.any(String));
+  });
+
+  test("markComplete clears the flag", () => {
+    const member = markComplete(createIncompleteMember({ lat: 0, lng: 0 }));
+    expect(member.incomplete).toBe(false);
   });
 });

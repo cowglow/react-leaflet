@@ -37,4 +37,7 @@ export type Member = {
   organizationId?: string;
   signupDate: string;
   status: MemberStatus;
+  // A member dropped on the map as a placeholder — has a location but no real
+  // details yet. Cleared once the Member form is saved for it.
+  incomplete?: boolean;
 };

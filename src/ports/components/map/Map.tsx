@@ -1,5 +1,5 @@
 import { useCallback, useMemo, type ReactNode } from "react";
-import { Map as MapLibreMap } from "@vis.gl/react-maplibre";
+import { Map as MapLibreMap, type MapLayerMouseEvent } from "@vis.gl/react-maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import styled from "styled-components";
 import { Box } from "@mui/material";
@@ -22,7 +22,10 @@ interface MapProps {
   scrollZoom?: boolean;
   minZoom?: number;
   maxZoom?: number;
-  onMapClick?: (coordinates: { lat: number; lng: number }) => void;
+  onMapClick?: (
+    coordinates: { lat: number; lng: number },
+    modifiers: { shift: boolean },
+  ) => void;
   children?: ReactNode;
 }
 
@@ -46,8 +49,9 @@ export default function Map({
   );
 
   const handleClick = useCallback(
-    ({ lngLat }: { lngLat: { lat: number; lng: number } }) => {
-      onMapClick?.({ lat: lngLat.lat, lng: lngLat.lng });
+    (event: MapLayerMouseEvent) => {
+      const { lat, lng } = event.lngLat;
+      onMapClick?.({ lat, lng }, { shift: event.originalEvent.shiftKey });
     },
     [onMapClick],
   );
@@ -59,6 +63,9 @@ export default function Map({
         minZoom={minZoom}
         maxZoom={maxZoom}
         scrollZoom={scrollZoom}
+        // Shift is our quick-pin modifier; free it from MapLibre's shift-drag
+        // box-zoom, which otherwise swallows the click event.
+        boxZoom={false}
         mapStyle={mapStyle}
         style={FILL}
         onClick={onMapClick ? handleClick : undefined}

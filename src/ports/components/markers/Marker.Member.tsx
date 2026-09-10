@@ -23,6 +23,23 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const { street, number, zip, city, coordinates } = member.address;
   const fullName = `${member.name.firstName} ${member.name.lastName}`;
 
+  const openForm = () =>
+    dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }));
+
+  // Incomplete pin (Shift+click placeholder): amber, smaller, and clicking it
+  // jumps straight to the form to fill in the details.
+  if (member.incomplete) {
+    return (
+      <MapMarker
+        longitude={coordinates.lng}
+        latitude={coordinates.lat}
+        color="#d98a00"
+        scale={0.85}
+        onActivate={canWrite ? openForm : undefined}
+      />
+    );
+  }
+
   return (
     <MapMarker longitude={coordinates.lng} latitude={coordinates.lat}>
       <strong>{fullName}</strong>
@@ -35,12 +52,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
       {canWrite && (
         <>
           <br />
-          <button
-            className="btn"
-            onClick={() =>
-              dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }))
-            }
-          >
+          <button className="btn" onClick={openForm}>
             {t.common.edit}
           </button>
         </>

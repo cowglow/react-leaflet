@@ -44,6 +44,7 @@ function toApiMember(member: PrismaMember) {
       member.statusKind === "lost_contact"
         ? { kind: "lost-contact" as const, lastActiveDate: member.lastActiveDate?.toISOString() ?? "" }
         : { kind: "active" as const },
+    incomplete: member.incomplete,
   };
 }
 
@@ -61,6 +62,7 @@ interface ApiMemberInput {
   responsibility?: { level: OrganizationType; type: DepartmentType };
   organizationId?: string;
   status: { kind: "active" } | { kind: "lost-contact"; lastActiveDate: string };
+  incomplete?: boolean;
 }
 
 function fromApiMember(input: ApiMemberInput) {
@@ -80,6 +82,7 @@ function fromApiMember(input: ApiMemberInput) {
     organizationId: input.organizationId ?? null,
     statusKind: input.status.kind === "lost-contact" ? ("lost_contact" as const) : ("active" as const),
     lastActiveDate: input.status.kind === "lost-contact" ? new Date(input.status.lastActiveDate) : null,
+    incomplete: input.incomplete ?? false,
   };
 }
 
