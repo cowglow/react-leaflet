@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getFilteredMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { addMember } from "infrastructure/redux/member/member.slice.ts";
-import { clearSelection } from "infrastructure/redux/selection/selection.slice.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { createIncompleteMember } from "domain/member/member.factory.ts";
 
@@ -24,15 +23,12 @@ export default function MembersMap() {
       zoom={8}
       scrollZoom
       onMapClick={({ lat, lng }, { shift }) => {
+        // Map interaction never touches the selection (that's driven from the
+        // tree and marker clicks). Shift = quick pin; plain = new member here.
+        if (!canWrite) return;
         if (shift) {
-          // Quick pin — drop a placeholder member, fill in details later.
-          if (canWrite) dispatch(addMember(createIncompleteMember({ lat, lng })));
-          return;
-        }
-        // A plain click on empty map clears the selection...
-        dispatch(clearSelection());
-        // ...and, for leaders, starts a new member here.
-        if (canWrite) {
+          dispatch(addMember(createIncompleteMember({ lat, lng })));
+        } else {
           dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { coordinates: { lat, lng } } }));
         }
       }}

@@ -97,6 +97,11 @@ const es: Translations = {
     title: "Organizaciones",
     empty: "Aún no hay organizaciones.",
     noMembers: "Sin miembros",
+    clear: "Limpiar",
+    selectedCount: (count: number) => `${count} miembros seleccionados`,
+    coordinates: "Coordenadas",
+    noPhone: "Sin teléfono",
+    noEmail: "Sin correo",
   },
   member: {
     untitled: "Miembro sin nombre",

@@ -9,6 +9,7 @@ import { getOrganizationError } from "infrastructure/redux/organization/organiza
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
+import SelectionKeys from "ports/components/selection/SelectionKeys.tsx";
 
 // The desktop menu bar and the connection banner beneath it stay above every
 // floating window: a window dragged to the top of the screen tucks under the
@@ -39,6 +40,7 @@ export default function App() {
   return (
     <DesktopChrome>
       <ActionMenu />
+      <SelectionKeys />
       {connectionError && (
         <ConnectionErrorBanner
           message={t.connectionError(connectionError)}

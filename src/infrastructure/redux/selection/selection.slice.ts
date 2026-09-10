@@ -14,8 +14,19 @@ const selectionSlice = createSlice({
   name: "selection",
   initialState,
   reducers: {
-    selectMembers(_state, action: PayloadAction<string[]>) {
-      return { memberIds: [...new Set(action.payload)] };
+    selectMembers(state, action: PayloadAction<string[]>) {
+      const next = [...new Set(action.payload)];
+      // Re-selecting the same set is a no-op — return the identical state so
+      // downstream effects (the camera) don't re-fire.
+      const sortedNext = [...next].sort();
+      const sortedCurrent = [...state.memberIds].sort();
+      if (
+        sortedNext.length === sortedCurrent.length &&
+        sortedNext.every((id, index) => id === sortedCurrent[index])
+      ) {
+        return state;
+      }
+      return { memberIds: next };
     },
     toggleMember(state, action: PayloadAction<string>) {
       const id = action.payload;

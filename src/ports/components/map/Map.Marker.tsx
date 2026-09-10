@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Marker, Popup } from "@vis.gl/react-maplibre";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
@@ -24,6 +24,12 @@ interface MapMarkerProps {
   selected?: boolean;
   /** Called on a marker click; `multi` is true when a modifier key was held. */
   onSelect?: (multi: boolean) => void;
+  /**
+   * Force the popup open (true) or closed (false) when it changes — used to
+   * auto-open the popup for a lone selected marker. The user can still toggle it
+   * by clicking the pin afterwards.
+   */
+  autoOpen?: boolean;
   children?: ReactNode;
 }
 
@@ -43,11 +49,17 @@ export default function MapMarker({
   onMoveEnd,
   selected,
   onSelect,
+  autoOpen,
   children,
 }: MapMarkerProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [moving, setMoving] = useState(false);
+
+  useEffect(() => {
+    if (autoOpen === undefined) return;
+    setOpen(autoOpen);
+  }, [autoOpen]);
 
   const effectiveColor = moving ? MOVING_COLOR : selected ? SELECTED_COLOR : color;
   const effectiveScale = selected ? (scale ?? 1) * 1.2 : scale;

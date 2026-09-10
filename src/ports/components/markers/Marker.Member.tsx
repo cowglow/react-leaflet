@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { updateMember } from "infrastructure/redux/member/member.slice.ts";
 import { selectMembers, toggleMember } from "infrastructure/redux/selection/selection.slice.ts";
-import { isMemberSelected } from "infrastructure/redux/selection/selection.selectors.ts";
+import {
+  getSelectionCount,
+  isMemberSelected,
+} from "infrastructure/redux/selection/selection.selectors.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
@@ -17,8 +20,12 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const ownMemberId = useSelector(getMemberId);
   const canWrite = leader || ownMemberId === member.id;
   const selected = useSelector((state) => isMemberSelected(state, member.id));
+  const selectionCount = useSelector(getSelectionCount);
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  // Auto-open the popup only when this marker is the sole selection.
+  const autoOpen = selected && selectionCount === 1;
 
   if (!member.address) {
     return null;
@@ -65,6 +72,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
       latitude={coordinates.lat}
       selected={selected}
       onSelect={handleSelect}
+      autoOpen={autoOpen}
       onMoveEnd={canWrite ? handleMoveEnd : undefined}
     >
       <strong>{fullName}</strong>

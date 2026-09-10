@@ -98,6 +98,11 @@ const de: Translations = {
     title: "Organisationen",
     empty: "Noch keine Organisationen.",
     noMembers: "Keine Mitglieder",
+    clear: "Zurücksetzen",
+    selectedCount: (count: number) => `${count} Mitglieder ausgewählt`,
+    coordinates: "Koordinaten",
+    noPhone: "Kein Telefon",
+    noEmail: "Keine E-Mail",
   },
   member: {
     untitled: "Unbenanntes Mitglied",

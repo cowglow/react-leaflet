@@ -5,9 +5,9 @@ import { getSelectedMemberIds } from "infrastructure/redux/selection/selection.s
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { bbox } from "application/geo/bbox.ts";
 
-// Pans / fits the map to whatever is selected. Only reacts to the selection
-// changing (not to member edits), so dragging a selected marker doesn't yank the
-// camera back afterwards.
+// Nudges the map toward the selection — but only when it changes, only when
+// something selected is off-screen, and never by zooming. If the selected
+// marker(s) are already visible the camera stays put.
 export default function SelectionCamera() {
   const { current: map } = useMap();
   const selectedIds = useSelector(getSelectedMemberIds);
@@ -21,18 +21,28 @@ export default function SelectionCamera() {
     const coordinates = members
       .filter((member) => selected.has(member.id) && member.address)
       .map((member) => member.address!.coordinates);
-
     if (coordinates.length === 0) {
       return;
     }
+
+    const raw = map.getMap();
+    const viewport = raw.getBounds();
+    if (coordinates.every(({ lat, lng }) => viewport.contains([lng, lat]))) {
+      return; // already in view — leave the camera alone
+    }
+
     if (coordinates.length === 1) {
       const [{ lat, lng }] = coordinates;
-      map.easeTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 13) });
+      raw.panTo([lng, lat], { duration: 400 });
       return;
     }
     const bounds = bbox(coordinates);
     if (bounds) {
-      map.fitBounds(bounds, { padding: 80, maxZoom: 15 });
+      const center: [number, number] = [
+        (bounds[0][0] + bounds[1][0]) / 2,
+        (bounds[0][1] + bounds[1][1]) / 2,
+      ];
+      raw.panTo(center, { duration: 400 });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, selectedIds]);

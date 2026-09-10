@@ -95,6 +95,11 @@ const en = {
     title: "Organizations",
     empty: "No organizations yet.",
     noMembers: "No members",
+    clear: "Clear",
+    selectedCount: (count: number) => `${count} members selected`,
+    coordinates: "Coordinates",
+    noPhone: "No phone",
+    noEmail: "No email",
   },
   member: {
     untitled: "Untitled member",
