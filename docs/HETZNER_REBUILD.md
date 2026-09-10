@@ -17,7 +17,8 @@ already done.
 |---|---|
 | Hetzner Cloud **project** | The **server** (new box, new IP) |
 | IONOS DNS **zone** for `cowglow.io` | The `api` **A record's value** (new IP) |
-| GitHub repo + **10 of 12 secrets** (`POSTGRES_*`, `JWT_SECRET`, `CLIENT_ORIGIN`, `GHCR_PAT`, `EMAIL_*`, `RESEND_*`) | `HETZNER_HOST` + `HETZNER_SSH_KEY` secrets (new IP, new key) |
+| GitHub repo + **11 of 12 secrets** (incl. `HETZNER_SSH_KEY`, set from `cert/id_hetzner`) | `HETZNER_HOST` secret (new IP) |
+| SSH keypair in `cert/` (`id_hetzner` CI, `id_hetzner_admin` personal) | The `.pub` keys added to the new Hetzner server *before* it's created |
 | The API image on `ghcr.io` | A fresh **SSH keypair** |
 | `.github/workflows/deploy.yml`, `docker-compose.prod.yml`, `Caddyfile` | The first **leader account** (DB volume is gone → re-seed) |
 
@@ -29,24 +30,32 @@ re-seed one leader account at the end.
 ## 0. Set these once in your terminal
 
 ```bash
-export SERVER_IP=                       # fill in after step 2
-export SSH_KEY=~/.ssh/id_hetzner        # created in step 1
+export SERVER_IP=                        # fill in after step 2
+export SSH_KEY=cert/id_hetzner           # existing CI deploy key (repo-local, gitignored)
+export ADMIN_KEY=cert/id_hetzner_admin   # your personal key, for manual SSH
 export REPO=cowglow/visual-directory
 ```
 
-## 1. New SSH keypair (passphrase-free)
+## 1. SSH keys — reuse the existing ones
 
-CI cannot unlock a passphrase-protected key, so this **must** have no passphrase.
-This is the single most common thing that breaks the deploy.
+The repo already carries them in `cert/` (gitignored, never committed):
+
+- **`cert/id_hetzner`** (+ `.pub`) — the passphrase-free CI deploy key
+  (`github-actions-deploy`). The `HETZNER_SSH_KEY` GitHub secret was set from this,
+  so it should still match — you likely won't touch it in step 5.
+- **`cert/id_hetzner_admin`** (+ `.pub`) — your personal (passphrase-protected) key
+  for logging in by hand.
+
+Only generate a fresh key if `cert/id_hetzner` is missing or you want to rotate:
+`ssh-keygen -t ed25519 -C hetzner-deploy -f cert/id_hetzner -N ""`, then you *must*
+`gh secret set HETZNER_SSH_KEY --repo "$REPO" < cert/id_hetzner` in step 5.
+
+Confirm the CI key has no passphrase (CI can't unlock one — the most common cause of
+a broken deploy):
 
 ```bash
-ssh-keygen -t ed25519 -C "hetzner-deploy" -f "$SSH_KEY" -N ""
+ssh-keygen -y -P "" -f "$SSH_KEY" >/dev/null && echo "ok, no passphrase"
 ```
-
-You now have `~/.ssh/id_hetzner` (private → GitHub secret in step 5) and
-`~/.ssh/id_hetzner.pub` (public → the server in step 2). Use this one key for both CI
-and your own SSH access; add a separate personal key later via
-[`HETZNER_ROOT_LOCKDOWN.md`](./HETZNER_ROOT_LOCKDOWN.md) if you want.
 
 ## 2. Provision the server
 
@@ -54,13 +63,14 @@ and your own SSH access; add a separate personal key later via
 that existed at create time; adding one to an existing box does nothing.
 
 1. Hetzner Console → **Security → SSH Keys → Add SSH Key** → paste
-   `~/.ssh/id_hetzner.pub`. (If an old `hetzner-deploy` key is still listed, delete it
-   or give this one a new name.)
+   `cert/id_hetzner.pub` **and** `cert/id_hetzner_admin.pub` (two entries). An old
+   server's copies may still be listed — a duplicate public key is rejected, so
+   either delete the stale one or reuse it.
 2. Console → **Servers → Add Server**:
    - **Image**: Ubuntu 24.04 LTS
    - **Type**: CX22 (cheapest shared vCPU — plenty)
    - **Location**: Falkenstein or Nuremberg (EU)
-   - **SSH keys**: select the key from step 1
+   - **SSH keys**: select **both** keys from step 1
    - **Firewall**: attach one allowing inbound **only** `22/tcp`, `80/tcp`,
      `443/tcp`. If your old firewall still exists in the project, just re-attach it.
      Do **not** open `4000`, `5432`, or `8081`.
@@ -125,14 +135,17 @@ ssh -i "$SSH_KEY" deploy@"$SERVER_IP" 'docker --version'
 
 ## 5. Sync the GitHub secrets
 
-Only two change on a rebuild. **`HETZNER_SSH_KEY` and `HETZNER_HOST` must match the
-new box and key exactly** or the deploy's SSH/SCP step fails with
-`handshake failed: unable to authenticate`.
+Reusing `cert/id_hetzner`, **only `HETZNER_HOST` changes** — the `HETZNER_SSH_KEY`
+secret was already set from that key. **`HETZNER_HOST` must be the new IP** or the
+deploy's SSH/SCP step fails with `handshake failed: unable to authenticate`.
 
 ```bash
-gh secret set HETZNER_HOST     --repo "$REPO" --body "$SERVER_IP"
-gh secret set HETZNER_USER     --repo "$REPO" --body "deploy"
-gh secret set HETZNER_SSH_KEY  --repo "$REPO" < "$SSH_KEY"     # the PRIVATE key file
+gh secret set HETZNER_HOST  --repo "$REPO" --body "$SERVER_IP"
+gh secret set HETZNER_USER  --repo "$REPO" --body "deploy"          # unchanged; harmless to re-set
+
+# ONLY if you rotated the key in step 1 (or the deploy still fails auth after the
+# new box has cert/id_hetzner.pub in authorized_keys):
+gh secret set HETZNER_SSH_KEY --repo "$REPO" < cert/id_hetzner      # the PRIVATE key file
 ```
 
 Then confirm the rest are still present (values aren't shown):
@@ -232,5 +245,5 @@ Log in, drop a normal pin and a Shift+click pin — you're back.
    `pg_dump` first if there's data worth keeping, see `HETZNER_DEPLOY.md` § Backups).
 2. The `api` DNS record now points at nothing — harmless, you'll repoint it next
    rebuild.
-3. GitHub secrets stay set; `HETZNER_HOST` / `HETZNER_SSH_KEY` are just stale until the
-   next run of this runbook.
+3. GitHub secrets stay set; `HETZNER_HOST` is just stale (wrong IP) until the next run
+   of this runbook. The keypair in `cert/` and the `HETZNER_SSH_KEY` secret carry over.
