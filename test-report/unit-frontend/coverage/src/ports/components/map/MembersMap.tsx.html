@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/39</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/39</span>
             </div>
         
             
@@ -106,24 +106,12 @@
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -134,11 +122,29 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -153,6 +159,7 @@
 <span class="cstat-no" title="statement not covered" >import MapBounds from "ports/components/layer-groups/MapBounds.ts";</span>
 <span class="cstat-no" title="statement not covered" >import MemberMarker from "ports/components/markers/Marker.Member.tsx";</span>
 <span class="cstat-no" title="statement not covered" >import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";</span>
+<span class="cstat-no" title="statement not covered" >import SelectionCamera from "ports/components/map/SelectionCamera.tsx";</span>
 <span class="cstat-no" title="statement not covered" >import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { getFilteredMembers } from "infrastructure/redux/member/member.selectors.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";</span>
@@ -173,9 +180,10 @@
 <span class="cstat-no" title="statement not covered" >      zoom={8}</span>
 <span class="cstat-no" title="statement not covered" >      scrollZoom</span>
 <span class="cstat-no" title="statement not covered" >      onMapClick={({ lat, lng }, { shift }) =&gt; {</span>
+        // Map interaction never touches the selection (that's driven from the
+        // tree and marker clicks). Shift = quick pin; plain = new member here.
 <span class="cstat-no" title="statement not covered" >        if (!canWrite) return;</span>
 <span class="cstat-no" title="statement not covered" >        if (shift) {</span>
-          // Quick pin — drop a placeholder member, fill in details later.
 <span class="cstat-no" title="statement not covered" >          dispatch(addMember(createIncompleteMember({ lat, lng })));</span>
 <span class="cstat-no" title="statement not covered" >        } else {</span>
 <span class="cstat-no" title="statement not covered" >          dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { coordinates: { lat, lng } } }));</span>
@@ -184,6 +192,7 @@
     &gt;
 <span class="cstat-no" title="statement not covered" >      &lt;MarkerOwnPosition /&gt;</span>
 <span class="cstat-no" title="statement not covered" >      &lt;MapBounds disableZoom={false} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;SelectionCamera /&gt;</span>
 <span class="cstat-no" title="statement not covered" >      {members</span>
 <span class="cstat-no" title="statement not covered" >        .filter((member) =&gt; Boolean(member.address))</span>
 <span class="cstat-no" title="statement not covered" >        .map((member) =&gt; (</span>
@@ -199,7 +208,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-10T16:24:24.329Z
+                at 2026-09-10T18:52:42.729Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
