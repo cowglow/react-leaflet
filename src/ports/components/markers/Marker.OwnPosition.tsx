@@ -1,17 +1,17 @@
-import { Marker, useMap } from "@vis.gl/react-maplibre";
+import { Marker } from "@vis.gl/react-maplibre";
 import { useEffect, useState } from "react";
 
 const DEFAULT_POSITION = { lng: 11.0767, lat: 49.4521 };
 
+// Shows where you are. It never moves the camera — MapBounds frames everyone on
+// load, and after that the map belongs to the user and to SelectionCamera.
 export default function MarkerOwnPosition() {
-  const { current: map } = useMap();
   const [position, setPosition] = useState<{ lng: number; lat: number } | null>(DEFAULT_POSITION);
 
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       ({ coords: { latitude, longitude } }) => {
         setPosition({ lng: longitude, lat: latitude });
-        map?.easeTo({ center: [longitude, latitude], zoom: 12 });
       },
       (error) => {
         console.error("Geolocation error:", error);
@@ -20,7 +20,7 @@ export default function MarkerOwnPosition() {
       { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 },
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [map]);
+  }, []);
 
   if (!position) {
     return null;

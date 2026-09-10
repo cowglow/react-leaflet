@@ -5,9 +5,9 @@ import { getSelectedMemberIds } from "infrastructure/redux/selection/selection.s
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { bbox } from "application/geo/bbox.ts";
 
-// Nudges the map toward the selection — but only when it changes, only when
-// something selected is off-screen, and never by zooming. If the selected
-// marker(s) are already visible the camera stays put.
+// Centres the map on the selection whenever it changes — the selected marker for
+// a single pick, the group's centre for several. Never changes zoom, and (thanks
+// to the slice's no-op guard) re-selecting the same set doesn't move the camera.
 export default function SelectionCamera() {
   const { current: map } = useMap();
   const selectedIds = useSelector(getSelectedMemberIds);
@@ -25,25 +25,15 @@ export default function SelectionCamera() {
       return;
     }
 
-    const raw = map.getMap();
-    const viewport = raw.getBounds();
-    if (coordinates.every(({ lat, lng }) => viewport.contains([lng, lat]))) {
-      return; // already in view — leave the camera alone
-    }
-
+    let target: [number, number];
     if (coordinates.length === 1) {
-      const [{ lat, lng }] = coordinates;
-      raw.panTo([lng, lat], { duration: 400 });
-      return;
+      target = [coordinates[0].lng, coordinates[0].lat];
+    } else {
+      const bounds = bbox(coordinates);
+      if (!bounds) return;
+      target = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
     }
-    const bounds = bbox(coordinates);
-    if (bounds) {
-      const center: [number, number] = [
-        (bounds[0][0] + bounds[1][0]) / 2,
-        (bounds[0][1] + bounds[1][1]) / 2,
-      ];
-      raw.panTo(center, { duration: 400 });
-    }
+    map.getMap().panTo(target, { duration: 400 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, selectedIds]);
 
