@@ -16,9 +16,11 @@ Two independently deployable pieces:
   only through its REST API, at whatever `VITE_API_URL` was baked in at build time —
   never touches Postgres directly.
 - **`server/`** — Node/Express + Prisma + Postgres backend, not a workspace member of
-  the frontend (separate `package.json`/`pnpm-lock.yaml`). Deployed manually to a
-  Hetzner VPS via `docker-compose.yml` (see `docs/HETZNER_DEPLOY.md`); no CI/CD for
-  the backend by design.
+  the frontend (separate `package.json`/`pnpm-lock.yaml`). Runs as `db` + `api` +
+  `caddy` on a Hetzner VPS via `docker-compose.prod.yml`; the `deploy_server` job in
+  `.github/workflows/deploy.yml` builds the image, deploys, and runs
+  `prisma migrate deploy` on every push to `main`. Setup: `docs/HETZNER_DEPLOY.md`;
+  rebuilding after a teardown: `docs/HETZNER_REBUILD.md`.
 
 ## Commands
 

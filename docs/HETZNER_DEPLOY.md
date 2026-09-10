@@ -5,6 +5,10 @@ on a Hetzner Cloud VPS. The frontend stays on GitHub Pages. Once the server is s
 per steps 1–8 below, subsequent deploys are fully automated via GitHub Actions — see
 the [Automated CI/CD](#automated-cicd) section.
 
+> **Rebuilding after you deleted the box?** Most of this (Hetzner project, DNS zone,
+> GitHub secrets, the ghcr image) survives a teardown — use the short runbook in
+> [`HETZNER_REBUILD.md`](./HETZNER_REBUILD.md) instead of starting here from zero.
+
 Replace `YOUR_SERVER_IP` below with the actual server IP throughout. The API subdomain
 used throughout this guide is `api.cowglow.io` — replace it if you ever move to a
 different domain.
