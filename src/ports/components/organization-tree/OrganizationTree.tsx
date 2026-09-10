@@ -163,17 +163,14 @@ export default function OrganizationTree({ z }: { z?: number }) {
                                 });
                               }}
                             >
-                              {/* The triangle expands/collapses; clicking the name
-                                  selects the org's members (and expands). */}
-                              <summary>
-                                <span
-                                  className={`org-name org-name--${state}`}
-                                  onClick={(event) => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    selectOrganization(organization.id);
-                                  }}
-                                >
+                              {/* Single click just expands/collapses, like any
+                                  tree node. Double click selects all the org's
+                                  members (and leaves it expanded). */}
+                              <summary
+                                title={t.organizationTree.selectHint}
+                                onDoubleClick={() => selectOrganization(organization.id)}
+                              >
+                                <span className={`org-name org-name--${state}`}>
                                   {organization.name}
                                 </span>
                               </summary>

@@ -95,6 +95,7 @@ const en = {
     title: "Organizations",
     empty: "No organizations yet.",
     noMembers: "No members",
+    selectHint: "Double-click to select all members",
     clear: "Clear",
     selectedCount: (count: number) => `${count} members selected`,
     coordinates: "Coordinates",

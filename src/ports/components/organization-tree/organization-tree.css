@@ -38,6 +38,7 @@
 
 .org-name {
   cursor: pointer;
+  user-select: none;
 }
 
 .org-name--some {

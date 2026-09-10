@@ -97,6 +97,7 @@ const es: Translations = {
     title: "Organizaciones",
     empty: "Aún no hay organizaciones.",
     noMembers: "Sin miembros",
+    selectHint: "Doble clic para seleccionar todos los miembros",
     clear: "Limpiar",
     selectedCount: (count: number) => `${count} miembros seleccionados`,
     coordinates: "Coordenadas",
