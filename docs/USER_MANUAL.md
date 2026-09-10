@@ -83,14 +83,17 @@ everyone else, sorted by how far away they are.
 
 ## Importing and exporting the roster
 
-The two icons in the bottom-right corner of the map handle the whole directory as a
-file:
+The **File** menu in the top-left menu bar handles the whole directory as a file:
 
-- The **export** icon downloads everyone currently in the directory as a CSV file —
+- **Export as CSV** downloads everyone currently in the directory as a CSV file —
   useful as a backup, or for opening in a spreadsheet.
-- The **import** icon lets you pick a CSV file (in the same format the export
-  produces) and adds everyone in it as new members. If a row's ID already matches
-  someone already in the directory (for example, re-importing a file you just
+- **Export as GeoJSON** downloads the same roster as a GeoJSON `FeatureCollection`
+  (`members.geojson`) — useful for loading into mapping tools like QGIS, Leaflet, or
+  Mapbox. Each member is a point feature; members you haven't placed on the map yet
+  are still included, just without a location.
+- **Import** lets you pick a CSV file (in the same format the CSV export produces).
+  It replaces the current directory with the file's contents. If a row's ID already
+  matches someone in the directory (for example, re-importing a file you just
   exported), that row is skipped rather than creating a duplicate — you'll see a
   message telling you how many rows were skipped.
 
@@ -103,9 +106,10 @@ top of this manual — there's nothing else they need to do to accept the invite
 
 ## Other things in the interface
 
-- **Top-left**: the menu bar (File, Actions, View). "File" currently only has a
-  placeholder item. "View" has some external links (not part of the directory
-  itself). "Actions" only appears for leaders.
+- **Top-left**: the menu bar (File, Actions, About). "File" has import/export and
+  the language picker. "About" has some external links (not part of the directory
+  itself). "Actions" has the Organizations and Map windows, plus — for leaders —
+  Add Organization and Invite Account.
 - **Top-right, layers icon**: switch which map style/base layer is shown. Cosmetic
   only — doesn't affect your data.
 - **Bottom-left**: a "Filter Range" slider and zoom controls. The slider limits how

@@ -73,7 +73,8 @@ dependency rule where each layer may only depend on itself or layers inward of i
 - **`domain/`** — business types and factories, no framework dependencies. `member/`,
   `organization/`, `marker/` (the `GeoCoordinate` type), `shared/` (cross-domain types
   like the `Region → Headquarter → Area → District` organization hierarchy).
-- **`application/`** — use-case logic built on domain types: `csv/` (import/export),
+- **`application/`** — use-case logic built on domain types: `csv/` (roster
+  import/export), `geojson/` (roster → GeoJSON `FeatureCollection`, export only),
   `geo/` (bearing/distance calculations).
 - **`infrastructure/`** — framework/3rd-party bindings: `redux/` (Redux Toolkit slices
   + selectors per domain, `redux-saga` for async flows, wired together in `store.ts`),

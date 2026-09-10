@@ -4,7 +4,6 @@ import { MapContainer, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { setupStore } from "../src/infrastructure/redux/store.ts";
 import { installGeoSim } from "../src/infrastructure/geo-simulation/geo-simulation.ts";
-import { AppDialogContextProvider } from "../src/ports/context/app-dialog/app-dialog.provider.tsx";
 import { TileServerContext } from "../src/ports/context/tile-server/tile-server.context.ts";
 import { baseMaps, createBaseMaps } from "../src/infrastructure/tile-server/base-maps.ts";
 import { I18nContext } from "../src/ports/context/i18n/i18n.context.ts";
@@ -25,9 +24,7 @@ const tileProviderNames = Object.keys(baseMaps);
 
 const withAppProviders: Decorator = (Story, context) => (
   <Provider store={setupStore(context.parameters.reduxState ?? {})}>
-    <AppDialogContextProvider>
-      <Story />
-    </AppDialogContextProvider>
+    <Story />
   </Provider>
 );
 

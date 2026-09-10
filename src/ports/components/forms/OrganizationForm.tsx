@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useDispatch } from "infrastructure/redux/hooks.ts";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { addOrganization } from "infrastructure/redux/organization/organization.slice.ts";
 import { createOrganization } from "domain/organization/organization.factory.ts";
@@ -17,7 +17,6 @@ const organizationTypes: OrganizationType[] = [
 
 export default function OrganizationForm() {
   const dispatch = useDispatch();
-  const { openDialog } = useDialogContext();
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [type, setType] = useState<OrganizationType>("District");
@@ -26,7 +25,7 @@ export default function OrganizationForm() {
     event.preventDefault();
     try {
       await dispatch(addOrganization(createOrganization(name, type))).unwrap();
-      openDialog(null);
+      dispatch(closeWindow("ORGANIZATION_DIALOG"));
     } catch (error) {
       alert(
         error instanceof Error ? error.message : t.organizationForm.saveFailed,
@@ -37,7 +36,7 @@ export default function OrganizationForm() {
   return (
     <DialogWindow
       title={t.organizationForm.title}
-      onClose={() => openDialog(null)}
+      onClose={() => dispatch(closeWindow("ORGANIZATION_DIALOG"))}
     >
       <form onSubmit={handleSubmit}>
         <div className="field-stack">
@@ -75,7 +74,7 @@ export default function OrganizationForm() {
           <button
             type="button"
             className="btn"
-            onClick={() => openDialog(null)}
+            onClick={() => dispatch(closeWindow("ORGANIZATION_DIALOG"))}
           >
             {t.common.cancel}
           </button>

@@ -3,6 +3,7 @@ import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import styled from "styled-components";
 import MapAttribution from "ports/components/map/MapAttribution.tsx";
+import MapAutoResize from "ports/components/map/Map.AutoResize.tsx";
 import { Box } from "@mui/material";
 import { useSelector } from "infrastructure/redux/hooks.ts";
 import { getGyroscopeEnabled } from "infrastructure/redux/gyroscope/gyroscope.selectors.ts";
@@ -55,6 +56,7 @@ export default function Map({
         bounceAtZoomLimits={bounceAtZoomLimits}
       >
         <MapAttribution />
+        <MapAutoResize />
         {children}
       </StyledMapContainer>
     </MapWrapper>

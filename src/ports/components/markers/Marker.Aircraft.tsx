@@ -2,7 +2,13 @@ import type { MapMarkerProps } from "ports/components/map/map.types.ts";
 import { useMap } from "react-leaflet";
 import { useEffect } from "react";
 
-const { BASE_URL } = import.meta.env;
+// Strips a trailing slash so this can't produce "//aircraft-icon.svg" — a leading
+// "//" is a protocol-relative URL, which browsers resolve against a host literally
+// named "aircraft-icon.svg" instead of a path on the current origin. BASE_URL is
+// "/" in Storybook and "/visual-directory" (no trailing slash) in the app itself.
+function markerIconUrl(name: string): string {
+  return `${import.meta.env.BASE_URL.replace(/\/$/, "")}/${name}.svg`;
+}
 
 interface AircraftMarkerProps extends MapMarkerProps {
   bearing?: number;
@@ -21,7 +27,7 @@ export default function AircraftMarker({
   const aircraftIcon = L.divIcon({
     className: "aircraft-marker",
     html: iconHtml(
-      `<img src="${BASE_URL}/aircraft-icon.svg" style="transform: rotate(${bearing}deg)" alt="${fixedBearing}" />`,
+      `<img src="${markerIconUrl("aircraft-icon")}" style="transform: rotate(${bearing}deg)" alt="${fixedBearing}" />`,
     ),
     iconSize: new L.Point(24, 24),
   });

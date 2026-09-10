@@ -17,23 +17,24 @@ const es: Translations = {
     Area: "Área",
     District: "Distrito",
   },
-  layout: {
-    title: "Visual Directory (Vite + React + TS)",
-  },
   mapWindow: {
     title: "Mapa",
   },
   menu: {
     file: "Archivo",
     actions: "Acciones",
-    view: "Ver",
+    about: "Acerca de",
     language: "Idioma",
+    import: "Importar",
+    exportCsv: "Exportar como CSV",
+    exportGeoJson: "Exportar como GeoJSON",
     addOrganization: "Agregar organización",
     inviteAccount: "Invitar cuenta",
     organizations: "Organizaciones",
     systemCss: "system.css",
     sakunsTwitter: "Twitter de sakun",
     githubRepo: "Repositorio de GitHub",
+    map: "Mapa",
   },
   auth: {
     signIn: "Iniciar sesión",

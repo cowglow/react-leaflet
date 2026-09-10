@@ -1,5 +1,5 @@
-import { useSelector } from "infrastructure/redux/hooks.ts";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
+import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
@@ -10,7 +10,7 @@ import "./organization-tree.css";
 const ORGANIZATION_TYPE_ORDER: OrganizationType[] = ["Region", "Headquarter", "Area", "District"];
 
 export default function OrganizationTree() {
-  const { openDialog } = useDialogContext();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
   const organizations = useSelector(getOrganizations);
   const members = useSelector(getMembers);
@@ -18,7 +18,10 @@ export default function OrganizationTree() {
   const hasOrganizations = organizations.length > 0;
 
   return (
-    <DialogWindow title={t.organizationTree.title} onClose={() => openDialog(null)}>
+    <DialogWindow
+      title={t.organizationTree.title}
+      onClose={() => dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"))}
+    >
       {!hasOrganizations && <p>{t.organizationTree.empty}</p>}
       <ul className="org-tree">
         {ORGANIZATION_TYPE_ORDER.map((type) => {

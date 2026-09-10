@@ -1,46 +1,43 @@
-import L from "leaflet";
 import { useEffect } from "react";
-import MainLayout from "ports/components/layout/MainLayout.tsx";
-import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
-import Map from "ports/components/map/Map.tsx";
-import MapBounds from "ports/components/layer-groups/MapBounds.ts";
-import MapControls from "ports/components/controls/MapControls.tsx";
-import MemberMarker from "ports/components/markers/Marker.Member.tsx";
+import styled from "styled-components";
 import ConnectionErrorBanner from "ports/components/ui/ConnectionErrorBanner.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { fetchMembers } from "infrastructure/redux/member/member.slice.ts";
-import {
-  getFilteredMembers,
-  getMemberError,
-} from "infrastructure/redux/member/member.selectors.ts";
+import { getMemberError } from "infrastructure/redux/member/member.selectors.ts";
 import { fetchOrganizations } from "infrastructure/redux/organization/organization.slice.ts";
 import { getOrganizationError } from "infrastructure/redux/organization/organization.selectors.ts";
-import MapEvents from "ports/components/map/Map.Events.tsx";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
-import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
-import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
 
+// The desktop menu bar and the connection banner beneath it stay above every
+// floating window: a window dragged to the top of the screen tucks under the
+// menu bar, classic-Mac style. This sits above DesktopWindow's z-index (100)
+// and below the modal dialog backdrop (2000, in dialogs.css).
+const DesktopChrome = styled("header")`
+  position: relative;
+  z-index: 1000;
+`;
+
 export default function App() {
   const dispatch = useDispatch();
-  const members = useSelector(getFilteredMembers);
   const memberError = useSelector(getMemberError);
   const organizationError = useSelector(getOrganizationError);
-  const canWrite = useSelector(isLeader);
-  const { openDialog } = useDialogContext();
   const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(fetchMembers());
     dispatch(fetchOrganizations());
+    dispatch(openWindow({ type: "MAP_DIALOG" }));
   }, [dispatch]);
 
-  const nbgCenter = new L.LatLng(49.4521, 11.0767);
   const connectionError = memberError ?? organizationError;
 
+  // No app window chrome — the menu bar sits directly on the desktop and every
+  // other surface (the map, dialogs) is a floating DesktopWindow rendered by
+  // Dialogs at the viewport level.
   return (
-    <MainLayout>
+    <DesktopChrome>
       <ActionMenu />
       {connectionError && (
         <ConnectionErrorBanner
@@ -51,30 +48,6 @@ export default function App() {
           }}
         />
       )}
-      <DesktopWindow title={t.mapWindow.title}>
-        <Map
-          center={nbgCenter}
-          zoom={8}
-          scrollWheelZoom={true}
-          bounceAtZoomLimits={true}
-        >
-          <MarkerOwnPosition />
-          <MapControls />
-          <MapBounds disableZoom={false} />
-          {members
-            .filter((member) => Boolean(member.address))
-            .map((member) => (
-              <MemberMarker key={member.id} member={member} />
-            ))}
-          <MapEvents
-            onClick={({ latlng: { lat, lng } }) => {
-              if (canWrite) {
-                openDialog("MEMBER_DIALOG", { coordinates: { lat, lng } });
-              }
-            }}
-          />
-        </Map>
-      </DesktopWindow>
-    </MainLayout>
+    </DesktopChrome>
   );
 }

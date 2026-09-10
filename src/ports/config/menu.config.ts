@@ -1,5 +1,6 @@
 import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
-import { DialogContextApi } from "ports/context/app-dialog/app-dialog.types.ts";
+import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import type { AppDispatch } from "infrastructure/redux/store.ts";
 import { Role } from "infrastructure/redux/auth/auth.slice.ts";
 import type { Translations } from "ports/i18n/translations/index.ts";
 import { languages, languageLabels, type Language } from "ports/i18n/language.ts";
@@ -7,13 +8,20 @@ import { languages, languageLabels, type Language } from "ports/i18n/language.ts
 export type MenuConfig = Record<string, MenuConfigItem[]>;
 
 export function createMenuConfig(
-  openDialog: DialogContextApi["openDialog"],
+  dispatch: AppDispatch,
   role: Role | null,
   t: Translations,
   setLanguage: (language: Language) => void,
+  onImport: () => void,
+  onExportCsv: () => void,
+  onExportGeoJson: () => void,
 ): MenuConfig {
   return {
     [t.menu.file]: [
+      { label: t.menu.import, action: onImport },
+      { label: t.menu.exportCsv, action: onExportCsv },
+      { label: t.menu.exportGeoJson, action: onExportGeoJson },
+      "---",
       {
         label: t.menu.language,
         items: languages.map((language) => ({
@@ -22,17 +30,30 @@ export function createMenuConfig(
         })),
       },
     ],
-    ...(role === "leader"
-      ? {
-          [t.menu.actions]: [
-            { label: t.menu.addOrganization, action: () => openDialog("ORGANIZATION_DIALOG") },
-            { label: t.menu.inviteAccount, action: () => openDialog("INVITE_DIALOG") },
-          ] as MenuConfigItem[],
-        }
-      : {}),
-    [t.menu.view]: [
-      { label: t.menu.organizations, action: () => openDialog("ORGANIZATION_TREE_DIALOG") },
-      "---",
+    [t.menu.actions]: [
+      ...(role === "leader"
+        ? ([
+            {
+              label: t.menu.addOrganization,
+              action: () => dispatch(openWindow({ type: "ORGANIZATION_DIALOG" })),
+            },
+            {
+              label: t.menu.inviteAccount,
+              action: () => dispatch(openWindow({ type: "INVITE_DIALOG" })),
+            },
+            "---",
+          ] as MenuConfigItem[])
+        : []),
+      {
+        label: t.menu.organizations,
+        action: () => dispatch(openWindow({ type: "ORGANIZATION_TREE_DIALOG" })),
+      },
+      {
+        label: t.menu.map,
+        action: () => dispatch(openWindow({ type: "MAP_DIALOG" })),
+      },
+    ],
+    [t.menu.about]: [
       { label: t.menu.systemCss, href: "https://sakofchit.github.io/system.css/" },
       { label: t.menu.sakunsTwitter, href: "https://x.com/sakofchit" },
       "---",

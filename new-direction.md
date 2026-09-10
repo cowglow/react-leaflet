@@ -1,0 +1,9 @@
+- remove all the map controls
+- add close to window component
+- Add Map Window component with close button
+- add items to the menu, import and export
+- - add import and export functionality under "File" label, to help us mimic the os machintosh retro feel. 
+- - import clears the data markers and displays only the imported data markers.
+- - export offers two formats, both downloaded client-side: "Export as CSV" (spreadsheet round-trip, same format Import reads) and "Export as GeoJSON" (a FeatureCollection of Point features in [lng, lat] order; members not yet placed on the map are emitted with a null geometry so the export is lossless).
+- change 'View' to About.
+- remove the main window (the full-screen app window chrome + "Visual Directory" title bar). The menu bar now sits directly on the desktop; the map and dialogs are the only windows.

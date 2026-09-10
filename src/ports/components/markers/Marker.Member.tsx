@@ -1,8 +1,8 @@
 import MapMarker from "ports/components/map/Map.Marker.tsx";
 import { Popup } from "react-leaflet";
 import L from "leaflet";
-import { useSelector } from "infrastructure/redux/hooks.ts";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
+import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
@@ -15,7 +15,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const leader = useSelector(isLeader);
   const ownMemberId = useSelector(getMemberId);
   const canWrite = leader || ownMemberId === member.id;
-  const { openDialog } = useDialogContext();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
 
   if (!member.address) {
@@ -41,7 +41,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
             <br />
             <button
               className="btn"
-              onClick={() => openDialog("MEMBER_DIALOG", { memberId: member.id })}
+              onClick={() => dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }))}
             >
               {t.common.edit}
             </button>

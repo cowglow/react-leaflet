@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { DialogPayload } from "ports/context/app-dialog/app-dialog.types.ts";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { closeWindow, DialogPayload } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberById } from "infrastructure/redux/member/member.selectors.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
@@ -27,7 +26,6 @@ interface MemberFormProps {
 
 export default function MemberForm({ payload }: MemberFormProps) {
   const dispatch = useDispatch();
-  const { openDialog } = useDialogContext();
   const { t } = useTranslation();
   const organizations = useSelector(getOrganizations);
   const leader = useSelector(isLeader);
@@ -59,7 +57,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
 
   if (!coordinates) {
     return (
-      <DialogWindow title={title} onClose={() => openDialog(null)}>
+      <DialogWindow title={title} onClose={() => dispatch(closeWindow("MEMBER_DIALOG"))}>
         <p>{t.memberForm.noLocation}</p>
       </DialogWindow>
     );
@@ -80,7 +78,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
 
     try {
       await dispatch(isEditMode ? updateMember(member) : addMember(member)).unwrap();
-      openDialog(null);
+      dispatch(closeWindow("MEMBER_DIALOG"));
     } catch (error) {
       alert(error instanceof Error ? error.message : t.memberForm.saveFailed);
     }
@@ -88,12 +86,12 @@ export default function MemberForm({ payload }: MemberFormProps) {
 
   const handleRemove = async () => {
     if (!existingMember) {
-      openDialog(null);
+      dispatch(closeWindow("MEMBER_DIALOG"));
       return;
     }
     try {
       await dispatch(removeMember(existingMember.id)).unwrap();
-      openDialog(null);
+      dispatch(closeWindow("MEMBER_DIALOG"));
     } catch (error) {
       alert(error instanceof Error ? error.message : t.memberForm.removeFailed);
     }
@@ -101,7 +99,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
 
   if (confirmingRemove && existingMember) {
     return (
-      <DialogWindow title={t.memberForm.confirmRemoveTitle} onClose={() => openDialog(null)}>
+      <DialogWindow title={t.memberForm.confirmRemoveTitle} onClose={() => dispatch(closeWindow("MEMBER_DIALOG"))}>
         <ConfirmDialog
           message={t.memberForm.confirmRemoveMessage(
             `${existingMember.name.firstName} ${existingMember.name.lastName}`,
@@ -115,7 +113,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
   }
 
   return (
-    <DialogWindow title={title} onClose={() => openDialog(null)}>
+    <DialogWindow title={title} onClose={() => dispatch(closeWindow("MEMBER_DIALOG"))}>
       <form onSubmit={handleSubmit}>
         <div className="field-row field-stack">
           <div className="field-stack">
@@ -254,7 +252,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
           <button
             type="button"
             className="btn"
-            onClick={() => openDialog(null)}
+            onClick={() => dispatch(closeWindow("MEMBER_DIALOG"))}
           >
             {t.common.cancel}
           </button>

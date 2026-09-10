@@ -15,23 +15,24 @@ const en = {
     Area: "Area",
     District: "District",
   },
-  layout: {
-    title: "Visual Directory (Vite + React + TS)",
-  },
   mapWindow: {
     title: "Map",
   },
   menu: {
     file: "File",
     actions: "Actions",
-    view: "View",
+    about: "About",
     language: "Language",
+    import: "Import",
+    exportCsv: "Export as CSV",
+    exportGeoJson: "Export as GeoJSON",
     addOrganization: "Add Organization",
     inviteAccount: "Invite Account",
     organizations: "Organizations",
     systemCss: "system.css",
     sakunsTwitter: "sakun's twitter",
     githubRepo: "GitHub Repo",
+    map: "Map",
   },
   auth: {
     signIn: "Sign in",
@@ -50,7 +51,8 @@ const en = {
   memberForm: {
     addTitle: "Add Member",
     editTitle: "Edit Member",
-    noLocation: "No location selected. Close this and click the map to place a new member.",
+    noLocation:
+      "No location selected. Close this and click the map to place a new member.",
     firstName: "First name",
     lastName: "Last name",
     street: "Street",
@@ -66,7 +68,8 @@ const en = {
     saveFailed: "Failed to save member",
     removeFailed: "Failed to remove member",
     confirmRemoveTitle: "Remove Member?",
-    confirmRemoveMessage: (name: string) => `Remove ${name}? This cannot be undone.`,
+    confirmRemoveMessage: (name: string) =>
+      `Remove ${name}? This cannot be undone.`,
   },
   organizationForm: {
     title: "Add Organization",

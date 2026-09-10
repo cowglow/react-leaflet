@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
-import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";
+import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
-import { useSelector } from "infrastructure/redux/hooks.ts";
+import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { apiFetch } from "infrastructure/api/api-client.ts";
 import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
@@ -9,7 +9,7 @@ import DialogWindow from "ports/components/dialogs/DialogWindow.tsx";
 import "./forms.css";
 
 export default function InviteForm() {
-  const { openDialog } = useDialogContext();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
   const members = useSelector(getMembers);
   const [email, setEmail] = useState("");
@@ -37,12 +37,12 @@ export default function InviteForm() {
   const roleLabel = role === "leader" ? t.inviteForm.roleLeader : t.inviteForm.roleMember;
 
   return (
-    <DialogWindow title={t.inviteForm.title} onClose={() => openDialog(null)}>
+    <DialogWindow title={t.inviteForm.title} onClose={() => dispatch(closeWindow("INVITE_DIALOG"))}>
       {sent ? (
         <>
           <p>{t.inviteForm.invited(email, roleLabel)}</p>
           <div className="field-row field-stack">
-            <button type="button" className="btn" onClick={() => openDialog(null)}>
+            <button type="button" className="btn" onClick={() => dispatch(closeWindow("INVITE_DIALOG"))}>
               {t.common.close}
             </button>
           </div>
@@ -92,7 +92,7 @@ export default function InviteForm() {
             <button type="submit" className="btn">
               {t.inviteForm.sendInvite}
             </button>
-            <button type="button" className="btn" onClick={() => openDialog(null)}>
+            <button type="button" className="btn" onClick={() => dispatch(closeWindow("INVITE_DIALOG"))}>
               {t.common.cancel}
             </button>
           </div>
