@@ -223,14 +223,17 @@ export default function OrganizationTree({ z }: { z?: number }) {
                 member={selectedMembers[0]}
                 organizationName={organizationNameFor(selectedMembers[0])}
                 t={t}
-                onEdit={() =>
+                onEdit={() => {
+                  // Hand off to the modal editor and get the tree window out of
+                  // the way.
                   dispatch(
                     openWindow({
                       type: "MEMBER_DIALOG",
                       payload: { memberId: selectedMembers[0].id },
                     }),
-                  )
-                }
+                  );
+                  dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"));
+                }}
               />
             ) : (
               <>
