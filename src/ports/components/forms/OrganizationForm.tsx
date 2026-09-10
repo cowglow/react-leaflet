@@ -1,11 +1,11 @@
 import { FormEvent, useState } from "react";
 import { useDispatch } from "infrastructure/redux/hooks.ts";
-import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { bringToFront, closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { addOrganization } from "infrastructure/redux/organization/organization.slice.ts";
 import { createOrganization } from "domain/organization/organization.factory.ts";
 import type { OrganizationType } from "domain/shared/types.ts";
-import DialogWindow from "ports/components/dialogs/DialogWindow.tsx";
+import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import "./forms.css";
 
 const organizationTypes: OrganizationType[] = [
@@ -15,7 +15,7 @@ const organizationTypes: OrganizationType[] = [
   "District",
 ];
 
-export default function OrganizationForm() {
+export default function OrganizationForm({ z }: { z?: number }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [name, setName] = useState("");
@@ -34,9 +34,15 @@ export default function OrganizationForm() {
   };
 
   return (
-    <DialogWindow
+    <DesktopWindow
       title={t.organizationForm.title}
       onClose={() => dispatch(closeWindow("ORGANIZATION_DIALOG"))}
+      onFocus={() => dispatch(bringToFront("ORGANIZATION_DIALOG"))}
+      initialPosition={{ x: 160, y: 140 }}
+      width="min(400px, 92vw)"
+      height="auto"
+      z={z}
+      padded
     >
       <form onSubmit={handleSubmit}>
         <div className="field-stack">
@@ -83,6 +89,6 @@ export default function OrganizationForm() {
           </button>
         </div>
       </form>
-    </DialogWindow>
+    </DesktopWindow>
   );
 }

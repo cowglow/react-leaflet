@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Marker, Popup } from "@vis.gl/react-maplibre";
+import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
 interface MapMarkerProps {
   longitude: number;
@@ -13,8 +14,16 @@ interface MapMarkerProps {
    * incomplete markers, which jump straight to the edit form.
    */
   onActivate?: () => void;
+  /**
+   * When set, the popup gets a "Move" button; clicking it makes the pin
+   * draggable, and dropping it calls this with the new coordinates. Clicking the
+   * pin without dragging cancels the move.
+   */
+  onMoveEnd?: (coordinates: { lat: number; lng: number }) => void;
   children?: ReactNode;
 }
+
+const MOVING_COLOR = "#2e9e4f";
 
 // A default MapLibre pin. The marker's DOM click otherwise bubbles to the map
 // canvas — which fires the map's own `click` (closing the popup via
@@ -26,32 +35,44 @@ export default function MapMarker({
   color,
   scale,
   onActivate,
+  onMoveEnd,
   children,
 }: MapMarkerProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [moving, setMoving] = useState(false);
+
+  const effectiveColor = moving ? MOVING_COLOR : color;
 
   return (
     <>
       <Marker
         // react-maplibre only reads `color`/`scale` when it first creates the
-        // maplibre Marker; remount when either changes (e.g. an incomplete pin
-        // being completed).
-        key={`${color ?? ""}-${scale ?? ""}`}
+        // maplibre Marker; remount when either changes (incomplete pin being
+        // completed, or a pin entering/leaving move mode).
+        key={`${effectiveColor ?? ""}-${scale ?? ""}`}
         longitude={longitude}
         latitude={latitude}
         anchor="bottom"
-        color={color}
+        color={effectiveColor}
         scale={scale}
+        draggable={moving}
+        onDragEnd={(event) => {
+          setMoving(false);
+          onMoveEnd?.({ lat: event.lngLat.lat, lng: event.lngLat.lng });
+        }}
         onClick={(event) => {
           event.originalEvent.stopPropagation();
-          if (onActivate) {
+          if (moving) {
+            setMoving(false); // clicked without dragging → cancel the move
+          } else if (onActivate) {
             onActivate();
           } else {
             setOpen((value) => !value);
           }
         }}
       />
-      {open && children && (
+      {open && !moving && children && (
         <Popup
           longitude={longitude}
           latitude={latitude}
@@ -60,6 +81,20 @@ export default function MapMarker({
           onClose={() => setOpen(false)}
         >
           {children}
+          {onMoveEnd && (
+            <>
+              <br />
+              <button
+                className="btn"
+                onClick={() => {
+                  setOpen(false);
+                  setMoving(true);
+                }}
+              >
+                {t.common.move}
+              </button>
+            </>
+          )}
         </Popup>
       )}
     </>

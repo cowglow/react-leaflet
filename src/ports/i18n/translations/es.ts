@@ -7,6 +7,7 @@ const es: Translations = {
     close: "Cerrar",
     resize: "Cambiar tamaño",
     edit: "Editar",
+    move: "Mover",
     remove: "Eliminar",
     delete: "Eliminar",
     retry: "Reintentar",

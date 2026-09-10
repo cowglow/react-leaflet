@@ -12,7 +12,14 @@ interface DesktopWindowProps {
   onClose: () => void;
   initialPosition?: WindowPosition;
   width?: string;
+  /** A CSS length, or "auto" to size to the content (capped to the desktop). */
   height?: string;
+  /** Pad the content area and let it scroll — for forms and text, not the map. */
+  padded?: boolean;
+  /** Stacking order among the floating windows; defaults to the base layer. */
+  z?: number;
+  /** Called on any pointer-down inside the window — cycle it to the front. */
+  onFocus?: () => void;
 }
 
 // A window can never be dragged so far that its title bar leaves the desktop —
@@ -24,13 +31,15 @@ const DRAG_MARGIN = 48;
 const EXPANDED_INSET = 8;
 const MENU_BAR_OFFSET = 40;
 
+const BASE_Z = 100;
+
+// z-index is set inline from the `z` prop (per-window stacking order). It stays
+// between the desktop and the menu bar (1000); modal backdrops (2000) are above.
 const StyledDesktopWindow = styled("div")`
   position: absolute;
   margin: 0;
   display: flex;
   flex-direction: column;
-  /* Above the desktop, below the menu bar (1000) and modal backdrops (2000). */
-  z-index: 100;
 `;
 
 const StyledTitleBar = styled("div")`
@@ -38,9 +47,7 @@ const StyledTitleBar = styled("div")`
 `;
 
 const StyledContent = styled("div")`
-  flex: 1;
-  display: flex;
-  overflow: hidden;
+  min-height: 0;
 `;
 
 function clampToDesktop({ x, y }: WindowPosition): WindowPosition {
@@ -56,6 +63,9 @@ export default function DesktopWindow({
   initialPosition = { x: 24, y: 24 },
   width = "min(900px, 90vw)",
   height = "min(640px, 80vh)",
+  padded = false,
+  z = BASE_Z,
+  onFocus,
   children,
 }: PropsWithChildren<DesktopWindowProps>) {
   const { t } = useTranslation();
@@ -92,17 +102,36 @@ export default function DesktopWindow({
 
   // Zoom toggles between the caller's size at the last dragged position and a
   // near-full-desktop box; restoring drops the window back exactly where it was.
-  const geometry = expanded
+  const autoHeight = height === "auto";
+  const geometry: React.CSSProperties = expanded
     ? {
+        zIndex: z,
         top: MENU_BAR_OFFSET,
         left: EXPANDED_INSET,
         width: `calc(100vw - ${EXPANDED_INSET * 2}px)`,
         height: `calc(100vh - ${MENU_BAR_OFFSET + EXPANDED_INSET}px)`,
       }
-    : { top: position.y, left: position.x, width, height };
+    : {
+        zIndex: z,
+        top: position.y,
+        left: position.x,
+        width,
+        // "auto" sizes to content but never taller than the desktop.
+        ...(autoHeight
+          ? { maxHeight: `calc(100vh - ${MENU_BAR_OFFSET + EXPANDED_INSET * 2}px)` }
+          : { height }),
+      };
+
+  const contentStyle: React.CSSProperties = padded
+    ? { flex: "0 1 auto", overflow: "auto", padding: "1rem" }
+    : { flex: 1, display: "flex", overflow: "hidden" };
 
   return (
-    <StyledDesktopWindow className="window" style={geometry}>
+    <StyledDesktopWindow
+      className="window"
+      style={geometry}
+      onPointerDownCapture={onFocus}
+    >
       <StyledTitleBar
         className="title-bar"
         style={{ cursor: expanded ? "default" : "grab" }}
@@ -120,7 +149,7 @@ export default function DesktopWindow({
         />
       </StyledTitleBar>
       <div className="separator" />
-      <StyledContent>{children}</StyledContent>
+      <StyledContent style={contentStyle}>{children}</StyledContent>
     </StyledDesktopWindow>
   );
 }

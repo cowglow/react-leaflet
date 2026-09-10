@@ -1,6 +1,7 @@
 import MapMarker from "ports/components/map/Map.Marker.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { updateMember } from "infrastructure/redux/member/member.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
@@ -26,6 +27,16 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const openForm = () =>
     dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }));
 
+  const handleMoveEnd = async ({ lat, lng }: { lat: number; lng: number }) => {
+    try {
+      await dispatch(
+        updateMember({ ...member, address: { ...member.address!, coordinates: { lat, lng } } }),
+      ).unwrap();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : t.memberForm.saveFailed);
+    }
+  };
+
   // Incomplete pin (Shift+click placeholder): amber, smaller, and clicking it
   // jumps straight to the form to fill in the details.
   if (member.incomplete) {
@@ -41,7 +52,11 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   }
 
   return (
-    <MapMarker longitude={coordinates.lng} latitude={coordinates.lat}>
+    <MapMarker
+      longitude={coordinates.lng}
+      latitude={coordinates.lat}
+      onMoveEnd={canWrite ? handleMoveEnd : undefined}
+    >
       <strong>{fullName}</strong>
       <br />
       {street} {number}, {zip} {city}

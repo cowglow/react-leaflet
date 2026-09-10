@@ -7,6 +7,7 @@ const de: Translations = {
     close: "Schließen",
     resize: "Größe ändern",
     edit: "Bearbeiten",
+    move: "Verschieben",
     remove: "Entfernen",
     delete: "Löschen",
     retry: "Erneut versuchen",

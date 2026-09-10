@@ -1,10 +1,10 @@
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import MembersMap from "ports/components/map/MembersMap.tsx";
 import { useDispatch } from "infrastructure/redux/hooks.ts";
-import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { bringToFront, closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 
-export default function MapWindow() {
+export default function MapWindow({ z }: { z?: number }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -15,6 +15,8 @@ export default function MapWindow() {
     <DesktopWindow
       title={t.mapWindow.title}
       initialPosition={{ x: 24, y: 44 }}
+      z={z}
+      onFocus={() => dispatch(bringToFront("MAP_DIALOG"))}
       onClose={() => dispatch(closeWindow("MAP_DIALOG"))}
     >
       <MembersMap />

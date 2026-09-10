@@ -1,15 +1,15 @@
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { bringToFront, closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
-import DialogWindow from "ports/components/dialogs/DialogWindow.tsx";
+import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import type { OrganizationType } from "domain/shared/types.ts";
 import "./organization-tree.css";
 
 const ORGANIZATION_TYPE_ORDER: OrganizationType[] = ["Region", "Headquarter", "Area", "District"];
 
-export default function OrganizationTree() {
+export default function OrganizationTree({ z }: { z?: number }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const organizations = useSelector(getOrganizations);
@@ -18,9 +18,15 @@ export default function OrganizationTree() {
   const hasOrganizations = organizations.length > 0;
 
   return (
-    <DialogWindow
+    <DesktopWindow
       title={t.organizationTree.title}
       onClose={() => dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"))}
+      onFocus={() => dispatch(bringToFront("ORGANIZATION_TREE_DIALOG"))}
+      initialPosition={{ x: 96, y: 96 }}
+      width="min(460px, 92vw)"
+      height="auto"
+      z={z}
+      padded
     >
       {!hasOrganizations && <p>{t.organizationTree.empty}</p>}
       <ul className="org-tree">
@@ -68,6 +74,6 @@ export default function OrganizationTree() {
           );
         })}
       </ul>
-    </DialogWindow>
+    </DesktopWindow>
   );
 }

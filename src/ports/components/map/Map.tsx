@@ -12,6 +12,10 @@ const MapWrapper = styled(Box)`
   position: relative;
   width: 100%;
   height: 100%;
+  /* Pin the map onto its own compositing layer. Without this, layering another
+     positioned element (a floating window) over the WebGL canvas can leave a
+     stale/blank rectangle where Chromium fails to re-composite the canvas. */
+  transform: translateZ(0);
 `;
 
 const FILL: React.CSSProperties = { width: "100%", height: "100%" };

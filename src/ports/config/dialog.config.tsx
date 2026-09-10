@@ -6,10 +6,13 @@ import OrganizationTree from "ports/components/organization-tree/OrganizationTre
 import MapWindow from "ports/components/map/MapWindow.tsx";
 import { JSX } from "react";
 
-export const dialogConfig: Record<DialogType, (payload: DialogPayload | null) => JSX.Element> = {
+export const dialogConfig: Record<
+  DialogType,
+  (payload: DialogPayload | null, z?: number) => JSX.Element
+> = {
   MEMBER_DIALOG: (payload) => <MemberForm payload={payload} />,
-  ORGANIZATION_DIALOG: () => <OrganizationForm />,
+  ORGANIZATION_DIALOG: (_payload, z) => <OrganizationForm z={z} />,
   INVITE_DIALOG: () => <InviteForm />,
-  ORGANIZATION_TREE_DIALOG: () => <OrganizationTree />,
-  MAP_DIALOG: () => <MapWindow />,
+  ORGANIZATION_TREE_DIALOG: (_payload, z) => <OrganizationTree z={z} />,
+  MAP_DIALOG: (_payload, z) => <MapWindow z={z} />,
 };
