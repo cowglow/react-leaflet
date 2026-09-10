@@ -2,6 +2,8 @@ import MapMarker from "ports/components/map/Map.Marker.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { updateMember } from "infrastructure/redux/member/member.slice.ts";
+import { selectMembers, toggleMember } from "infrastructure/redux/selection/selection.slice.ts";
+import { isMemberSelected } from "infrastructure/redux/selection/selection.selectors.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import type { Member } from "domain/member/member.types.ts";
@@ -14,6 +16,7 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
   const leader = useSelector(isLeader);
   const ownMemberId = useSelector(getMemberId);
   const canWrite = leader || ownMemberId === member.id;
+  const selected = useSelector((state) => isMemberSelected(state, member.id));
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -26,6 +29,9 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
 
   const openForm = () =>
     dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }));
+
+  const handleSelect = (multi: boolean) =>
+    dispatch(multi ? toggleMember(member.id) : selectMembers([member.id]));
 
   const handleMoveEnd = async ({ lat, lng }: { lat: number; lng: number }) => {
     try {
@@ -46,6 +52,8 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
         latitude={coordinates.lat}
         color="#d98a00"
         scale={0.85}
+        selected={selected}
+        onSelect={handleSelect}
         onActivate={canWrite ? openForm : undefined}
       />
     );
@@ -55,6 +63,8 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
     <MapMarker
       longitude={coordinates.lng}
       latitude={coordinates.lat}
+      selected={selected}
+      onSelect={handleSelect}
       onMoveEnd={canWrite ? handleMoveEnd : undefined}
     >
       <strong>{fullName}</strong>

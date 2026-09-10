@@ -20,10 +20,15 @@ interface MapMarkerProps {
    * pin without dragging cancels the move.
    */
   onMoveEnd?: (coordinates: { lat: number; lng: number }) => void;
+  /** Highlight the pin as selected. */
+  selected?: boolean;
+  /** Called on a marker click; `multi` is true when a modifier key was held. */
+  onSelect?: (multi: boolean) => void;
   children?: ReactNode;
 }
 
 const MOVING_COLOR = "#2e9e4f";
+const SELECTED_COLOR = "#e5484d";
 
 // A default MapLibre pin. The marker's DOM click otherwise bubbles to the map
 // canvas — which fires the map's own `click` (closing the popup via
@@ -36,13 +41,16 @@ export default function MapMarker({
   scale,
   onActivate,
   onMoveEnd,
+  selected,
+  onSelect,
   children,
 }: MapMarkerProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [moving, setMoving] = useState(false);
 
-  const effectiveColor = moving ? MOVING_COLOR : color;
+  const effectiveColor = moving ? MOVING_COLOR : selected ? SELECTED_COLOR : color;
+  const effectiveScale = selected ? (scale ?? 1) * 1.2 : scale;
 
   return (
     <>
@@ -50,12 +58,12 @@ export default function MapMarker({
         // react-maplibre only reads `color`/`scale` when it first creates the
         // maplibre Marker; remount when either changes (incomplete pin being
         // completed, or a pin entering/leaving move mode).
-        key={`${effectiveColor ?? ""}-${scale ?? ""}`}
+        key={`${effectiveColor ?? ""}-${effectiveScale ?? ""}`}
         longitude={longitude}
         latitude={latitude}
         anchor="bottom"
         color={effectiveColor}
-        scale={scale}
+        scale={effectiveScale}
         draggable={moving}
         onDragEnd={(event) => {
           setMoving(false);
@@ -65,7 +73,10 @@ export default function MapMarker({
           event.originalEvent.stopPropagation();
           if (moving) {
             setMoving(false); // clicked without dragging → cancel the move
-          } else if (onActivate) {
+            return;
+          }
+          onSelect?.(event.originalEvent.shiftKey || event.originalEvent.metaKey);
+          if (onActivate) {
             onActivate();
           } else {
             setOpen((value) => !value);

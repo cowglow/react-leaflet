@@ -3,6 +3,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authSlice from "infrastructure/redux/auth/auth.slice.ts";
 import memberSlice from "infrastructure/redux/member/member.slice.ts";
 import organizationSlice from "infrastructure/redux/organization/organization.slice.ts";
+import selectionSlice from "infrastructure/redux/selection/selection.slice.ts";
 import windowsSlice from "infrastructure/redux/windows/windows.slice.ts";
 import { watchSaga } from "infrastructure/redux/sagas.ts";
 
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   auth: authSlice,
   member: memberSlice,
   organization: organizationSlice,
+  selection: selectionSlice,
   windows: windowsSlice,
 });
 
