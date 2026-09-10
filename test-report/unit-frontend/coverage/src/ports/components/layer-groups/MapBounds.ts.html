@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -87,34 +87,49 @@
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useMap } from "react-leaflet";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useMap } from "@vis.gl/react-maplibre";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 <span class="cstat-no" title="statement not covered" >import { useEffect } from "react";</span>
 <span class="cstat-no" title="statement not covered" >import { useSelector } from "infrastructure/redux/hooks.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { getMembersWithAddress } from "infrastructure/redux/member/member.selectors.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { bbox } from "application/geo/bbox.ts";</span>
 &nbsp;
 interface MapBoundsProps {
   disableZoom: boolean;
@@ -122,16 +137,22 @@ interface MapBoundsProps {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export default function MapBounds({ disableZoom = false }: MapBoundsProps) {</span>
 <span class="cstat-no" title="statement not covered" >  const members = useSelector(getMembersWithAddress);</span>
-<span class="cstat-no" title="statement not covered" >  const map = useMap();</span>
+<span class="cstat-no" title="statement not covered" >  const { current: map } = useMap();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  useEffect(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (!map || disableZoom) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" >    const coordinates = members.map((member) =&gt; member.address!.coordinates);</span>
-<span class="cstat-no" title="statement not covered" >    const bounds = L.latLngBounds(coordinates);</span>
-<span class="cstat-no" title="statement not covered" >    if (bounds.isValid() &amp;&amp; !disableZoom &amp;&amp; coordinates.length &gt; 5) {</span>
-<span class="cstat-no" title="statement not covered" >      map.fitBounds(bounds);</span>
+<span class="cstat-no" title="statement not covered" >    if (coordinates.length &lt;= 5) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    const bounds = bbox(coordinates);</span>
+<span class="cstat-no" title="statement not covered" >    if (bounds) {</span>
+<span class="cstat-no" title="statement not covered" >      map.fitBounds(bounds, { padding: 40, animate: false });</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
     // eslint-disable-next-line react-hooks/exhaustive-deps
-<span class="cstat-no" title="statement not covered" >  }, [members]);</span>
+<span class="cstat-no" title="statement not covered" >  }, [members, map]);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return null;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
@@ -142,7 +163,7 @@ interface MapBoundsProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/41</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/41</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -113,12 +113,7 @@
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -142,7 +137,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -161,19 +155,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import MapMarker from "ports/components/map/Map.Marker.tsx";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { Popup } from "react-leaflet";</span>
-<span class="cstat-no" title="statement not covered" >import L from "leaflet";</span>
-<span class="cstat-no" title="statement not covered" >import { useSelector } from "infrastructure/redux/hooks.ts";</span>
-<span class="cstat-no" title="statement not covered" >import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { useTranslation } from "ports/context/i18n/i18n.hook.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";</span>
 import type { Member } from "domain/member/member.types.ts";
@@ -186,7 +178,7 @@ interface MemberMarkerProps {
 <span class="cstat-no" title="statement not covered" >  const leader = useSelector(isLeader);</span>
 <span class="cstat-no" title="statement not covered" >  const ownMemberId = useSelector(getMemberId);</span>
 <span class="cstat-no" title="statement not covered" >  const canWrite = leader || ownMemberId === member.id;</span>
-<span class="cstat-no" title="statement not covered" >  const { openDialog } = useDialogContext();</span>
+<span class="cstat-no" title="statement not covered" >  const dispatch = useDispatch();</span>
 <span class="cstat-no" title="statement not covered" >  const { t } = useTranslation();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!member.address) {</span>
@@ -194,31 +186,30 @@ interface MemberMarkerProps {
 <span class="cstat-no" title="statement not covered" >  }</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  const { street, number, zip, city, coordinates } = member.address;</span>
-<span class="cstat-no" title="statement not covered" >  const latLng = new L.LatLng(coordinates.lat, coordinates.lng);</span>
 <span class="cstat-no" title="statement not covered" >  const fullName = `${member.name.firstName} ${member.name.lastName}`;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
-<span class="cstat-no" title="statement not covered" >    &lt;MapMarker position={latLng} events={{}} alt={fullName}&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;Popup&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;strong&gt;{fullName}&lt;/strong&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >        {street} {number}, {zip} {city}</span>
-<span class="cstat-no" title="statement not covered" >        &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >        {member.status.kind === "lost-contact"</span>
-<span class="cstat-no" title="statement not covered" >          ? t.memberMarker.lostContactSince(member.status.lastActiveDate.slice(0, 10))</span>
-<span class="cstat-no" title="statement not covered" >          : t.memberMarker.active}</span>
-<span class="cstat-no" title="statement not covered" >        {canWrite &amp;&amp; (</span>
-<span class="cstat-no" title="statement not covered" >          &lt;&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;button</span>
-<span class="cstat-no" title="statement not covered" >              className="btn"</span>
-<span class="cstat-no" title="statement not covered" >              onClick={() =&gt; openDialog("MEMBER_DIALOG", { memberId: member.id })}</span>
-            &gt;
-<span class="cstat-no" title="statement not covered" >              {t.common.edit}</span>
-<span class="cstat-no" title="statement not covered" >            &lt;/button&gt;</span>
-<span class="cstat-no" title="statement not covered" >          &lt;/&gt;</span>
-        )}
-<span class="cstat-no" title="statement not covered" >      &lt;/Popup&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;MapMarker longitude={coordinates.lng} latitude={coordinates.lat}&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;strong&gt;{fullName}&lt;/strong&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;br /&gt;</span>
+<span class="cstat-no" title="statement not covered" >      {street} {number}, {zip} {city}</span>
+<span class="cstat-no" title="statement not covered" >      &lt;br /&gt;</span>
+<span class="cstat-no" title="statement not covered" >      {member.status.kind === "lost-contact"</span>
+<span class="cstat-no" title="statement not covered" >        ? t.memberMarker.lostContactSince(member.status.lastActiveDate.slice(0, 10))</span>
+<span class="cstat-no" title="statement not covered" >        : t.memberMarker.active}</span>
+<span class="cstat-no" title="statement not covered" >      {canWrite &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >        &lt;&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;br /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;button</span>
+<span class="cstat-no" title="statement not covered" >            className="btn"</span>
+<span class="cstat-no" title="statement not covered" >            onClick={() =&gt;</span>
+<span class="cstat-no" title="statement not covered" >              dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { memberId: member.id } }))</span>
+            }
+          &gt;
+<span class="cstat-no" title="statement not covered" >            {t.common.edit}</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/&gt;</span>
+      )}
 <span class="cstat-no" title="statement not covered" >    &lt;/MapMarker&gt;</span>
   );
 <span class="cstat-no" title="statement not covered" >}</span>
@@ -229,7 +220,7 @@ interface MemberMarkerProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

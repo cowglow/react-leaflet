@@ -270,9 +270,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { FormEvent, useState } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { useTranslation } from "ports/context/i18n/i18n.hook.ts";</span>
-<span class="cstat-no" title="statement not covered" >import { useSelector } from "infrastructure/redux/hooks.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { apiFetch } from "infrastructure/api/api-client.ts";</span>
 import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
 <span class="cstat-no" title="statement not covered" >import { getMembers } from "infrastructure/redux/member/member.selectors.ts";</span>
@@ -280,7 +280,7 @@ import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
 <span class="cstat-no" title="statement not covered" >import "./forms.css";</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export default function InviteForm() {</span>
-<span class="cstat-no" title="statement not covered" >  const { openDialog } = useDialogContext();</span>
+<span class="cstat-no" title="statement not covered" >  const dispatch = useDispatch();</span>
 <span class="cstat-no" title="statement not covered" >  const { t } = useTranslation();</span>
 <span class="cstat-no" title="statement not covered" >  const members = useSelector(getMembers);</span>
 <span class="cstat-no" title="statement not covered" >  const [email, setEmail] = useState("");</span>
@@ -308,12 +308,12 @@ import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
 <span class="cstat-no" title="statement not covered" >  const roleLabel = role === "leader" ? t.inviteForm.roleLeader : t.inviteForm.roleMember;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
-<span class="cstat-no" title="statement not covered" >    &lt;DialogWindow title={t.inviteForm.title} onClose={() =&gt; openDialog(null)}&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;DialogWindow title={t.inviteForm.title} onClose={() =&gt; dispatch(closeWindow("INVITE_DIALOG"))}&gt;</span>
 <span class="cstat-no" title="statement not covered" >      {sent ? (</span>
 <span class="cstat-no" title="statement not covered" >        &lt;&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;p&gt;{t.inviteForm.invited(email, roleLabel)}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;div className="field-row field-stack"&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;button type="button" className="btn" onClick={() =&gt; openDialog(null)}&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;button type="button" className="btn" onClick={() =&gt; dispatch(closeWindow("INVITE_DIALOG"))}&gt;</span>
 <span class="cstat-no" title="statement not covered" >              {t.common.close}</span>
 <span class="cstat-no" title="statement not covered" >            &lt;/button&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
@@ -363,7 +363,7 @@ import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
 <span class="cstat-no" title="statement not covered" >            &lt;button type="submit" className="btn"&gt;</span>
 <span class="cstat-no" title="statement not covered" >              {t.inviteForm.sendInvite}</span>
 <span class="cstat-no" title="statement not covered" >            &lt;/button&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;button type="button" className="btn" onClick={() =&gt; openDialog(null)}&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;button type="button" className="btn" onClick={() =&gt; dispatch(closeWindow("INVITE_DIALOG"))}&gt;</span>
 <span class="cstat-no" title="statement not covered" >              {t.common.cancel}</span>
 <span class="cstat-no" title="statement not covered" >            &lt;/button&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
@@ -379,7 +379,7 @@ import type { Role } from "infrastructure/redux/auth/auth.slice.ts";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

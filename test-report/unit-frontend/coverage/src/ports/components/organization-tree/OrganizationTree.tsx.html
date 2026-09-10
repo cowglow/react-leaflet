@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/57</span>
+                <span class='fraction'>0/59</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/57</span>
+                <span class='fraction'>0/59</span>
             </div>
         
             
@@ -132,7 +132,10 @@
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -151,13 +154,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -182,6 +178,16 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -201,8 +207,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useSelector } from "infrastructure/redux/hooks.ts";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { useTranslation } from "ports/context/i18n/i18n.hook.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { getMembers } from "infrastructure/redux/member/member.selectors.ts";</span>
@@ -213,7 +219,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
 <span class="cstat-no" title="statement not covered" >const ORGANIZATION_TYPE_ORDER: OrganizationType[] = ["Region", "Headquarter", "Area", "District"];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export default function OrganizationTree() {</span>
-<span class="cstat-no" title="statement not covered" >  const { openDialog } = useDialogContext();</span>
+<span class="cstat-no" title="statement not covered" >  const dispatch = useDispatch();</span>
 <span class="cstat-no" title="statement not covered" >  const { t } = useTranslation();</span>
 <span class="cstat-no" title="statement not covered" >  const organizations = useSelector(getOrganizations);</span>
 <span class="cstat-no" title="statement not covered" >  const members = useSelector(getMembers);</span>
@@ -221,7 +227,10 @@ import type { OrganizationType } from "domain/shared/types.ts";
 <span class="cstat-no" title="statement not covered" >  const hasOrganizations = organizations.length &gt; 0;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
-<span class="cstat-no" title="statement not covered" >    &lt;DialogWindow title={t.organizationTree.title} onClose={() =&gt; openDialog(null)}&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;DialogWindow</span>
+<span class="cstat-no" title="statement not covered" >      title={t.organizationTree.title}</span>
+<span class="cstat-no" title="statement not covered" >      onClose={() =&gt; dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"))}</span>
+    &gt;
 <span class="cstat-no" title="statement not covered" >      {!hasOrganizations &amp;&amp; &lt;p&gt;{t.organizationTree.empty}&lt;/p&gt;}</span>
 <span class="cstat-no" title="statement not covered" >      &lt;ul className="org-tree"&gt;</span>
 <span class="cstat-no" title="statement not covered" >        {ORGANIZATION_TYPE_ORDER.map((type) =&gt; {</span>
@@ -277,7 +286,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

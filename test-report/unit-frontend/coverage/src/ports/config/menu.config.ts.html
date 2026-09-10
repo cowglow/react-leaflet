@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/35</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/35</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -105,7 +105,29 @@
 <a name='L40'></a><a href='#L40'>40</a>
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -113,6 +135,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -148,7 +190,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { MenuConfigItem } from "ports/components/action-menu/action-menu.types.ts";
-import { DialogContextApi } from "ports/context/app-dialog/app-dialog.types.ts";
+<span class="cstat-no" title="statement not covered" >import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";</span>
+import type { AppDispatch } from "infrastructure/redux/store.ts";
 import { Role } from "infrastructure/redux/auth/auth.slice.ts";
 import type { Translations } from "ports/i18n/translations/index.ts";
 <span class="cstat-no" title="statement not covered" >import { languages, languageLabels, type Language } from "ports/i18n/language.ts";</span>
@@ -156,13 +199,20 @@ import type { Translations } from "ports/i18n/translations/index.ts";
 export type MenuConfig = Record&lt;string, MenuConfigItem[]&gt;;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export function createMenuConfig(</span>
-<span class="cstat-no" title="statement not covered" >  openDialog: DialogContextApi["openDialog"],</span>
+<span class="cstat-no" title="statement not covered" >  dispatch: AppDispatch,</span>
 <span class="cstat-no" title="statement not covered" >  role: Role | null,</span>
 <span class="cstat-no" title="statement not covered" >  t: Translations,</span>
 <span class="cstat-no" title="statement not covered" >  setLanguage: (language: Language) =&gt; void,</span>
+<span class="cstat-no" title="statement not covered" >  onImport: () =&gt; void,</span>
+<span class="cstat-no" title="statement not covered" >  onExportCsv: () =&gt; void,</span>
+<span class="cstat-no" title="statement not covered" >  onExportGeoJson: () =&gt; void,</span>
 <span class="cstat-no" title="statement not covered" >): MenuConfig {</span>
 <span class="cstat-no" title="statement not covered" >  return {</span>
 <span class="cstat-no" title="statement not covered" >    [t.menu.file]: [</span>
+<span class="cstat-no" title="statement not covered" >      { label: t.menu.import, action: onImport },</span>
+<span class="cstat-no" title="statement not covered" >      { label: t.menu.exportCsv, action: onExportCsv },</span>
+<span class="cstat-no" title="statement not covered" >      { label: t.menu.exportGeoJson, action: onExportGeoJson },</span>
+<span class="cstat-no" title="statement not covered" >      "---",</span>
 <span class="cstat-no" title="statement not covered" >      {</span>
 <span class="cstat-no" title="statement not covered" >        label: t.menu.language,</span>
 <span class="cstat-no" title="statement not covered" >        items: languages.map((language) =&gt; ({</span>
@@ -171,17 +221,30 @@ export type MenuConfig = Record&lt;string, MenuConfigItem[]&gt;;
 <span class="cstat-no" title="statement not covered" >        })),</span>
 <span class="cstat-no" title="statement not covered" >      },</span>
 <span class="cstat-no" title="statement not covered" >    ],</span>
-<span class="cstat-no" title="statement not covered" >    ...(role === "leader"</span>
-<span class="cstat-no" title="statement not covered" >      ? {</span>
-<span class="cstat-no" title="statement not covered" >          [t.menu.actions]: [</span>
-<span class="cstat-no" title="statement not covered" >            { label: t.menu.addOrganization, action: () =&gt; openDialog("ORGANIZATION_DIALOG") },</span>
-<span class="cstat-no" title="statement not covered" >            { label: t.menu.inviteAccount, action: () =&gt; openDialog("INVITE_DIALOG") },</span>
-<span class="cstat-no" title="statement not covered" >          ] as MenuConfigItem[],</span>
-<span class="cstat-no" title="statement not covered" >        }</span>
-<span class="cstat-no" title="statement not covered" >      : {}),</span>
-<span class="cstat-no" title="statement not covered" >    [t.menu.view]: [</span>
-<span class="cstat-no" title="statement not covered" >      { label: t.menu.organizations, action: () =&gt; openDialog("ORGANIZATION_TREE_DIALOG") },</span>
-<span class="cstat-no" title="statement not covered" >      "---",</span>
+<span class="cstat-no" title="statement not covered" >    [t.menu.actions]: [</span>
+<span class="cstat-no" title="statement not covered" >      ...(role === "leader"</span>
+<span class="cstat-no" title="statement not covered" >        ? ([</span>
+<span class="cstat-no" title="statement not covered" >            {</span>
+<span class="cstat-no" title="statement not covered" >              label: t.menu.addOrganization,</span>
+<span class="cstat-no" title="statement not covered" >              action: () =&gt; dispatch(openWindow({ type: "ORGANIZATION_DIALOG" })),</span>
+<span class="cstat-no" title="statement not covered" >            },</span>
+<span class="cstat-no" title="statement not covered" >            {</span>
+<span class="cstat-no" title="statement not covered" >              label: t.menu.inviteAccount,</span>
+<span class="cstat-no" title="statement not covered" >              action: () =&gt; dispatch(openWindow({ type: "INVITE_DIALOG" })),</span>
+<span class="cstat-no" title="statement not covered" >            },</span>
+<span class="cstat-no" title="statement not covered" >            "---",</span>
+<span class="cstat-no" title="statement not covered" >          ] as MenuConfigItem[])</span>
+<span class="cstat-no" title="statement not covered" >        : []),</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        label: t.menu.organizations,</span>
+<span class="cstat-no" title="statement not covered" >        action: () =&gt; dispatch(openWindow({ type: "ORGANIZATION_TREE_DIALOG" })),</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        label: t.menu.map,</span>
+<span class="cstat-no" title="statement not covered" >        action: () =&gt; dispatch(openWindow({ type: "MAP_DIALOG" })),</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    [t.menu.about]: [</span>
 <span class="cstat-no" title="statement not covered" >      { label: t.menu.systemCss, href: "https://sakofchit.github.io/system.css/" },</span>
 <span class="cstat-no" title="statement not covered" >      { label: t.menu.sakunsTwitter, href: "https://x.com/sakofchit" },</span>
 <span class="cstat-no" title="statement not covered" >      "---",</span>
@@ -196,7 +259,7 @@ export type MenuConfig = Record&lt;string, MenuConfigItem[]&gt;;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

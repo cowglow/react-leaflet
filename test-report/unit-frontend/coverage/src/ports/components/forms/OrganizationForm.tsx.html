@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/75</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/75</span>
             </div>
         
             
@@ -151,8 +151,7 @@
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -169,7 +168,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -243,7 +241,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { FormEvent, useState } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 <span class="cstat-no" title="statement not covered" >import { useDispatch } from "infrastructure/redux/hooks.ts";</span>
-<span class="cstat-no" title="statement not covered" >import { useDialogContext } from "ports/context/app-dialog/app-dialog.hook.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { closeWindow } from "infrastructure/redux/windows/windows.slice.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { useTranslation } from "ports/context/i18n/i18n.hook.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { addOrganization } from "infrastructure/redux/organization/organization.slice.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { createOrganization } from "domain/organization/organization.factory.ts";</span>
@@ -260,7 +258,6 @@ import type { OrganizationType } from "domain/shared/types.ts";
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export default function OrganizationForm() {</span>
 <span class="cstat-no" title="statement not covered" >  const dispatch = useDispatch();</span>
-<span class="cstat-no" title="statement not covered" >  const { openDialog } = useDialogContext();</span>
 <span class="cstat-no" title="statement not covered" >  const { t } = useTranslation();</span>
 <span class="cstat-no" title="statement not covered" >  const [name, setName] = useState("");</span>
 <span class="cstat-no" title="statement not covered" >  const [type, setType] = useState&lt;OrganizationType&gt;("District");</span>
@@ -269,7 +266,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
 <span class="cstat-no" title="statement not covered" >    event.preventDefault();</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await dispatch(addOrganization(createOrganization(name, type))).unwrap();</span>
-<span class="cstat-no" title="statement not covered" >      openDialog(null);</span>
+<span class="cstat-no" title="statement not covered" >      dispatch(closeWindow("ORGANIZATION_DIALOG"));</span>
 <span class="cstat-no" title="statement not covered" >    } catch (error) {</span>
 <span class="cstat-no" title="statement not covered" >      alert(</span>
 <span class="cstat-no" title="statement not covered" >        error instanceof Error ? error.message : t.organizationForm.saveFailed,</span>
@@ -280,7 +277,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
 <span class="cstat-no" title="statement not covered" >  return (</span>
 <span class="cstat-no" title="statement not covered" >    &lt;DialogWindow</span>
 <span class="cstat-no" title="statement not covered" >      title={t.organizationForm.title}</span>
-<span class="cstat-no" title="statement not covered" >      onClose={() =&gt; openDialog(null)}</span>
+<span class="cstat-no" title="statement not covered" >      onClose={() =&gt; dispatch(closeWindow("ORGANIZATION_DIALOG"))}</span>
     &gt;
 <span class="cstat-no" title="statement not covered" >      &lt;form onSubmit={handleSubmit}&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;div className="field-stack"&gt;</span>
@@ -318,7 +315,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
 <span class="cstat-no" title="statement not covered" >          &lt;button</span>
 <span class="cstat-no" title="statement not covered" >            type="button"</span>
 <span class="cstat-no" title="statement not covered" >            className="btn"</span>
-<span class="cstat-no" title="statement not covered" >            onClick={() =&gt; openDialog(null)}</span>
+<span class="cstat-no" title="statement not covered" >            onClick={() =&gt; dispatch(closeWindow("ORGANIZATION_DIALOG"))}</span>
           &gt;
 <span class="cstat-no" title="statement not covered" >            {t.common.cancel}</span>
 <span class="cstat-no" title="statement not covered" >          &lt;/button&gt;</span>
@@ -337,7 +334,7 @@ import type { OrganizationType } from "domain/shared/types.ts";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

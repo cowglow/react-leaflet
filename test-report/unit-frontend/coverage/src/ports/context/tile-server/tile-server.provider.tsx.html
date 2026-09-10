@@ -93,7 +93,9 @@
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -105,6 +107,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -112,21 +127,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { ReactNode, useEffect, useState } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { ReactNode, useEffect, useState } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 <span class="cstat-no" title="statement not covered" >import { TileServerContext } from "ports/context/tile-server/tile-server.context.ts";</span>
 <span class="cstat-no" title="statement not covered" >import { useLocalStorage } from "ports/hooks/use-local-storage.ts";</span>
-<span class="cstat-no" title="statement not covered" >import { baseMaps } from "infrastructure/tile-server/base-maps.ts";</span>
+<span class="cstat-no" title="statement not covered" >import { baseMaps, defaultBaseMapName } from "infrastructure/tile-server/base-maps.ts";</span>
 import { TileServerName } from "ports/context/tile-server/tile-server.types.ts";
 &nbsp;
 interface TileServerContextProviderProps {
@@ -134,17 +138,18 @@ interface TileServerContextProviderProps {
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const TileServerContextProvider = ({ children }: TileServerContextProviderProps) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  const layers = Object.keys(baseMaps);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  const [serverIndex, setServerIndex] = useLocalStorage({</span>
+<span class="cstat-no" title="statement not covered" >  const [storedName, setStoredName] = useLocalStorage&lt;TileServerName&gt;({</span>
 <span class="cstat-no" title="statement not covered" >    key: "TILE_SERVER",</span>
-<span class="cstat-no" title="statement not covered" >    defaultValue: layers[0],</span>
+<span class="cstat-no" title="statement not covered" >    defaultValue: defaultBaseMapName,</span>
 <span class="cstat-no" title="statement not covered" >  });</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  const [selectedBaseMap, setSelectedBaseMap] = useState&lt;TileServerName&gt;(serverIndex);</span>
+  // A name persisted by an older build may no longer exist — fall back rather
+  // than hand the map an undefined source.
+<span class="cstat-no" title="statement not covered" >  const initialName = storedName in baseMaps ? storedName : defaultBaseMapName;</span>
+<span class="cstat-no" title="statement not covered" >  const [selectedBaseMap, setSelectedBaseMap] = useState&lt;TileServerName&gt;(initialName);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  useEffect(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    setServerIndex(selectedBaseMap);</span>
+<span class="cstat-no" title="statement not covered" >    setStoredName(selectedBaseMap);</span>
     // eslint-disable-next-line react-hooks/exhaustive-deps
 <span class="cstat-no" title="statement not covered" >  }, [selectedBaseMap]);</span>
 &nbsp;
@@ -153,14 +158,15 @@ interface TileServerContextProviderProps {
 <span class="cstat-no" title="statement not covered" >      {children}</span>
 <span class="cstat-no" title="statement not covered" >    &lt;/TileServerContext.Provider&gt;</span>
   );
-<span class="cstat-no" title="statement not covered" >};</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-11T17:35:16.114Z
+                at 2026-09-10T15:51:54.280Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
