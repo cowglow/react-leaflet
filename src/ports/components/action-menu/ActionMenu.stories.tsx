@@ -1,19 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import ActionMenu from "ports/components/action-menu/ActionMenu.tsx";
-import LayerControl from "ports/components/controls/LayerControl.tsx";
 
 const meta: Meta<typeof ActionMenu> = {
   title: "ports/action-menu/ActionMenu",
   component: ActionMenu,
-  parameters: { map: true },
-  // Matches its real position from MapControls.tsx (topLeft, always open).
-  decorators: [
-    (Story) => (
-      <LayerControl position="topLeft" noIcon={true}>
-        <Story />
-      </LayerControl>
-    ),
-  ],
 };
 
 export default meta;

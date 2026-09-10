@@ -75,16 +75,17 @@ dependency rule where each layer may only depend on itself or layers inward of i
   like the `Region → Headquarter → Area → District` organization hierarchy).
 - **`application/`** — use-case logic built on domain types: `csv/` (roster
   import/export), `geojson/` (roster → GeoJSON `FeatureCollection`, export only),
-  `geo/` (bearing/distance calculations).
+  `geo/` (bearing, distance, bounding-box).
 - **`infrastructure/`** — framework/3rd-party bindings: `redux/` (Redux Toolkit slices
   + selectors per domain, `redux-saga` for async flows, wired together in `store.ts`),
-  `api/` (REST client for the backend), `csv/`, `tile-server/`, `geo-simulation/`.
+  `api/` (REST client for the backend), `csv/`, `tile-server/` (raster basemap sources
+  + `rasterStyle()`, the MapLibre style JSON the map renders), `geo-simulation/`.
 - **`ports/`** — the public/UI surface: `components/` (React components, grouped by
   feature area — `map/`, `markers/`, `forms/`, `dialogs/`, `auth/`, etc.),
   `context/` (React context providers: dialogs, i18n, tile server config), `hooks/`,
   `i18n/`, `config/`, `testing/` (Storybook fixtures).
 
-Imports are absolute from `src/` (e.g. `ports/components/layout/MainLayout.tsx`, not a
+Imports are absolute from `src/` (e.g. `ports/components/map/MembersMap.tsx`, not a
 relative path) — enabled via `baseUrl: "./src"` in `tsconfig.json` and the
 `vite-tsconfig-paths` plugin, not a bundler alias to reproduce elsewhere.
 

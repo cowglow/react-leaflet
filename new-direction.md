@@ -7,3 +7,4 @@
 - - export offers two formats, both downloaded client-side: "Export as CSV" (spreadsheet round-trip, same format Import reads) and "Export as GeoJSON" (a FeatureCollection of Point features in [lng, lat] order; members not yet placed on the map are emitted with a null geometry so the export is lossless).
 - change 'View' to About.
 - remove the main window (the full-screen app window chrome + "Visual Directory" title bar). The menu bar now sits directly on the desktop; the map and dialogs are the only windows.
+- drop Leaflet / react-leaflet, move the map to MapLibre GL (`@vis.gl/react-maplibre`). Basemap stays raster: `infrastructure/tile-server/base-maps.ts` holds the provider list + `rasterStyle()`, a minimal MapLibre style JSON. Deleted every map component the app no longer rendered (MapControls + its subtree, editable-list, aircraft/point markers, gyroscope, layer groups). The `window.L` UMD-global hack is gone.

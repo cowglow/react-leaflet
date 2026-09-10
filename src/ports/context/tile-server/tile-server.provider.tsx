@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { TileServerContext } from "ports/context/tile-server/tile-server.context.ts";
 import { useLocalStorage } from "ports/hooks/use-local-storage.ts";
-import { baseMaps } from "infrastructure/tile-server/base-maps.ts";
+import { baseMaps, defaultBaseMapName } from "infrastructure/tile-server/base-maps.ts";
 import { TileServerName } from "ports/context/tile-server/tile-server.types.ts";
 
 interface TileServerContextProviderProps {
@@ -9,17 +9,18 @@ interface TileServerContextProviderProps {
 }
 
 export const TileServerContextProvider = ({ children }: TileServerContextProviderProps) => {
-  const layers = Object.keys(baseMaps);
-
-  const [serverIndex, setServerIndex] = useLocalStorage({
+  const [storedName, setStoredName] = useLocalStorage<TileServerName>({
     key: "TILE_SERVER",
-    defaultValue: layers[0],
+    defaultValue: defaultBaseMapName,
   });
 
-  const [selectedBaseMap, setSelectedBaseMap] = useState<TileServerName>(serverIndex);
+  // A name persisted by an older build may no longer exist — fall back rather
+  // than hand the map an undefined source.
+  const initialName = storedName in baseMaps ? storedName : defaultBaseMapName;
+  const [selectedBaseMap, setSelectedBaseMap] = useState<TileServerName>(initialName);
 
   useEffect(() => {
-    setServerIndex(selectedBaseMap);
+    setStoredName(selectedBaseMap);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBaseMap]);
 

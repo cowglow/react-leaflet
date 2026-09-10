@@ -102,22 +102,7 @@ const de: Translations = {
     active: "Aktiv",
     lostContactSince: (date: string) => `Kontakt verloren seit ${date}`,
   },
-  mapControls: {
-    filterRange: "Filterbereich",
-    enable: "Aktivieren",
-    disable: "Deaktivieren",
-    zoomControls: "Zoomsteuerung",
-    mapLayerGroup: "Kartenebenengruppe",
-  },
-  distanceControl: {
-    distanceFrom: "Entfernung von",
-    select: "— Auswählen —",
-    myLocation: "Mein Standort",
-    gettingLocation: "Standort wird ermittelt…",
-  },
   importExport: {
-    exportLabel: "Mitglieder als CSV exportieren",
-    importLabel: "Mitglieder aus CSV importieren",
     importResult: (imported: number, total: number, failed: number) =>
       `${imported} von ${total} Mitgliedern importiert (${failed} fehlgeschlagen — vermutlich bereits vorhanden).`,
   },

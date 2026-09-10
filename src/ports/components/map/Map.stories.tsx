@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import L from "leaflet";
 import Map from "ports/components/map/Map.tsx";
 import MarkerOwnPosition from "ports/components/markers/Marker.OwnPosition.tsx";
 import MemberMarker from "ports/components/markers/Marker.Member.tsx";
-import AircraftMarker from "ports/components/markers/Marker.Aircraft.tsx";
 import { sampleMembers } from "ports/testing/story-fixtures.ts";
 
 const reduxState = {
@@ -18,21 +16,20 @@ const reduxState = {
 const meta: Meta<typeof Map> = {
   title: "ports/map/Map",
   component: Map,
-  // Map renders its own MapContainer internally, so this does NOT use the
-  // `map: true` decorator parameter (that would nest a second MapContainer).
-  // Map's wrapper relies on height:100% cascading down from its parent, which
-  // collapses to 0 in the story canvas unless we give it a concrete height here.
+  // Map renders its own MapLibre <Map> — do NOT use `parameters: { map: true }`
+  // (that nests a second map). Its flex wrapper needs a sized flex parent, which
+  // the bare story canvas doesn't provide.
   decorators: [
     (Story) => (
-      <div style={{ height: "400px", width: "100%" }}>
+      <div style={{ height: "400px", width: "100%", display: "flex" }}>
         <Story />
       </div>
     ),
   ],
   args: {
-    center: new L.LatLng(49.4521, 11.0767),
+    center: { longitude: 11.0767, latitude: 49.4521 },
     zoom: 13,
-    scrollWheelZoom: true,
+    scrollZoom: true,
   },
   parameters: { reduxState },
 };
@@ -40,12 +37,11 @@ const meta: Meta<typeof Map> = {
 export default meta;
 type Story = StoryObj<typeof Map>;
 
-export const WithMembersAndAircraft: Story = {
+export const WithMembers: Story = {
   args: {
     children: (
       <>
         <MarkerOwnPosition />
-        <AircraftMarker position={new L.LatLng(49.46, 11.09)} bearing={220} />
         {sampleMembers.map((member) => (
           <MemberMarker key={member.id} member={member} />
         ))}

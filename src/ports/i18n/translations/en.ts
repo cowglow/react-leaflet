@@ -99,22 +99,7 @@ const en = {
     active: "Active",
     lostContactSince: (date: string) => `Lost contact since ${date}`,
   },
-  mapControls: {
-    filterRange: "Filter Range",
-    enable: "Enable",
-    disable: "Disable",
-    zoomControls: "Zoom Controls",
-    mapLayerGroup: "Map Layer Group",
-  },
-  distanceControl: {
-    distanceFrom: "Distance from",
-    select: "— Select —",
-    myLocation: "My Location",
-    gettingLocation: "Getting your location…",
-  },
   importExport: {
-    exportLabel: "Export Members as CSV",
-    importLabel: "Import Members from CSV",
     importResult: (imported: number, total: number, failed: number) =>
       `Imported ${imported} of ${total} members (${failed} failed — likely already existed).`,
   },

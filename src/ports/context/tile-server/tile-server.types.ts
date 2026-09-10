@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
+import type { BaseMapSource } from "infrastructure/tile-server/base-maps.ts";
 
 export type TileServerName = string;
 
 interface TileServerContextProps {
-  baseMaps: Record<TileServerName, L.TileLayer>;
+  baseMaps: Record<TileServerName, BaseMapSource>;
   selectedBaseMap: TileServerName;
 }
 

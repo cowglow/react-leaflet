@@ -1,12 +1,10 @@
-import type { MapContainerProps } from "react-leaflet";
-import { MapContainer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { Map as MapLibreMap } from "@vis.gl/react-maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
 import styled from "styled-components";
-import MapAttribution from "ports/components/map/MapAttribution.tsx";
-import MapAutoResize from "ports/components/map/Map.AutoResize.tsx";
 import { Box } from "@mui/material";
-import { useSelector } from "infrastructure/redux/hooks.ts";
-import { getGyroscopeEnabled } from "infrastructure/redux/gyroscope/gyroscope.selectors.ts";
+import { useTileServer } from "ports/context/tile-server/tile-server.hook.ts";
+import { rasterStyle } from "infrastructure/tile-server/base-maps.ts";
 
 const MapWrapper = styled(Box)`
   flex: 1;
@@ -15,50 +13,58 @@ const MapWrapper = styled(Box)`
   width: 100%;
   height: 100%;
 `;
-const StyledMapContainer = styled(MapContainer)`
-  display: block;
-  width: 100%;
-  height: 100%;
-`;
-const GyroScopeMask = styled(Box)`
-  position: absolute;
-  z-index: 1000;
-  width: 100%;
-  height: 100%;
-  mask-image: radial-gradient(circle at 50% 50%, transparent 50%, black 50%);
-  background-color: wheat;
-  overflow: hidden;
-`;
+
+const FILL: React.CSSProperties = { width: "100%", height: "100%" };
+
+interface MapProps {
+  center: { longitude: number; latitude: number };
+  zoom?: number;
+  scrollZoom?: boolean;
+  minZoom?: number;
+  maxZoom?: number;
+  onMapClick?: (coordinates: { lat: number; lng: number }) => void;
+  children?: ReactNode;
+}
 
 export default function Map({
-  children,
   center,
-  scrollWheelZoom = false,
-  bounceAtZoomLimits = false,
   zoom = 3,
-}: MapContainerProps) {
-  const isGyroscope = useSelector(getGyroscopeEnabled);
-  const bounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
+  scrollZoom = false,
+  minZoom = 3,
+  maxZoom = 19,
+  onMapClick,
+  children,
+}: MapProps) {
+  const { baseMaps, selectedBaseMap } = useTileServer();
+
+  // A fresh style object each render makes react-maplibre call `setStyle` on
+  // every render, which reloads the raster source (and blanks the tiles); key it
+  // to the selected provider instead.
+  const mapStyle = useMemo(
+    () => rasterStyle(baseMaps[selectedBaseMap]),
+    [baseMaps, selectedBaseMap],
+  );
+
+  const handleClick = useCallback(
+    ({ lngLat }: { lngLat: { lat: number; lng: number } }) => {
+      onMapClick?.({ lat: lngLat.lat, lng: lngLat.lng });
+    },
+    [onMapClick],
+  );
+
   return (
     <MapWrapper>
-      <GyroScopeMask display={isGyroscope ? "block" : "none"}>
-        &nbsp;
-      </GyroScopeMask>
-      <StyledMapContainer
-        zoomControl={false}
-        center={center}
-        zoom={zoom}
-        scrollWheelZoom={scrollWheelZoom}
-        minZoom={3}
-        maxZoom={19}
-        maxBounds={bounds}
-        maxBoundsViscosity={0.15}
-        bounceAtZoomLimits={bounceAtZoomLimits}
+      <MapLibreMap
+        initialViewState={{ ...center, zoom }}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        scrollZoom={scrollZoom}
+        mapStyle={mapStyle}
+        style={FILL}
+        onClick={onMapClick ? handleClick : undefined}
       >
-        <MapAttribution />
-        <MapAutoResize />
         {children}
-      </StyledMapContainer>
+      </MapLibreMap>
     </MapWrapper>
   );
 }
