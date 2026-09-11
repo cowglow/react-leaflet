@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/80</span>
+                <span class='fraction'>0/87</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/80</span>
+                <span class='fraction'>0/87</span>
             </div>
         
             
@@ -194,7 +194,14 @@
 <a name='L129'></a><a href='#L129'>129</a>
 <a name='L130'></a><a href='#L130'>130</a>
 <a name='L131'></a><a href='#L131'>131</a>
-<a name='L132'></a><a href='#L132'>132</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -263,6 +270,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -270,6 +281,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -392,7 +406,11 @@ interface MapMarkerProps {
 <span class="cstat-no" title="statement not covered" >    setOpen(autoOpen);</span>
 <span class="cstat-no" title="statement not covered" >  }, [autoOpen]);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  const effectiveColor = moving ? MOVING_COLOR : selected ? SELECTED_COLOR : color;</span>
+<span class="cstat-no" title="statement not covered" >  const effectiveColor = moving</span>
+<span class="cstat-no" title="statement not covered" >    ? MOVING_COLOR</span>
+<span class="cstat-no" title="statement not covered" >    : selected</span>
+<span class="cstat-no" title="statement not covered" >      ? SELECTED_COLOR</span>
+<span class="cstat-no" title="statement not covered" >      : color;</span>
 <span class="cstat-no" title="statement not covered" >  const effectiveScale = selected ? (scale ?? 1) * 1.2 : scale;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
@@ -408,6 +426,7 @@ interface MapMarkerProps {
 <span class="cstat-no" title="statement not covered" >        color={effectiveColor}</span>
 <span class="cstat-no" title="statement not covered" >        scale={effectiveScale}</span>
 <span class="cstat-no" title="statement not covered" >        draggable={moving}</span>
+<span class="cstat-no" title="statement not covered" >        className={moving ? "map-marker-moving" : undefined}</span>
 <span class="cstat-no" title="statement not covered" >        onDragEnd={(event) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          setMoving(false);</span>
 <span class="cstat-no" title="statement not covered" >          onMoveEnd?.({ lat: event.lngLat.lat, lng: event.lngLat.lng });</span>
@@ -418,7 +437,9 @@ interface MapMarkerProps {
 <span class="cstat-no" title="statement not covered" >            setMoving(false); // clicked without dragging → cancel the move</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
 <span class="cstat-no" title="statement not covered" >          }</span>
-<span class="cstat-no" title="statement not covered" >          onSelect?.(event.originalEvent.shiftKey || event.originalEvent.metaKey);</span>
+<span class="cstat-no" title="statement not covered" >          onSelect?.(</span>
+<span class="cstat-no" title="statement not covered" >            event.originalEvent.shiftKey || event.originalEvent.metaKey,</span>
+<span class="cstat-no" title="statement not covered" >          );</span>
 <span class="cstat-no" title="statement not covered" >          if (onActivate) {</span>
 <span class="cstat-no" title="statement not covered" >            onActivate();</span>
 <span class="cstat-no" title="statement not covered" >          } else {</span>
@@ -463,7 +484,7 @@ interface MapMarkerProps {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-11T19:24:34.633Z
+                at 2026-09-11T19:36:00.749Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
