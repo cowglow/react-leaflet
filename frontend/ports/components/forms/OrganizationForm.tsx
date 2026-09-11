@@ -1,8 +1,17 @@
-import { FormEvent, useState } from "react";
-import { useDispatch } from "infrastructure/redux/hooks.ts";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { bringToFront, closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
-import { addOrganization } from "infrastructure/redux/organization/organization.slice.ts";
+import {
+  addOrganizationRequested,
+  resetOrganizationMutation,
+} from "infrastructure/redux/organization/organization.slice.ts";
+import {
+  getOrganizationMutationError,
+  getOrganizationMutationRequestId,
+  getOrganizationMutationStatus,
+} from "infrastructure/redux/organization/organization.selectors.ts";
+import { createRequestId } from "infrastructure/redux/request-id.ts";
 import { createOrganization } from "domain/organization/organization.factory.ts";
 import type { OrganizationType } from "domain/shared/types.ts";
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
@@ -21,16 +30,31 @@ export default function OrganizationForm({ z }: { z?: number }) {
   const [name, setName] = useState("");
   const [type, setType] = useState<OrganizationType>("District");
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    try {
-      await dispatch(addOrganization(createOrganization(name, type))).unwrap();
-      dispatch(closeWindow("ORGANIZATION_DIALOG"));
-    } catch (error) {
-      alert(
-        error instanceof Error ? error.message : t.organizationForm.saveFailed,
-      );
+  const pendingRequestId = useRef<string | null>(null);
+  const mutationStatus = useSelector(getOrganizationMutationStatus);
+  const mutationRequestId = useSelector(getOrganizationMutationRequestId);
+  const mutationError = useSelector(getOrganizationMutationError);
+
+  useEffect(() => {
+    if (!pendingRequestId.current || mutationRequestId !== pendingRequestId.current) {
+      return;
     }
+    if (mutationStatus === "succeeded") {
+      pendingRequestId.current = null;
+      dispatch(resetOrganizationMutation());
+      dispatch(closeWindow("ORGANIZATION_DIALOG"));
+    } else if (mutationStatus === "failed") {
+      pendingRequestId.current = null;
+      alert(mutationError ?? t.organizationForm.saveFailed);
+      dispatch(resetOrganizationMutation());
+    }
+  }, [mutationStatus, mutationRequestId, mutationError, dispatch, t]);
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    const requestId = createRequestId();
+    pendingRequestId.current = requestId;
+    dispatch(addOrganizationRequested({ requestId, organization: createOrganization(name, type) }));
   };
 
   return (

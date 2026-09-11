@@ -6,9 +6,10 @@ import SelectionCamera from "ports/components/map/SelectionCamera.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { getFilteredMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
-import { addMember } from "infrastructure/redux/member/member.slice.ts";
+import { addMemberRequested } from "infrastructure/redux/member/member.slice.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { createIncompleteMember } from "domain/member/member.factory.ts";
+import { createRequestId } from "infrastructure/redux/request-id.ts";
 
 const NBG_CENTER = { longitude: 11.0767, latitude: 49.4521 };
 
@@ -27,7 +28,7 @@ export default function MembersMap() {
         // tree and marker clicks). Shift = quick pin; plain = new member here.
         if (!canWrite) return;
         if (shift) {
-          dispatch(addMember(createIncompleteMember({ lat, lng })));
+          dispatch(addMemberRequested({ requestId: createRequestId(), member: createIncompleteMember({ lat, lng }) }));
         } else {
           dispatch(openWindow({ type: "MEMBER_DIALOG", payload: { coordinates: { lat, lng } } }));
         }

@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import ConnectionErrorBanner from "ports/components/ui/ConnectionErrorBanner.tsx";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { fetchMembers } from "infrastructure/redux/member/member.slice.ts";
+import { fetchMembersRequested } from "infrastructure/redux/member/member.slice.ts";
 import { getMemberError } from "infrastructure/redux/member/member.selectors.ts";
-import { fetchOrganizations } from "infrastructure/redux/organization/organization.slice.ts";
+import { fetchOrganizationsRequested } from "infrastructure/redux/organization/organization.slice.ts";
 import { getOrganizationError } from "infrastructure/redux/organization/organization.selectors.ts";
 import { openWindow } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
@@ -26,8 +26,8 @@ export default function App() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    dispatch(fetchMembers());
-    dispatch(fetchOrganizations());
+    dispatch(fetchMembersRequested());
+    dispatch(fetchOrganizationsRequested());
     dispatch(openWindow({ type: "MAP_DIALOG" }));
   }, [dispatch]);
 
@@ -43,8 +43,8 @@ export default function App() {
         <ConnectionErrorBanner
           message={t.connectionError(connectionError)}
           onRetry={() => {
-            dispatch(fetchMembers());
-            dispatch(fetchOrganizations());
+            dispatch(fetchMembersRequested());
+            dispatch(fetchOrganizationsRequested());
           }}
         />
       )}

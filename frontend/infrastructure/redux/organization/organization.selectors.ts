@@ -12,3 +12,15 @@ export function getOrganizationById(state: RootState, id: string): Organization 
 export function getOrganizationError(state: RootState): string | null {
   return state.organization.error;
 }
+
+export function getOrganizationMutationStatus(state: RootState) {
+  return state.organization.mutationStatus;
+}
+
+export function getOrganizationMutationRequestId(state: RootState): string | null {
+  return state.organization.mutationRequestId;
+}
+
+export function getOrganizationMutationError(state: RootState): string | null {
+  return state.organization.mutationError;
+}

@@ -20,3 +20,19 @@ export function getMemberById(state: RootState, id: string): Member | undefined 
 export function getMemberError(state: RootState): string | null {
   return state.member.error;
 }
+
+export function getMemberMutationStatus(state: RootState) {
+  return state.member.mutationStatus;
+}
+
+export function getMemberMutationRequestId(state: RootState): string | null {
+  return state.member.mutationRequestId;
+}
+
+export function getMemberMutationError(state: RootState): string | null {
+  return state.member.mutationError;
+}
+
+export function getMemberImportResult(state: RootState) {
+  return state.member.importResult;
+}
