@@ -18,7 +18,7 @@ const CLIENT_APP_PATH = "/visual-directory";
 
 export function buildAppDeps(): AppDeps {
   return {
-    requireAuth: createRequireAuth(jwtTokenSigner),
+    requireAuth: createRequireAuth(jwtTokenSigner, prismaAccountRepository),
     memberRepository: prismaMemberRepository,
     organizationRepository: prismaOrganizationRepository,
     accountRepository: prismaAccountRepository,
