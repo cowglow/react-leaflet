@@ -27,16 +27,6 @@ export const baseMaps = {
     attribution: `${OSM}, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France`,
     maxZoom: 19,
   },
-  "Carto (Basemaps)": {
-    tiles: [
-      "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-      "https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-      "https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-      "https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-    ],
-    attribution: `${OSM}, © CARTO`,
-    maxZoom: 19,
-  },
   "Open Street Map (Fr)": {
     tiles: [
       "https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
