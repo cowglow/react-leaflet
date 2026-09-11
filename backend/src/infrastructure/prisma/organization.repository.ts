@@ -12,6 +12,7 @@ function toDomainOrganization(organization: PrismaOrganization): Organization {
     id: organization.id,
     name: organization.name,
     type: organization.type,
+    parentId: organization.parentId ?? undefined,
     members: [],
   };
 }
@@ -30,13 +31,18 @@ export const prismaOrganizationRepository: OrganizationRepository = {
   async create(input: OrganizationInput, actorAccountId) {
     const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const created = await tx.organization.create({
-        data: { name: input.name, type: input.type, ...(input.id ? { id: input.id } : {}) },
+        data: {
+          name: input.name,
+          type: input.type,
+          parentId: input.parentId ?? null,
+          ...(input.id ? { id: input.id } : {}),
+        },
       });
       await appendAuditLog(tx, {
         actorAccountId,
         entity: "organization",
         entityId: created.id,
-        diff: { type: "create", after: { name: input.name, type: input.type } },
+        diff: { type: "create", after: { name: input.name, type: input.type, parentId: input.parentId } },
       });
       return created;
     });
@@ -51,13 +57,17 @@ export const prismaOrganizationRepository: OrganizationRepository = {
     const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updated = await tx.organization.update({
         where: { id },
-        data: { name: input.name, type: input.type },
+        data: { name: input.name, type: input.type, parentId: input.parentId ?? null },
       });
       await appendAuditLog(tx, {
         actorAccountId,
         entity: "organization",
         entityId: id,
-        diff: { type: "update", before: existing, after: { name: input.name, type: input.type } },
+        diff: {
+          type: "update",
+          before: existing,
+          after: { name: input.name, type: input.type, parentId: input.parentId },
+        },
       });
       return updated;
     });

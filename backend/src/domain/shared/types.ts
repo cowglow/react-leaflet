@@ -6,6 +6,6 @@
 // where `infrastructure/prisma/*.repository.ts` maps between the two.
 export type Role = "member" | "leader";
 
-export type OrganizationType = "Region" | "Headquarter" | "Area" | "District";
+export type OrganizationType = "Region" | "Headquarter" | "Area" | "District" | "Group";
 
 export type DepartmentType = "MD" | "WD" | "JMD" | "JWD";

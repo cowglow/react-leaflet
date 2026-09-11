@@ -7,6 +7,7 @@ export type Organization = {
   id: string;
   name: string;
   type: OrganizationType;
+  parentId?: string;
   members: Member[];
   leadership?: LeadershipType;
 };

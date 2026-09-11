@@ -17,6 +17,7 @@ const es: Translations = {
     Headquarter: "Sede",
     Area: "Área",
     District: "Distrito",
+    Group: "Grupo",
   },
   mapWindow: {
     title: "Mapa",
@@ -83,6 +84,8 @@ const es: Translations = {
     title: "Agregar organización",
     name: "Nombre",
     type: "Tipo",
+    parent: "Superior",
+    noParent: "— Ninguno —",
     saveFailed: "No se pudo guardar la organización",
   },
   inviteForm: {

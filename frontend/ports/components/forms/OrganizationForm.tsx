@@ -13,6 +13,7 @@ import {
 } from "infrastructure/redux/organization/organization.selectors.ts";
 import { createRequestId } from "infrastructure/redux/request-id.ts";
 import { createOrganization } from "domain/organization/organization.factory.ts";
+import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import type { OrganizationType } from "domain/shared/types.ts";
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import "./forms.css";
@@ -22,18 +23,43 @@ const organizationTypes: OrganizationType[] = [
   "Headquarter",
   "Area",
   "District",
+  "Group",
 ];
+
+// Which type a given organization type's parent must be — Region sits at the
+// top of the hierarchy and has none. Mirrors docs/INITIAL_ORGANIZATION_MAP.md's
+// real-world structure (HS=Headquarter, BR=Area, BZ=District, GR=Group).
+const PARENT_TYPE: Partial<Record<OrganizationType, OrganizationType>> = {
+  Headquarter: "Region",
+  Area: "Headquarter",
+  District: "Area",
+  Group: "District",
+};
 
 export default function OrganizationForm({ z }: { z?: number }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [type, setType] = useState<OrganizationType>("District");
+  const [parentId, setParentId] = useState("");
+  const organizations = useSelector(getOrganizations);
 
   const pendingRequestId = useRef<string | null>(null);
   const mutationStatus = useSelector(getOrganizationMutationStatus);
   const mutationRequestId = useSelector(getOrganizationMutationRequestId);
   const mutationError = useSelector(getOrganizationMutationError);
+
+  const requiredParentType = PARENT_TYPE[type];
+  const parentOptions = requiredParentType
+    ? organizations.filter((organization) => organization.type === requiredParentType)
+    : [];
+
+  useEffect(() => {
+    if (!parentOptions.some((organization) => organization.id === parentId)) {
+      setParentId("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
 
   useEffect(() => {
     if (!pendingRequestId.current || mutationRequestId !== pendingRequestId.current) {
@@ -54,7 +80,12 @@ export default function OrganizationForm({ z }: { z?: number }) {
     event.preventDefault();
     const requestId = createRequestId();
     pendingRequestId.current = requestId;
-    dispatch(addOrganizationRequested({ requestId, organization: createOrganization(name, type) }));
+    dispatch(
+      addOrganizationRequested({
+        requestId,
+        organization: createOrganization(name, type, parentId || undefined),
+      }),
+    );
   };
 
   return (
@@ -96,6 +127,24 @@ export default function OrganizationForm({ z }: { z?: number }) {
             ))}
           </select>
         </div>
+
+        {requiredParentType && (
+          <div className="field-stack">
+            <label htmlFor="org-parent">{t.organizationForm.parent}</label>
+            <select
+              id="org-parent"
+              value={parentId}
+              onChange={(event) => setParentId(event.target.value)}
+            >
+              <option value="">{t.organizationForm.noParent}</option>
+              {parentOptions.map((organization) => (
+                <option key={organization.id} value={organization.id}>
+                  {organization.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div
           className="field-row field-stack"

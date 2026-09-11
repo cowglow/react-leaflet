@@ -17,6 +17,7 @@ enum OrganizationType {
   Headquarter
   Area
   District
+  Group
 }
 
 enum DepartmentType {
@@ -57,10 +58,15 @@ model Organization {
   id        String           @id @default(uuid())
   name      String
   type      OrganizationType
+  parentId  String?
+  parent    Organization?    @relation("OrganizationHierarchy", fields: [parentId], references: [id])
+  children  Organization[]   @relation("OrganizationHierarchy")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
   members Member[]
+
+  @@index([parentId])
 }
 
 model Member {

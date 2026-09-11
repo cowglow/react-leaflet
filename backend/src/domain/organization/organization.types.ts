@@ -8,6 +8,7 @@ export type Organization = {
   id: string;
   name: string;
   type: OrganizationType;
+  parentId?: string;
   members: never[];
 };
 
@@ -15,4 +16,5 @@ export type OrganizationInput = {
   id?: string;
   name: string;
   type: OrganizationType;
+  parentId?: string;
 };

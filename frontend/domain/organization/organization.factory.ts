@@ -15,13 +15,14 @@ function buildOrganization(args: Omit<Organization, "id">): Organization {
     id: crypto.randomUUID(),
     name: args.name,
     type: args.type,
+    parentId: args.parentId,
     members: args.members,
     leadership: args.leadership,
   };
 }
 
-export function createOrganization(name: string, type: OrganizationType): Organization {
-  return buildOrganization({ name, type, members: [] });
+export function createOrganization(name: string, type: OrganizationType, parentId?: string): Organization {
+  return buildOrganization({ name, type, parentId, members: [] });
 }
 
 export function createDistrictOrganization(name: string, members: Member[]): Organization {

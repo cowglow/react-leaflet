@@ -15,6 +15,7 @@ const en = {
     Headquarter: "Headquarter",
     Area: "Area",
     District: "District",
+    Group: "Group",
   },
   mapWindow: {
     title: "Map",
@@ -81,6 +82,8 @@ const en = {
     title: "Add Organization",
     name: "Name",
     type: "Type",
+    parent: "Parent",
+    noParent: "— None —",
     saveFailed: "Failed to save organization",
   },
   inviteForm: {

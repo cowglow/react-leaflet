@@ -11,10 +11,10 @@ import type { OrganizationType } from "domain/shared/types.ts";
 
 export type MenuConfig = Record<string, MenuConfigItem[]>;
 
-// The four organization "levels" (really just OrganizationType values — orgs are
-// flat, there's no actual parent/child link between e.g. a Region and the Areas
-// under it) that the Map menu's "Select by Level" submenu offers as scopes.
-const ORGANIZATION_TYPES: OrganizationType[] = ["Region", "Headquarter", "Area", "District"];
+// The organization "levels" (OrganizationType values, top to bottom of the
+// Region → Headquarter → Area → District → Group hierarchy) that the Map
+// menu's "Select by Level" submenu offers as scopes.
+const ORGANIZATION_TYPES: OrganizationType[] = ["Region", "Headquarter", "Area", "District", "Group"];
 
 export interface MenuConfigDeps {
   dispatch: AppDispatch;
@@ -46,12 +46,31 @@ export function createMenuConfig({
   // Selects every member belonging to any organization of the given type — a
   // broader scope than the Organizations tree's own double-click (which selects
   // one specific organization's members), since a "level" can span several orgs.
+  // Members live on leaf-level organizations (Group), so selecting a higher
+  // level like "Area" must pull in every org beneath it in the tree, not just
+  // orgs of that exact type.
+  const descendantOrgIds = (rootIds: Set<string>): Set<string> => {
+    const result = new Set(rootIds);
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (const organization of organizations) {
+        if (organization.parentId && result.has(organization.parentId) && !result.has(organization.id)) {
+          result.add(organization.id);
+          grew = true;
+        }
+      }
+    }
+    return result;
+  };
+
   const selectByLevel = (type: OrganizationType) => {
     const orgIdsOfType = new Set(
       organizations.filter((organization) => organization.type === type).map((organization) => organization.id),
     );
+    const scopeOrgIds = descendantOrgIds(orgIdsOfType);
     const memberIds = members
-      .filter((member) => member.organizationId && orgIdsOfType.has(member.organizationId))
+      .filter((member) => member.organizationId && scopeOrgIds.has(member.organizationId))
       .map((member) => member.id);
     dispatch(selectMembers(memberIds));
   };
