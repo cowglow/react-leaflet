@@ -1,13 +1,13 @@
 import type { Decorator, Preview } from "@storybook/react";
 import { Provider } from "react-redux";
 import { Map as MapLibreMap } from "@vis.gl/react-maplibre";
-import { setupStore } from "../src/infrastructure/redux/store.ts";
-import { installGeoSim } from "../src/infrastructure/geo-simulation/geo-simulation.ts";
-import { TileServerContext } from "../src/ports/context/tile-server/tile-server.context.ts";
-import { baseMaps, rasterStyle } from "../src/infrastructure/tile-server/base-maps.ts";
-import { I18nContext } from "../src/ports/context/i18n/i18n.context.ts";
-import { translations } from "../src/ports/i18n/translations/index.ts";
-import { languages, languageLabels, type Language } from "../src/ports/i18n/language.ts";
+import { setupStore } from "../frontend/infrastructure/redux/store.ts";
+import { installGeoSim } from "../frontend/infrastructure/geo-simulation/geo-simulation.ts";
+import { TileServerContext } from "../frontend/ports/context/tile-server/tile-server.context.ts";
+import { baseMaps, rasterStyle } from "../frontend/infrastructure/tile-server/base-maps.ts";
+import { I18nContext } from "../frontend/ports/context/i18n/i18n.context.ts";
+import { translations } from "../frontend/ports/i18n/translations/index.ts";
+import { languages, languageLabels, type Language } from "../frontend/ports/i18n/language.ts";
 import "@sakun/system.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 

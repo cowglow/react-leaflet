@@ -5,7 +5,7 @@ import { BASE_URL } from "./config.ts";
 // authenticated map view. Outside production, the API returns a `devToken` alongside
 // its response and LoginForm.tsx auto-verifies with it immediately (skipping the
 // "login link has been sent" message) rather than requiring a human to go dig the
-// link out of an email/console — see server/src/routes/auth.routes.ts.
+// link out of an email/console — see backend/src/ports/http/routes/auth.routes.ts.
 export async function loginAs(page: Page, email: string): Promise<void> {
   await page.goto(BASE_URL);
   await expect(page.locator("text=Sign in")).toBeVisible({ timeout: 15000 });

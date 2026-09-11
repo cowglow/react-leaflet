@@ -8,7 +8,7 @@
     "dev:all": "pnpm backend:up && concurrently -n frontend,storybook -c blue.bold,magenta.bold \"npm:dev\" \"npm:storybook\"",
     "docker:dev": "docker compose run --service-ports frontend bash",
     "build": "tsc && vite build",
-    "lint": "eslint src e2e --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint frontend e2e --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "format": "prettier . --write",
     "test": "vitest --coverage",

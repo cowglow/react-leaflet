@@ -26,8 +26,8 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Install server dependencies
-        run: cd server && pnpm install
+      - name: Install backend dependencies
+        run: cd backend && pnpm install
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
@@ -46,10 +46,10 @@ jobs:
         continue-on-error: true
         run: pnpm exec vitest run --coverage
 
-      - name: Run server unit tests
-        id: server-unit
+      - name: Run backend unit tests
+        id: backend-unit
         continue-on-error: true
-        run: cd server && pnpm exec vitest run --coverage
+        run: cd backend && pnpm exec vitest run --coverage
 
       - name: Run e2e tests
         id: e2e
@@ -63,9 +63,9 @@ jobs:
       - name: Assemble combined test report
         if: always()
         run: |
-          mkdir -p test-report/unit-frontend test-report/unit-server
+          mkdir -p test-report/unit-frontend test-report/unit-backend
           [ -d coverage ] && mv coverage test-report/unit-frontend/coverage
-          [ -d server/coverage ] && mv server/coverage test-report/unit-server/coverage
+          [ -d backend/coverage ] && mv backend/coverage test-report/unit-backend/coverage
           cat > test-report/index.html << HTML
           <!doctype html>
           <html>
@@ -76,7 +76,7 @@ jobs:
             <ul>
               <li><a href="./e2e/">E2E test report (Playwright)</a></li>
               <li><a href="./unit-frontend/coverage/">Frontend unit test coverage</a></li>
-              <li><a href="./unit-server/coverage/">Server unit test coverage</a></li>
+              <li><a href="./unit-backend/coverage/">Backend unit test coverage</a></li>
             </ul>
           </body>
           </html>
@@ -91,5 +91,5 @@ jobs:
           target-folder: test-report
 
       - name: Fail the job if any test suite failed
-        if: steps.frontend-unit.outcome == 'failure' || steps.server-unit.outcome == 'failure' || steps.e2e.outcome == 'failure'
+        if: steps.frontend-unit.outcome == 'failure' || steps.backend-unit.outcome == 'failure' || steps.e2e.outcome == 'failure'
         run: exit 1

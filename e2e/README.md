@@ -1,8 +1,9 @@
 # E2E tests
 
 Real end-to-end tests — a headless browser driving the actual frontend against the
-actual backend (Postgres + API), not mocks. Complements the unit tests under `src/`
-and `server/src/`, which don't exercise the browser, network, or database at all.
+actual backend (Postgres + API), not mocks. Complements the unit tests under
+`frontend/` and `backend/src/`, which don't exercise the browser, network, or
+database at all.
 
 ## Prerequisites
 
@@ -40,7 +41,7 @@ out mysteriously.
 
 This suite runs the api container with `NODE_ENV=development` (see `docker-compose.yml`),
 so the `POST /auth/magic-link` response includes a `devToken` field (see
-`server/src/routes/auth.routes.ts`) — a convenience so nobody has to go dig the link
+`backend/src/ports/http/routes/auth.routes.ts`) — a convenience so nobody has to go dig the link
 out of an email/console by hand outside production. `LoginForm.tsx` auto-verifies with
 it immediately, so `helpers/auth.ts`'s `loginAs` just waits for the authenticated map
 view rather than reading a link out of `docker compose logs api` or clicking one.
