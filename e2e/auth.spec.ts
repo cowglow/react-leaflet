@@ -9,6 +9,8 @@ test("shows the sign-in form when not authenticated", async ({ page }) => {
 
 test("the seeded leader can log in via magic link", async ({ page }) => {
   await loginAs(page, SEED_LEADER_EMAIL);
-  await expect(page.locator(".leaflet-container")).toBeVisible();
-  await expect(page.locator('ul[role="menu-bar"] >> text=Actions')).toBeVisible();
+  await expect(page.locator(".maplibregl-canvas").first()).toBeVisible();
+  await expect(
+    page.locator('ul[role="menu-bar"] > li[role="menu-item"]', { hasText: "Organization" }),
+  ).toBeVisible();
 });
