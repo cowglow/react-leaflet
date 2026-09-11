@@ -36,6 +36,17 @@ async function main() {
         });
         orgIdByKey.set(org.key, created.id);
       }
+      // Parent links are set in a second pass — a parent's id isn't known
+      // until it's been created, and the tree is declared parent-before-child
+      // but that's not guaranteed to hold as demo-data.ts is extended.
+      for (const org of demoOrganizations) {
+        if (!org.parent) continue;
+        const parentId = orgIdByKey.get(org.parent);
+        if (!parentId) {
+          throw new Error(`Organization "${org.key}" references unknown parent key "${org.parent}"`);
+        }
+        await tx.organization.update({ where: { id: orgIdByKey.get(org.key)! }, data: { parentId } });
+      }
 
       let leaderLinkId: string | null = null;
       for (const member of demoMembers) {

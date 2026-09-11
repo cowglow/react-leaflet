@@ -1,0 +1,27 @@
+HS Franken
+ - BR Regnitz
+   - BZ Nord-Oberfranken
+     - GR Kirschblüte
+     - GR Buddhi-CO
+   - BZ Mainblick 
+     - GR Würzburg 
+     - GR Lotos 
+     - GR Carpe Diem
+   - BZ Erlangen
+     - GR Glücksritter 
+     - GR Erlangen Innen
+   - BZ Ars Leonis
+     - GR Löwenzahn 
+     - GR Ars Vivendi
+ - BR Mittelfranken
+   - BZ Sternentor 
+     - GR Sonnenlotos 
+     - GR Sonne 
+     - GR Langwasser 
+     - GR Grenzenlos 
+     - GR Cosmos
+   - BZ Brücke 
+     - GR Leuchtturm 
+     - GR Glücksklee 
+     - GR Fürther Freiheit 
+     - GR Europakanal
