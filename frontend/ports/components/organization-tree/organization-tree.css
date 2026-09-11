@@ -12,7 +12,7 @@
 .org-tree-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .org-tree,
@@ -83,10 +83,15 @@
 }
 
 .org-preview {
-  flex: 0 0 15rem;
+  flex: 0 0 18rem;
   border-left: 2px solid #000;
   padding-left: 1rem;
   font-size: 0.9em;
+}
+
+.org-preview-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .org-preview-name {

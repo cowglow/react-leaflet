@@ -1,11 +1,22 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
 import { closeWindow, DialogPayload } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberById } from "infrastructure/redux/member/member.selectors.ts";
+import {
+  getMemberMutationError,
+  getMemberMutationRequestId,
+  getMemberMutationStatus,
+} from "infrastructure/redux/member/member.selectors.ts";
 import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
-import { addMember, removeMember, updateMember } from "infrastructure/redux/member/member.slice.ts";
+import {
+  addMemberRequested,
+  removeMemberRequested,
+  resetMemberMutation,
+  updateMemberRequested,
+} from "infrastructure/redux/member/member.slice.ts";
+import { createRequestId } from "infrastructure/redux/request-id.ts";
 import {
   assignOrganization,
   createMember,
@@ -54,24 +65,46 @@ export default function MemberForm({ payload }: MemberFormProps) {
   );
   const [confirmingRemove, setConfirmingRemove] = useState(false);
 
+  // Correlates a save/remove this form issued with the outcome the saga reports
+  // back — see request-id.ts. Without it, this effect could react to some other
+  // member's in-flight mutation (e.g. a marker being drag-moved elsewhere).
+  const pendingRequest = useRef<{ id: string; kind: "save" | "remove" } | null>(null);
+  const mutationStatus = useSelector(getMemberMutationStatus);
+  const mutationRequestId = useSelector(getMemberMutationRequestId);
+  const mutationError = useSelector(getMemberMutationError);
+
+  useEffect(() => {
+    const pending = pendingRequest.current;
+    if (!pending || mutationRequestId !== pending.id) {
+      return;
+    }
+    if (mutationStatus === "succeeded") {
+      pendingRequest.current = null;
+      dispatch(resetMemberMutation());
+      dispatch(closeWindow("MEMBER_DIALOG"));
+    } else if (mutationStatus === "failed") {
+      pendingRequest.current = null;
+      alert(mutationError ?? (pending.kind === "remove" ? t.memberForm.removeFailed : t.memberForm.saveFailed));
+      dispatch(resetMemberMutation());
+    }
+  }, [mutationStatus, mutationRequestId, mutationError, dispatch, t]);
+
   const title = isEditMode ? t.memberForm.editTitle : t.memberForm.addTitle;
 
-  if (!coordinates) {
-    return (
-      <DialogWindow title={title} onClose={() => dispatch(closeWindow("MEMBER_DIALOG"))}>
-        <p>{t.memberForm.noLocation}</p>
-      </DialogWindow>
-    );
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
     let member: Member = existingMember ? { ...existingMember } : createMember(firstName, lastName);
     member = { ...member, name: { firstName, lastName } };
 
-    const address: MemberAddress = { street, number, zip: Number(zip), city, coordinates };
-    member = updateMemberAddress(member, address);
+    // A member added without a map location (e.g. from the Organizations menu's
+    // "Add Member") simply has no address — there's nothing to place on the map
+    // until one is set, matching how domain/member/member.factory.ts's createMember
+    // already leaves `address` unset by default.
+    if (coordinates) {
+      const address: MemberAddress = { street, number, zip: Number(zip), city, coordinates };
+      member = updateMemberAddress(member, address);
+    }
     member = updateMemberTelephone(member, telephone);
     member = updateMemberEmail(member, email);
     member = organizationId ? assignOrganization(member, organizationId) : member;
@@ -79,25 +112,19 @@ export default function MemberForm({ payload }: MemberFormProps) {
     // Saving the form means the details are filled in now.
     member = markComplete(member);
 
-    try {
-      await dispatch(isEditMode ? updateMember(member) : addMember(member)).unwrap();
-      dispatch(closeWindow("MEMBER_DIALOG"));
-    } catch (error) {
-      alert(error instanceof Error ? error.message : t.memberForm.saveFailed);
-    }
+    const requestId = createRequestId();
+    pendingRequest.current = { id: requestId, kind: "save" };
+    dispatch(isEditMode ? updateMemberRequested({ requestId, member }) : addMemberRequested({ requestId, member }));
   };
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (!existingMember) {
       dispatch(closeWindow("MEMBER_DIALOG"));
       return;
     }
-    try {
-      await dispatch(removeMember(existingMember.id)).unwrap();
-      dispatch(closeWindow("MEMBER_DIALOG"));
-    } catch (error) {
-      alert(error instanceof Error ? error.message : t.memberForm.removeFailed);
-    }
+    const requestId = createRequestId();
+    pendingRequest.current = { id: requestId, kind: "remove" };
+    dispatch(removeMemberRequested({ requestId, id: existingMember.id }));
   };
 
   if (confirmingRemove && existingMember) {
@@ -141,47 +168,53 @@ export default function MemberForm({ payload }: MemberFormProps) {
           </div>
         </div>
 
-        <div className="field-row field-stack">
-          <div className="field-stack">
-            <label htmlFor="member-street">{t.memberForm.street}</label>
-            <input
-              id="member-street"
-              type="text"
-              value={street}
-              onChange={(event) => setStreet(event.target.value)}
-            />
-          </div>
-          <div className="field-stack">
-            <label htmlFor="member-number">{t.memberForm.number}</label>
-            <input
-              id="member-number"
-              type="text"
-              value={number}
-              onChange={(event) => setNumber(event.target.value)}
-            />
-          </div>
-        </div>
+        {coordinates ? (
+          <>
+            <div className="field-row field-stack">
+              <div className="field-stack">
+                <label htmlFor="member-street">{t.memberForm.street}</label>
+                <input
+                  id="member-street"
+                  type="text"
+                  value={street}
+                  onChange={(event) => setStreet(event.target.value)}
+                />
+              </div>
+              <div className="field-stack">
+                <label htmlFor="member-number">{t.memberForm.number}</label>
+                <input
+                  id="member-number"
+                  type="text"
+                  value={number}
+                  onChange={(event) => setNumber(event.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="field-row field-stack">
-          <div className="field-stack">
-            <label htmlFor="member-zip">{t.memberForm.zip}</label>
-            <input
-              id="member-zip"
-              type="text"
-              value={zip}
-              onChange={(event) => setZip(event.target.value)}
-            />
-          </div>
-          <div className="field-stack">
-            <label htmlFor="member-city">{t.memberForm.city}</label>
-            <input
-              id="member-city"
-              type="text"
-              value={city}
-              onChange={(event) => setCity(event.target.value)}
-            />
-          </div>
-        </div>
+            <div className="field-row field-stack">
+              <div className="field-stack">
+                <label htmlFor="member-zip">{t.memberForm.zip}</label>
+                <input
+                  id="member-zip"
+                  type="text"
+                  value={zip}
+                  onChange={(event) => setZip(event.target.value)}
+                />
+              </div>
+              <div className="field-stack">
+                <label htmlFor="member-city">{t.memberForm.city}</label>
+                <input
+                  id="member-city"
+                  type="text"
+                  value={city}
+                  onChange={(event) => setCity(event.target.value)}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <p>{t.memberForm.noLocation}</p>
+        )}
 
         <div className="field-row field-stack">
           <div className="field-stack">
@@ -222,30 +255,34 @@ export default function MemberForm({ payload }: MemberFormProps) {
           </select>
         </div>
 
-        <div className="field-row field-stack">
-          <input
-            id="member-lost-contact"
-            type="checkbox"
-            checked={lostContact}
-            onChange={(event) => setLostContact(event.target.checked)}
-          />
-          <label htmlFor="member-lost-contact">
-            {t.memberForm.lostContact}
-          </label>
-        </div>
+        {isEditMode && (
+          <>
+            <div className="field-row field-stack">
+              <input
+                id="member-lost-contact"
+                type="checkbox"
+                checked={lostContact}
+                onChange={(event) => setLostContact(event.target.checked)}
+              />
+              <label htmlFor="member-lost-contact">
+                {t.memberForm.lostContact}
+              </label>
+            </div>
 
-        {lostContact && (
-          <div className="field-stack">
-            <label htmlFor="member-last-active-date">
-              {t.memberForm.lastKnownActive}
-            </label>
-            <input
-              id="member-last-active-date"
-              type="date"
-              value={lastActiveDate}
-              onChange={(event) => setLastActiveDate(event.target.value)}
-            />
-          </div>
+            {lostContact && (
+              <div className="field-stack">
+                <label htmlFor="member-last-active-date">
+                  {t.memberForm.lastKnownActive}
+                </label>
+                <input
+                  id="member-last-active-date"
+                  type="date"
+                  value={lastActiveDate}
+                  onChange={(event) => setLastActiveDate(event.target.value)}
+                />
+              </div>
+            )}
+          </>
         )}
 
         <div

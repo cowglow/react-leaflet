@@ -21,12 +21,46 @@ import "./organization-tree.css";
 
 const ORGANIZATION_TYPE_ORDER: OrganizationType[] = ["Region", "Headquarter", "Area", "District"];
 
+// A sentinel key alongside real organization ids in the `openOrgs` expand/collapse
+// set — safe since organization ids are UUIDs, never this literal string.
+const UNASSIGNED_KEY = "__unassigned__";
+
 function isMulti(event: MouseEvent | KeyboardEvent) {
   return event.shiftKey || event.metaKey || event.ctrlKey;
 }
 
 function displayName(member: Member, t: Translations) {
   return `${member.name.firstName} ${member.name.lastName}`.trim() || t.member.untitled;
+}
+
+function MemberRow({
+  member,
+  selected,
+  onSelect,
+  t,
+}: {
+  member: Member;
+  selected: boolean;
+  onSelect: (event: MouseEvent | KeyboardEvent) => void;
+  t: Translations;
+}) {
+  return (
+    <li
+      className={`org-tree-member${selected ? " is-selected" : ""}`}
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
+      onClick={onSelect}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(event);
+        }
+      }}
+    >
+      {displayName(member, t)}
+    </li>
+  );
 }
 
 function MemberPreview({
@@ -64,10 +98,14 @@ function MemberPreview({
           </>
         )}
       </dl>
-      <p className="org-preview-status">{status}</p>
-      <button className="btn btn-default" onClick={onEdit}>
-        {t.common.edit}
-      </button>
+      <p className="org-preview-status">
+        {t.memberMarker.statusLabel}: {status}
+      </p>
+      <div className="org-preview-actions">
+        <button className="btn btn-default" onClick={onEdit}>
+          {t.common.edit}
+        </button>
+      </div>
     </div>
   );
 }
@@ -87,17 +125,18 @@ export default function OrganizationTree({ z }: { z?: number }) {
 
   const membersOf = (organizationId: string) =>
     members.filter((member) => member.organizationId === organizationId);
+  const unassignedMembers = members.filter((member) => !member.organizationId);
 
   const selectMember = (id: string, event: MouseEvent | KeyboardEvent) =>
     dispatch(isMulti(event) ? toggleMember(id) : selectMembers([id]));
 
-  const selectOrganization = (organizationId: string) => {
-    dispatch(selectMembers(membersOf(organizationId).map((member) => member.id)));
-    setOpenOrgs((prev) => new Set(prev).add(organizationId));
+  const selectGroup = (groupKey: string, groupMembers: Member[]) => {
+    dispatch(selectMembers(groupMembers.map((member) => member.id)));
+    setOpenOrgs((prev) => new Set(prev).add(groupKey));
   };
 
-  const organizationState = (organizationId: string): "none" | "some" | "all" => {
-    const ids = membersOf(organizationId).map((member) => member.id);
+  const groupState = (groupMembers: Member[]): "none" | "some" | "all" => {
+    const ids = groupMembers.map((member) => member.id);
     if (ids.length === 0) return "none";
     const selectedCount = ids.filter((id) => selectedSet.has(id)).length;
     if (selectedCount === 0) return "none";
@@ -113,21 +152,14 @@ export default function OrganizationTree({ z }: { z?: number }) {
       onClose={() => dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"))}
       onFocus={() => dispatch(bringToFront("ORGANIZATION_TREE_DIALOG"))}
       initialPosition={{ x: 96, y: 96 }}
-      width={hasSelection ? "min(760px, 94vw)" : "min(460px, 92vw)"}
+      width={hasSelection ? "min(810px, 94vw)" : "min(460px, 92vw)"}
       height="auto"
       z={z}
       padded
     >
       <div className="org-tree-layout">
         <div className="org-tree-main">
-          {hasSelection && (
-            <div className="org-tree-toolbar">
-              <button className="btn" onClick={() => dispatch(clearSelection())}>
-                {t.organizationTree.clear}
-              </button>
-            </div>
-          )}
-          {!hasOrganizations && <p>{t.organizationTree.empty}</p>}
+          {!hasOrganizations && unassignedMembers.length === 0 && <p>{t.organizationTree.empty}</p>}
           <ul className="org-tree">
             {ORGANIZATION_TYPE_ORDER.map((type) => {
               const organizationsOfType = organizations.filter(
@@ -144,7 +176,7 @@ export default function OrganizationTree({ z }: { z?: number }) {
                     <ul>
                       {organizationsOfType.map((organization) => {
                         const organizationMembers = membersOf(organization.id);
-                        const state = organizationState(organization.id);
+                        const state = groupState(organizationMembers);
 
                         return (
                           <li key={organization.id}>
@@ -168,7 +200,7 @@ export default function OrganizationTree({ z }: { z?: number }) {
                                   members (and leaves it expanded). */}
                               <summary
                                 title={t.organizationTree.selectHint}
-                                onDoubleClick={() => selectOrganization(organization.id)}
+                                onDoubleClick={() => selectGroup(organization.id, organizationMembers)}
                               >
                                 <span className={`org-name org-name--${state}`}>
                                   {organization.name}
@@ -176,27 +208,15 @@ export default function OrganizationTree({ z }: { z?: number }) {
                               </summary>
                               {organizationMembers.length > 0 ? (
                                 <ul>
-                                  {organizationMembers.map((member) => {
-                                    const selected = selectedSet.has(member.id);
-                                    return (
-                                      <li
-                                        key={member.id}
-                                        className={`org-tree-member${selected ? " is-selected" : ""}`}
-                                        role="button"
-                                        tabIndex={0}
-                                        aria-pressed={selected}
-                                        onClick={(event) => selectMember(member.id, event)}
-                                        onKeyDown={(event) => {
-                                          if (event.key === "Enter" || event.key === " ") {
-                                            event.preventDefault();
-                                            selectMember(member.id, event);
-                                          }
-                                        }}
-                                      >
-                                        {displayName(member, t)}
-                                      </li>
-                                    );
-                                  })}
+                                  {organizationMembers.map((member) => (
+                                    <MemberRow
+                                      key={member.id}
+                                      member={member}
+                                      selected={selectedSet.has(member.id)}
+                                      onSelect={(event) => selectMember(member.id, event)}
+                                      t={t}
+                                    />
+                                  ))}
                                 </ul>
                               ) : (
                                 <p className="org-tree-empty">{t.organizationTree.noMembers}</p>
@@ -210,7 +230,51 @@ export default function OrganizationTree({ z }: { z?: number }) {
                 </li>
               );
             })}
+            {unassignedMembers.length > 0 && (
+              <li>
+                <details
+                  open={openOrgs.has(UNASSIGNED_KEY)}
+                  onToggle={(event) => {
+                    const nowOpen = event.currentTarget.open;
+                    setOpenOrgs((prev) => {
+                      if (prev.has(UNASSIGNED_KEY) === nowOpen) return prev;
+                      const next = new Set(prev);
+                      if (nowOpen) next.add(UNASSIGNED_KEY);
+                      else next.delete(UNASSIGNED_KEY);
+                      return next;
+                    });
+                  }}
+                >
+                  <summary
+                    title={t.organizationTree.selectHint}
+                    onDoubleClick={() => selectGroup(UNASSIGNED_KEY, unassignedMembers)}
+                  >
+                    <span className={`org-name org-name--${groupState(unassignedMembers)}`}>
+                      {t.organizationTree.unassigned}
+                    </span>
+                  </summary>
+                  <ul>
+                    {unassignedMembers.map((member) => (
+                      <MemberRow
+                        key={member.id}
+                        member={member}
+                        selected={selectedSet.has(member.id)}
+                        onSelect={(event) => selectMember(member.id, event)}
+                        t={t}
+                      />
+                    ))}
+                  </ul>
+                </details>
+              </li>
+            )}
           </ul>
+          {hasSelection && (
+            <div className="org-tree-toolbar">
+              <button className="btn" onClick={() => dispatch(clearSelection())}>
+                {t.organizationTree.clear}
+              </button>
+            </div>
+          )}
         </div>
 
         {hasSelection && (
