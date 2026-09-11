@@ -65,7 +65,11 @@ export default function MapMarker({
     setOpen(autoOpen);
   }, [autoOpen]);
 
-  const effectiveColor = moving ? MOVING_COLOR : selected ? SELECTED_COLOR : color;
+  const effectiveColor = moving
+    ? MOVING_COLOR
+    : selected
+      ? SELECTED_COLOR
+      : color;
   const effectiveScale = selected ? (scale ?? 1) * 1.2 : scale;
 
   return (
@@ -81,6 +85,7 @@ export default function MapMarker({
         color={effectiveColor}
         scale={effectiveScale}
         draggable={moving}
+        className={moving ? "map-marker-moving" : undefined}
         onDragEnd={(event) => {
           setMoving(false);
           onMoveEnd?.({ lat: event.lngLat.lat, lng: event.lngLat.lng });
@@ -91,7 +96,9 @@ export default function MapMarker({
             setMoving(false); // clicked without dragging → cancel the move
             return;
           }
-          onSelect?.(event.originalEvent.shiftKey || event.originalEvent.metaKey);
+          onSelect?.(
+            event.originalEvent.shiftKey || event.originalEvent.metaKey,
+          );
           if (onActivate) {
             onActivate();
           } else {

@@ -128,29 +128,14 @@ export async function editSelectedMemberFromPreview(page: Page): Promise<void> {
   });
 }
 
-// Clicks "Move" on the currently-open marker popup, then drags whichever
-// marker is closest to the map's center by (dx, dy) pixels. Selecting a member
-// always centers the map on it first (SelectionCamera), so the marker being
-// moved is reliably the one nearest the canvas center — there's no other way
-// to identify "which marker is this member's" since MapLibre markers carry no
-// text of their own, unlike the old Leaflet <img alt="Full Name"> icons.
-// Selecting a member triggers SelectionCamera's animated panTo (400ms) — reading
-// marker positions before it settles risks grabbing stale coordinates (harmless
-// locally, where the surrounding clicks eat up enough wall-clock time for the pan
-// to finish anyway, but a real source of flakiness on CI's slower renderer). Poll
-// a marker's own box until two consecutive reads agree rather than a fixed sleep,
-// since the pan's actual duration on a given runner isn't predictable.
-async function waitForMapToSettle(page: Page): Promise<void> {
-  let previous: string | null = null;
-  for (let i = 0; i < 20; i++) {
-    const box = await page.locator(".maplibregl-marker").first().boundingBox();
-    const current = box ? `${box.x},${box.y}` : null;
-    if (current !== null && current === previous) return;
-    previous = current;
-    await page.waitForTimeout(50);
-  }
-}
-
+// Clicks "Move" on the currently-open marker popup, then drags the marker by
+// (dx, dy) pixels. The marker being moved is identified directly by the
+// "map-marker-moving" class Map.Marker.tsx applies while `moving` is true —
+// not by guessing which on-screen marker is closest to the map's center, which
+// broke down once enough members shared a small area (an unrelated, larger or
+// differently-positioned marker's box could read as "closer" to center than
+// the real one) and independently raced SelectionCamera's animated 400ms
+// panTo triggered by selecting the member.
 export async function moveSelectedMemberMarker(
   page: Page,
   dx: number,
@@ -162,38 +147,11 @@ export async function moveSelectedMemberMarker(
   await page
     .locator('.title-bar:has-text("Map")')
     .click({ position: { x: 5, y: 5 } });
-  await waitForMapToSettle(page);
   await page.locator('.maplibregl-popup button:has-text("Move")').click();
 
-  const box = await mapCanvasBox(page);
-  const centerX = box.x + box.width / 2;
-  const centerY = box.y + box.height / 2;
-
-  // Markers anchor at their bottom tip (Map.Marker.tsx's anchor="bottom"), so the
-  // point that actually sits on the member's coordinate — and that SelectionCamera
-  // centers the map on — is the bounding box's bottom-center, not its middle. Using
-  // the box's geometric center here can be closer to the canvas center for some
-  // unrelated, larger/smaller marker nearby than for the real (moving) one, especially
-  // once several members share a small area — picking the wrong, non-draggable marker
-  // and silently panning the map instead of dragging anything.
-  const markers = page.locator(".maplibregl-marker");
-  const count = await markers.count();
-  let closestIndex = 0;
-  let closestDistance = Infinity;
-  for (let i = 0; i < count; i++) {
-    const markerBox = await markers.nth(i).boundingBox();
-    if (!markerBox) continue;
-    const distance = Math.hypot(
-      markerBox.x + markerBox.width / 2 - centerX,
-      markerBox.y + markerBox.height - centerY,
-    );
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestIndex = i;
-    }
-  }
-
-  const markerBox = await markers.nth(closestIndex).boundingBox();
+  const marker = page.locator(".map-marker-moving");
+  await marker.waitFor({ state: "visible", timeout: 5000 });
+  const markerBox = await marker.boundingBox();
   if (!markerBox) throw new Error("could not locate the draggable marker");
   const startX = markerBox.x + markerBox.width / 2;
   const startY = markerBox.y + markerBox.height / 2;
