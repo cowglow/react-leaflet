@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Marker, Popup } from "@vis.gl/react-maplibre";
+import { Marker, Popup, useMap } from "@vis.gl/react-maplibre";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import "./map-marker.css";
 
@@ -57,6 +57,7 @@ export default function MapMarker({
   children,
 }: MapMarkerProps) {
   const { t } = useTranslation();
+  const { current: map } = useMap();
   const [open, setOpen] = useState(false);
   const [moving, setMoving] = useState(false);
 
@@ -64,6 +65,19 @@ export default function MapMarker({
     if (autoOpen === undefined) return;
     setOpen(autoOpen);
   }, [autoOpen]);
+
+  // MapLibre's own click-drag-to-pan and a marker's drag-to-move both react to
+  // the same mousedown/mousemove sequence; whichever one's internal handler
+  // processes it first is meant to suppress the other (the marker calls
+  // preventDefault()), but which one wins isn't guaranteed across browsers.
+  // Disabling panning for the duration of a move removes the ambiguity instead
+  // of relying on that race resolving the same way everywhere.
+  useEffect(() => {
+    if (!moving || !map) return;
+    const dragPan = map.getMap().dragPan;
+    dragPan.disable();
+    return () => dragPan.enable();
+  }, [moving, map]);
 
   const effectiveColor = moving
     ? MOVING_COLOR
