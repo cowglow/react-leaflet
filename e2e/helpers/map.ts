@@ -68,8 +68,31 @@ export async function addMemberViaMap(
   });
 }
 
+// DesktopWindow.tsx raises a window's z-index on any pointerdown inside it
+// (onPointerDownCapture={onFocus}, taking no arguments — a plain "bring me to
+// front", not a real click). moveSelectedMemberMarker deliberately raises the
+// Map window over Organizations to interact with a marker's popup, and once
+// the two overlap enough that Map fully covers Organizations on screen there's
+// no point left to aim a real mouse click at — a Playwright click() waits for
+// its target to be the topmost element at some point and simply never gets
+// there. dispatchEvent bypasses that hit-testing and fires the pointerdown
+// directly on the element, exactly reproducing what raises a window in the
+// real app, without needing an actually-uncovered pixel to click through.
+async function bringWindowToFront(
+  page: Page,
+  titleText: string,
+): Promise<void> {
+  await page
+    .locator(".window", {
+      has: page.locator(".title-bar", { hasText: titleText }),
+    })
+    .dispatchEvent("pointerdown");
+}
+
 // Opens the Organizations window from the menu bar (the "Organization" menu's
-// "Open Organizations" item), if it isn't open already.
+// "Open Organizations" item), if it isn't open already — and brings it to
+// front either way, since being visible doesn't mean it's on top (see
+// bringWindowToFront).
 export async function openOrganizationsTree(page: Page): Promise<void> {
   if (
     await page
@@ -77,6 +100,7 @@ export async function openOrganizationsTree(page: Page): Promise<void> {
       .isVisible()
       .catch(() => false)
   ) {
+    await bringWindowToFront(page, "Organizations");
     return;
   }
   await page
@@ -142,11 +166,10 @@ export async function moveSelectedMemberMarker(
   dy: number,
 ): Promise<void> {
   // The Organizations window (opened by selectMemberInTree) can visually overlap
-  // the Map window's auto-centered popup — bring Map back to front by clicking
-  // its title bar (not the canvas, which would register as "add a member here").
-  await page
-    .locator('.title-bar:has-text("Map")')
-    .click({ position: { x: 5, y: 5 } });
+  // the Map window's auto-centered popup — bring Map back to front (see
+  // bringWindowToFront; a plain click on the canvas would register as "add a
+  // member here" instead, so this must target the title bar specifically).
+  await bringWindowToFront(page, "Map");
   await page.locator('.maplibregl-popup button:has-text("Move")').click();
 
   const marker = page.locator(".map-marker-moving");
