@@ -134,6 +134,23 @@ export async function editSelectedMemberFromPreview(page: Page): Promise<void> {
 // moved is reliably the one nearest the canvas center — there's no other way
 // to identify "which marker is this member's" since MapLibre markers carry no
 // text of their own, unlike the old Leaflet <img alt="Full Name"> icons.
+// Selecting a member triggers SelectionCamera's animated panTo (400ms) — reading
+// marker positions before it settles risks grabbing stale coordinates (harmless
+// locally, where the surrounding clicks eat up enough wall-clock time for the pan
+// to finish anyway, but a real source of flakiness on CI's slower renderer). Poll
+// a marker's own box until two consecutive reads agree rather than a fixed sleep,
+// since the pan's actual duration on a given runner isn't predictable.
+async function waitForMapToSettle(page: Page): Promise<void> {
+  let previous: string | null = null;
+  for (let i = 0; i < 20; i++) {
+    const box = await page.locator(".maplibregl-marker").first().boundingBox();
+    const current = box ? `${box.x},${box.y}` : null;
+    if (current !== null && current === previous) return;
+    previous = current;
+    await page.waitForTimeout(50);
+  }
+}
+
 export async function moveSelectedMemberMarker(
   page: Page,
   dx: number,
@@ -145,6 +162,7 @@ export async function moveSelectedMemberMarker(
   await page
     .locator('.title-bar:has-text("Map")')
     .click({ position: { x: 5, y: 5 } });
+  await waitForMapToSettle(page);
   await page.locator('.maplibregl-popup button:has-text("Move")').click();
 
   const box = await mapCanvasBox(page);
