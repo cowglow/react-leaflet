@@ -1,14 +1,33 @@
 # Project Plan: Visual Directory
 
-This document is the working plan for turning this map prototype into a real tool: a
-visual directory where leadership can create members, assign them to organizations,
-see where everyone lives on a map, and see how far members are from each other. It
-covers three things that need to happen together: finishing the "Clear Architecture"
-migration already underway, building the actual member/organization features, and
-adding a real backend with accounts and an audit trail.
+This document is the working plan that took this map prototype from scratch into a
+real tool: a visual directory where leadership can create members, assign them to
+organizations, and see where everyone lives on a map. It covers three things that
+happened together: the "Clear Architecture" migration, the actual member/organization
+features, and a real backend with accounts and an audit trail.
 
-See `docs/CLEAR_ARCHITECTURE.md` for the architectural style being adopted, and
-`CLAUDE.md` for a snapshot of the current (partially-migrated) codebase state.
+**Status: Phases 0–5 below are complete.** The codebase has since moved past what
+this plan originally scoped in a few ways worth knowing before reading the phases as
+if they were still upcoming:
+
+- The map runs on MapLibre GL, not Leaflet (the migration this plan doesn't mention at
+  all, since it happened after this document was written).
+- Phase 5's "map-first" framing became a full desktop-window UI: the map and the
+  Organizations tree are independent, draggable/resizable `DesktopWindow`s with
+  z-order cycling, not just one map window.
+- Two features exist beyond this plan's scope: quick-pinning an "incomplete" member
+  (Shift+click, fill in details later) and two-way selection binding between the
+  Organizations tree and the map markers.
+- Phase 2's distance feature (`application/geo/distance.ts`, a "pick an origin, see
+  everyone sorted by distance" panel) was removed from the UI during the MapLibre
+  migration and never rebuilt — the underlying haversine helper is still in the tree
+  but nothing calls it. Revisit or delete; it's not currently a working feature.
+- `backend/prisma/demo-seed.ts` (`pnpm seed:demo`) exists for seeding a curated
+  demo/onboarding roster, on top of the original single-leader `pnpm seed`.
+
+See `docs/CLEAR_ARCHITECTURE_TS.md` for the architectural style adopted (Joschi
+Kuphal's [Clear Architecture](https://github.com/jkphl/clear-architecture/blob/master/README.md),
+adapted for this repo), and `CLAUDE.md` for a snapshot of the current codebase.
 
 ## Vision
 
@@ -63,37 +82,29 @@ These came out of discussion and are recorded here so they don't get re-litigate
   for local/Hetzner parity. This preserves the current separation between the static
   client and the data layer.
 
-## Current state (baseline this plan builds on)
+## Original baseline (historical — this plan started from here)
 
-- The Clear Architecture migration is in progress: `domain/`, `application/`,
-  `infrastructure/`, `ports/` are the live tree; `components/`, `context/`, `hooks/`,
-  `redux-store/`, `utils/`, `db/`, `feature/`, `types/` are dead leftovers from before
-  the migration (confirmed via import graph — nothing in the live tree references them).
-- `domain/member` and `domain/organization` already have real types and factories
-  (`member.factory.ts`, `organization.factory.ts`), but they're **not wired to
-  anything**: `infrastructure/redux/member/member.slice.ts` and
-  `.../organization/organization.slice.ts` are legacy-style stub reducers not even
-  included in the root reducer (`infrastructure/redux/store.ts` only combines
-  `markers` and `gyroscope`). `MemberForm`/`OrganizationForm` are placeholder
-  components with no real fields.
-- The map currently only ever renders anonymous `GeoCoordinate` pins added by clicking
-  the map (`marker.slice.ts` / `marker.saga.ts`) — there's no concept of a Member marker
-  yet.
-- File → Open/Save currently round-trips those anonymous marker pins as CSV
-  (`infrastructure/csv/csv.file.ts`), not member/organization records.
-- There's dead MongoDB stub code (`infrastructure/persistence/db.client.ts` and
-  `db.persistence.ts`, plus the older duplicate under `src/db/`) pointing at
-  `mongodb://localhost:27017` — never called from anywhere. `docker-compose.yml` still
-  has matching `mongodb`/`mongo-express` services left over from that abandoned idea.
-- The "Edit" menu currently means "enable/disable click-to-add-marker" — this exists
-  only because menu clicks bubble through to the map and were creating stray markers
-  behind the floating control panel. The floating-panel-inside-the-map layout should
-  stay; the real fix is stopping event propagation on the controls, not toggling
-  marker creation on/off.
-- The "Actions" menu is an empty placeholder for future actions. "View" only links out
-  to external pages (system.css, GitHub repo) — no in-app views yet.
-- `pnpm build` and `pnpm lint` are both currently broken (see `CLAUDE.md` for specifics)
-  — fixing these is a prerequisite, not optional cleanup.
+This section describes the prototype this plan started from, before any of the
+phases below ran. It's kept for context on *why* Phase 0 exists, not as a
+description of the current tree — see the Status note above for what actually
+shipped, and `CLAUDE.md` for the current architecture.
+
+- The Clear Architecture migration was just starting: `domain/`, `application/`,
+  `infrastructure/`, `ports/` were the live tree; `components/`, `context/`, `hooks/`,
+  `redux-store/`, `utils/`, `db/`, `feature/`, `types/` were dead leftovers from before
+  the migration.
+- `domain/member` and `domain/organization` had real types and factories but weren't
+  wired to anything — `member.slice.ts`/`organization.slice.ts` were legacy-style stub
+  reducers, and `MemberForm`/`OrganizationForm` were placeholder components.
+- The map only ever rendered anonymous `GeoCoordinate` pins added by clicking the map
+  — there was no concept of a Member marker yet.
+- File → Open/Save round-tripped those anonymous pins as CSV, not member/organization
+  records.
+- There was dead MongoDB stub code and matching `docker-compose.yml` services left
+  over from an abandoned idea, never wired to anything real.
+- The "Edit" menu meant "enable/disable click-to-add-marker," a workaround for map
+  clicks bubbling through floating controls, not a real feature.
+- `pnpm build` and `pnpm lint` were both broken.
 
 ## Phase 0 — Stabilize
 
@@ -208,4 +219,3 @@ each step ships independently:
 - A full pairwise distance matrix.
 - Passkey login (viable alternative to magic-link, revisit if magic-link email proves
   friction-prone).
-- CI/CD automation for backend deploys to Hetzner.

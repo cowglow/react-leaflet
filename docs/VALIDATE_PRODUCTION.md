@@ -9,7 +9,7 @@ Set once per terminal session so the rest of the commands below can be copy-past
 
 ```bash
 export HETZNER_HOST=YOUR_SERVER_IP        # or the domain, if DNS points at it
-export HETZNER_KEY=~/.ssh/id_hetzner_admin
+export HETZNER_KEY=cert/id_hetzner_admin
 ```
 
 The box has two keys authorized: `github-actions-deploy` (passphrase-free, used only

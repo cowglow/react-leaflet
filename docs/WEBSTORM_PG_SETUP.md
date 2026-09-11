@@ -48,13 +48,13 @@ defaults above.
    container is actually up: `docker compose ps db` should show `healthy`.
 6. Click **OK**. The `contact_book` database now appears in the tool window, with
    `Account`, `Member`, `Organization`, `MagicLinkToken`, and `AuditLogEntry` tables
-   under the `public` schema (from `server/prisma/schema.prisma`).
+   under the `public` schema (from `backend/prisma/schema.prisma`).
 
 ### Notes
 
 This connects directly to Postgres, bypassing Prisma and the API entirely — fine for
 inspecting data, but don't hand-edit rows you expect the app (or the audit log hash
-chain in `server/src/audit/audit-log.ts`) to stay consistent with.
+chain in `backend/src/infrastructure/prisma/audit-log.ts`) to stay consistent with.
 
 ## Production database (via SSH tunnel)
 
@@ -69,12 +69,12 @@ used only by CI — see `docs/HETZNER_DEPLOY.md`) and a personal `id_hetzner_adm
 for manual access like this. Use the admin key below, not the CI one:
 
 ```bash
-export HETZNER_KEY=~/.ssh/id_hetzner_admin
+export HETZNER_KEY=cert/id_hetzner_admin
 ```
 
 Treat this as read-only, debugging-only access. Prefer the app/API for anything that
 should show up correctly — any row you edit or insert directly bypasses the
-hash-chained audit log in `server/src/audit/audit-log.ts` entirely, silently breaking
+hash-chained audit log in `backend/src/infrastructure/prisma/audit-log.ts` entirely, silently breaking
 the guarantee that every write is logged.
 
 ### 1. Find the container's internal IP

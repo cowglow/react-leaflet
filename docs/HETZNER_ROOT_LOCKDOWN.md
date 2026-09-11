@@ -59,7 +59,7 @@ Using the new key pair from the rotation you just did (`id_hetzner` /
 
 ```bash
 # from your local machine
-ssh-copy-id -i ~/.ssh/id_hetzner.pub deploy@YOUR_SERVER_IP
+ssh-copy-id -i cert/id_hetzner.pub deploy@YOUR_SERVER_IP
 ```
 
 Or, already logged in as root on the box:
@@ -77,7 +77,7 @@ chmod 600 /home/deploy/.ssh/authorized_keys
 Keep your existing root session open. In a **separate** terminal:
 
 ```bash
-ssh -i ~/.ssh/id_hetzner deploy@YOUR_SERVER_IP
+ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP
 docker ps            # should work without sudo
 sudo -l               # should show deploy has sudo rights
 ```
@@ -113,7 +113,7 @@ only login — do this only once you've confirmed the `deploy` key works (step
 ## 6. Verify again, from a fresh terminal
 
 ```bash
-ssh -i ~/.ssh/id_hetzner deploy@YOUR_SERVER_IP   # should work
+ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP   # should work
 ssh root@YOUR_SERVER_IP                           # should be refused
 ```
 

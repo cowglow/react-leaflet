@@ -4,33 +4,33 @@
 # Visual Directory
 
 A map-based contact directory for leadership organizations: leaders add members by
-clicking their location on the map, assign them to organizations, mark lost contact,
-and see distance between members. See `docs/PLAN.md` for the full product plan and
-`docs/USER_MANUAL.md` for how to actually use the app.
+clicking their location on the map and assign them to organizations. See
+`docs/PLAN.md` for the full product plan and `docs/USER_MANUAL.md` for how to
+actually use the app.
 
 ![Visual Directory screenshot](docs/images/app-screenshot.png)
 
 ## Repo layout
 
-- **`src/`** — the frontend: React + TypeScript + Vite, deployed as a static site to
-  GitHub Pages. Talks to the backend only over its REST API. See `CLAUDE.md` for the
-  architecture (it's mid-migration to a layered domain/application/infrastructure/
-  ports structure).
-- **`server/`** — the backend: Node/Express + Prisma + Postgres. A separate,
-  independently deployable service — not a workspace member of the frontend.
+- **`frontend/`** — the frontend: React + TypeScript + Vite, deployed as a static
+  site to GitHub Pages. Talks to the backend only over its REST API. Follows the
+  **Clear Architecture** pattern — see `docs/CLEAR_ARCHITECTURE_TS.md`.
+- **`backend/`** — the backend: Node/Express + Prisma + Postgres, also following
+  Clear Architecture. A separate, independently deployable service — not a workspace
+  member of the frontend.
 - **`e2e/`** — Playwright end-to-end tests driving the real frontend against the real
-  backend. See `e2e/README.md`. Every push to `main` runs the frontend/server unit
+  backend. See `e2e/README.md`. Every push to `main` runs the frontend/backend unit
   tests and this e2e suite via `.github/workflows/test.yml` and publishes a combined
   report to [cowglow.github.io/visual-directory/test-report/](https://cowglow.github.io/visual-directory/test-report/).
-- **`docs/`** — `PLAN.md` (the product plan), `CLEAR_ARCHITECTURE.md` (the frontend's
-  architectural style), `PHASE_*_REPORT.md` (what was built in each phase and how it
-  was verified), `USER_MANUAL.md`, `HETZNER_DEPLOY.md` (production deployment guide),
+- **`docs/`** — `PLAN.md` (the product plan), `CLEAR_ARCHITECTURE_TS.md` (the
+  architectural style, both sides of the repo), `USER_MANUAL.md`, `HETZNER_DEPLOY.md`
+  (production deployment guide), `HETZNER_REBUILD.md` (rebuilding after a teardown),
   `VALIDATE_PRODUCTION.md` (checklist for confirming a production deploy is healthy).
 
 ## How the frontend is hosted
 
 The frontend is a static site — there's no Node server involved in production at all.
-`vite build` compiles `src/` into plain HTML/CSS/JS in `dist/`, and that's served
+`vite build` compiles `frontend/` into plain HTML/CSS/JS in `dist/`, and that's served
 directly by **GitHub Pages** from the `gh-pages` branch of this repo.
 
 That branch is kept up to date automatically by `.github/workflows/deploy.yml`: every
@@ -47,10 +47,10 @@ was built (baked in at build time, since Vite env vars aren't read at runtime). 
 that's `http://localhost:4000` (see `.env.example`); in the deployed build it points at
 wherever the backend is actually deployed (see `docs/HETZNER_DEPLOY.md` step 8).
 
-The backend (`server/`, Postgres + the API) is **not** part of this static deploy — it
+The backend (`backend/`, Postgres + the API) is **not** part of this static deploy — it
 runs separately, containerized, wherever you choose to host it (see
 [Running the backend in Docker](#running-the-backend-in-docker-for-development) and
-[Deploying the backend](#deploying-the-backend-with-docker) below).
+[Deploying the backend](#deploying-the-backend) below).
 
 ## Quick start
 
@@ -67,7 +67,7 @@ below for what these do), then a single command to boot everything day-to-day:
 
 ```bash
 cp .env.example .env               # VITE_API_URL should point at the backend
-cd server && cp .env.example .env && cd ..
+cd backend && cp .env.example .env && cd ..
 pnpm backend:up
 pnpm backend:migrate
 SEED_LEADER_EMAIL=you@example.com pnpm backend:seed   # first time only
@@ -75,11 +75,11 @@ SEED_LEADER_EMAIL=you@example.com pnpm backend:seed   # first time only
 pnpm dev:all               # backend (already up) + frontend dev server + Storybook, one terminal
 ```
 
-Magic-link logins are sent via [Resend](https://resend.com) in production
-(`RESEND_API_KEY`/`EMAIL_FROM`, see `server/.env.example` and
-`docs/HETZNER_DEPLOY.md`). In local/dev environments (`NODE_ENV !== "production"`),
-links are logged to the backend's own console instead, so nothing needs a real email
-account to test.
+Magic-link logins are sent via [Resend](https://resend.com) when `RESEND_API_KEY`/
+`EMAIL_FROM` are set (see `backend/.env.example` and `docs/HETZNER_DEPLOY.md`) —
+independent of `NODE_ENV`. Leave them unset (the local/dev default) and links are
+logged to the backend's own console instead, so nothing needs a real email account
+to test.
 
 ## Commands
 
@@ -89,7 +89,7 @@ Frontend (repo root):
 pnpm dev          # start dev server
 pnpm dev:all      # backend up + dev server + Storybook together, one terminal (see below)
 pnpm build        # tsc && vite build
-pnpm lint         # eslint src e2e
+pnpm lint         # eslint frontend e2e
 pnpm test         # vitest --coverage (unit tests)
 pnpm test:e2e     # playwright test (requires the backend running — see e2e/README.md)
 pnpm format       # prettier . --write
@@ -102,7 +102,7 @@ pnpm backend:migrate  # apply pending Prisma migrations inside the api container
 pnpm backend:seed     # bootstrap the first leader account (SEED_LEADER_EMAIL=... pnpm backend:seed)
 ```
 
-Backend (`server/`):
+Backend (`backend/`):
 
 ```bash
 pnpm dev              # tsx watch src/index.ts
@@ -134,13 +134,13 @@ Both need Docker Desktop (or another Docker Engine) running locally first.
 From the repo root:
 
 ```bash
-cd server
+cd backend
 cp .env.example .env               # dev defaults are fine locally, edit if you need to
 cd ..
 pnpm backend:up
 ```
 
-This builds the `api` image (see `server/Dockerfile` — a two-stage build that compiles
+This builds the `api` image (see `backend/Dockerfile` — a two-stage build that compiles
 the TypeScript and runs Prisma's client generation, then a slim production-style image
 that just runs `node dist/index.js`) and starts three containers:
 
@@ -223,32 +223,26 @@ time you ran it outside Docker. The anonymous volume keeps the container's
 `node_modules` separate from your host's, at the cost of it not persisting between
 separate `docker compose run` invocations — install once per session, not once ever.
 
-### Deploying the backend with Docker
+### Deploying the backend
 
-The frontend deploys automatically to GitHub Pages on every push to `main` (see
-[How the frontend is hosted](#how-the-frontend-is-hosted)) — there's nothing to do by
-hand there. The backend has no CI/CD by design (per `docs/PLAN.md`); it's deployed
-manually with the same `docker-compose.yml` used for local dev, on a Hetzner Cloud VPS.
+Both the frontend and the backend deploy automatically on every push to `main` via
+`.github/workflows/deploy.yml` — there's no manual step for a routine deploy on
+either side. The backend's `deploy_server` job builds the `api` image, pushes it to
+`ghcr.io`, SCPs `docker-compose.prod.yml` + `Caddyfile` to the Hetzner box, and runs
+`docker compose up -d` followed by `prisma migrate deploy` — the server never has the
+repo checked out at all, it only ever pulls the pre-built image.
 
-Short version:
-
-```bash
-ssh deploy@YOUR_SERVER_IP
-cd ~/app
-git pull
-docker compose up -d --build db api caddy   # caddy fronts api with HTTPS; see full guide
-docker compose exec api pnpm prisma:deploy  # only if there are new migrations
-```
-
-The full walkthrough — provisioning the server, firewall rules, production `.env`
-values, adding the Caddy reverse proxy for TLS, wiring `VITE_API_URL` into the frontend
-build so it points at the real API, backups, and day-2 operations — is in
-[`docs/HETZNER_DEPLOY.md`](docs/HETZNER_DEPLOY.md). Follow that end to end the first
-time; the snippet above is just the shape of a routine redeploy afterwards.
+The one-time setup (provisioning the server, firewall rules, DNS, the GitHub Secrets
+this workflow reads, adding the Caddy reverse proxy for TLS, and seeding the first
+leader account, since the seed itself never runs automatically) is in
+[`docs/HETZNER_DEPLOY.md`](docs/HETZNER_DEPLOY.md) — follow that end to end once, and
+every push to `main` after that just works. Rebuilding after the server itself was
+torn down is the shorter [`docs/HETZNER_REBUILD.md`](docs/HETZNER_REBUILD.md).
 
 ## Deploying
 
-Frontend deploys automatically to GitHub Pages on push to `main`
-(`.github/workflows/deploy.yml`) — see [How the frontend is hosted](#how-the-frontend-is-hosted).
-Backend deployment is manual — see [Deploying the backend with Docker](#deploying-the-backend-with-docker)
-and `docs/HETZNER_DEPLOY.md`.
+Both frontend and backend deploy automatically to their respective targets on every
+push to `main` (`.github/workflows/deploy.yml`) — see
+[How the frontend is hosted](#how-the-frontend-is-hosted) and
+[Deploying the backend](#deploying-the-backend) above. The one manual, one-time setup
+is in `docs/HETZNER_DEPLOY.md`.

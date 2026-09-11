@@ -10,10 +10,19 @@ kinds you'll run into:
 - **Passphrase-protected** — for your own personal use (your GitHub account, your own
   login to a server) — the passphrase protects the private key at rest if your laptop
   is ever lost or compromised. Pair it with an agent (below) so you're not retyping
-  the passphrase on every single connection.
+  the passphrase on every single connection. This repo's is `id_hetzner_admin`, also
+  generated per `HETZNER_DEPLOY.md` step 0.
 
 Don't reuse a passphrase-free key for personal logins, and don't try to give an
 automation key a passphrase — CI/scripts have no TTY to answer the prompt with.
+
+Both of this repo's keys live in `cert/` at the repo root (gitignored — see
+`.gitignore`), not the `~/.ssh/id_example` paths used generically below. That's a
+deliberate choice: keeping the deploy key in the repo checkout (rather than scattered
+across whichever machine happened to generate it) is what lets
+[`HETZNER_REBUILD.md`](./HETZNER_REBUILD.md) reuse the same keypair after a server
+teardown instead of rotating a new one and re-syncing secrets. Swap `~/.ssh/id_example`
+for `cert/id_hetzner` (or `cert/id_hetzner_admin`) wherever it appears below.
 
 ## Prerequisites
 

@@ -22,18 +22,25 @@ different domain.
   `cowglow.io`/`www.cowglow.io` records already point at (see step 2).
 - A dedicated SSH key pair for this server, generated **passphrase-free** (GitHub
   Actions' SSH step can't unlock a passphrase-protected key non-interactively — using
-  one is the single most common way this whole setup breaks). `ssh-keygen` ships with
-  OpenSSH, so the command is nearly identical across systems:
+  one is the single most common way this whole setup breaks), saved into `cert/` at
+  the repo root rather than `~/.ssh` — that directory is gitignored, and keeping the
+  deploy key there (instead of scattered across whichever machine happened to
+  generate it) is what lets a future teardown/rebuild
+  ([`HETZNER_REBUILD.md`](./HETZNER_REBUILD.md)) reuse it instead of rotating a new
+  one. `ssh-keygen` ships with OpenSSH, so the command is nearly identical across
+  systems — run it from the repo root:
 
   **macOS** — Terminal:
   ```bash
-  ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/id_hetzner -N ""
+  mkdir -p cert
+  ssh-keygen -t ed25519 -C "github-actions-deploy" -f cert/id_hetzner -N ""
   ```
 
   **Ubuntu** — Terminal (`openssh-client` is preinstalled on the desktop image; if
   missing, `sudo apt install openssh-client` first):
   ```bash
-  ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/id_hetzner -N ""
+  mkdir -p cert
+  ssh-keygen -t ed25519 -C "github-actions-deploy" -f cert/id_hetzner -N ""
   ```
 
   **Windows 11** — PowerShell (ships with the OpenSSH Client by default; if
@@ -42,16 +49,25 @@ different domain.
   PowerShell, or via **Settings → Optional Features → Add a feature → OpenSSH
   Client**):
   ```powershell
-  ssh-keygen -t ed25519 -C "github-actions-deploy" -f $HOME\.ssh\id_hetzner -N '""'
+  New-Item -ItemType Directory -Force -Path cert | Out-Null
+  ssh-keygen -t ed25519 -C "github-actions-deploy" -f cert\id_hetzner -N '""'
   ```
   If the empty-passphrase quoting above misbehaves in your shell, just omit `-N` and
   press Enter twice at the passphrase prompts instead — same result.
 
-  Either way this gives you `~/.ssh/id_hetzner` (private — on Windows,
-  `$HOME\.ssh\id_hetzner`) which goes into the `HETZNER_SSH_KEY` GitHub secret in step
-  8, and `id_hetzner.pub` (public) which goes on the server below. Keep working from
-  the same machine for the rest of this guide — later steps assume the key is at this
-  path locally.
+  Either way this gives you `cert/id_hetzner` (private — `cert\id_hetzner` on
+  Windows) which goes into the `HETZNER_SSH_KEY` GitHub secret in step 8, and
+  `cert/id_hetzner.pub` (public) which goes on the server below. Keep working from
+  the same machine (or just keep the repo's `cert/` directory) for the rest of this
+  guide — later steps assume the key is at this path.
+
+  Also generate a second, **passphrase-protected** key for your own manual access —
+  `cert/id_hetzner_admin` — so you're never using the passphrase-free CI key by hand.
+  [`SSH_KEY_SETUP.md`](./SSH_KEY_SETUP.md) covers generating this kind; add both
+  `.pub` files to Hetzner in step 1 below, and use `id_hetzner_admin` everywhere
+  later docs ([`VALIDATE_PRODUCTION.md`](./VALIDATE_PRODUCTION.md),
+  [`WEBSTORM_PG_SETUP.md`](./WEBSTORM_PG_SETUP.md),
+  [`HETZNER_ROOT_LOCKDOWN.md`](./HETZNER_ROOT_LOCKDOWN.md)) call for "the admin key."
 
 ## 1. Provision the server
 
@@ -63,9 +79,9 @@ no retroactive push. If you add the key after the fact, you'll get a server you 
 SSH into and have to delete and recreate it. So:
 
 1. Console → **Security → SSH Keys → Add SSH Key** → paste the contents of
-   `~/.ssh/id_hetzner.pub`.
-2. *Then* create the server, and in the "SSH keys" field during creation, select the
-   key you just added.
+   `cert/id_hetzner.pub` **and** `cert/id_hetzner_admin.pub` (two entries).
+2. *Then* create the server, and in the "SSH keys" field during creation, select
+   both keys you just added.
 
 Other server settings, in the Hetzner Cloud console (or via the `hcloud` CLI if you
 have it):
@@ -88,7 +104,7 @@ have it):
 Note the server's public IP once it's created — that's `YOUR_SERVER_IP` below. Verify
 the key actually works before doing anything else:
 ```bash
-ssh -i ~/.ssh/id_hetzner root@YOUR_SERVER_IP whoami
+ssh -i cert/id_hetzner root@YOUR_SERVER_IP whoami
 # should print "root" with no password prompt
 ```
 
@@ -143,7 +159,7 @@ error, come back and re-check DNS here first.
 SSH in as root the first time:
 
 ```bash
-ssh -i ~/.ssh/id_hetzner root@YOUR_SERVER_IP
+ssh -i cert/id_hetzner root@YOUR_SERVER_IP
 ```
 
 Install Docker (the official convenience script is fine for a fresh box):
@@ -180,7 +196,7 @@ entirely.
 
 The `rsync` copies root's `authorized_keys` (i.e. `id_hetzner.pub`) to `deploy` too, so
 the same key works for both without a separate copy step. From here on, SSH in as
-`ssh -i ~/.ssh/id_hetzner deploy@YOUR_SERVER_IP` instead of root — and this is the user
+`ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP` instead of root — and this is the user
 GitHub Actions should deploy as (see `HETZNER_USER` in step 8), not `root`. Once you've
 confirmed `deploy` works, consider following [`HETZNER_ROOT_LOCKDOWN.md`](./HETZNER_ROOT_LOCKDOWN.md)
 to disable root SSH login entirely.
@@ -194,7 +210,7 @@ image in CI, pushes it to `ghcr.io`, and on the server side only needs
 `docker-compose.prod.yml` + `Caddyfile` (which it SCPs over itself) and a `.env` file
 (which it writes itself, from GitHub Secrets) under `/opt/visual-directory/` — a
 directory it also creates itself. The image is fully self-contained (compiled code,
-`node_modules`, Prisma schema, `pnpm` all baked in via `server/Dockerfile`), so the
+`node_modules`, Prisma schema, `pnpm` all baked in via `backend/Dockerfile`), so the
 server never needs the repo checked out at all.
 
 So the one-time step here is just setting the secrets, not touching the server again.
@@ -202,12 +218,12 @@ Add everything in the [GitHub Secrets required](#github-secrets-required) table 
 (`Settings → Secrets and variables → Actions`) — `HETZNER_HOST`/`HETZNER_USER`/
 `HETZNER_SSH_KEY` from steps 1 and 3, plus `POSTGRES_USER`/`POSTGRES_PASSWORD`/
 `POSTGRES_DB`/`JWT_SECRET`/`CLIENT_ORIGIN`/`GHCR_PAT`. Don't reuse the dev defaults in
-`server/.env.example` (`app`/`app` Postgres credentials, `dev-secret-change-me` JWT
+`backend/.env.example` (`app`/`app` Postgres credentials, `dev-secret-change-me` JWT
 secret) — fine for local dev where nothing is reachable from outside your machine,
 not for a box on the public internet.
 
 `RESEND_API_KEY`/`EMAIL_FROM` can be left unset for now — `getMailer()` in
-`server/src/email.ts` falls back to `consoleMailer` (logs the magic link instead of
+`backend/src/infrastructure/mail/get-mailer.ts` falls back to `consoleMailer` (logs the magic link instead of
 emailing it) whenever they're unset, so login still works. Set them up later via
 [`RESEND_EMAIL_SETUP.md`](./RESEND_EMAIL_SETUP.md) when you want real email delivery.
 
@@ -252,7 +268,7 @@ The automated deploy runs migrations but never the seed script — there's no ac
 to log in with until you create one, once:
 
 ```bash
-ssh -i ~/.ssh/id_hetzner deploy@YOUR_SERVER_IP
+ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP
 cd /opt/visual-directory
 docker compose -f docker-compose.prod.yml exec api sh -c "SEED_LEADER_EMAIL=you@example.com pnpm seed"
 ```
@@ -273,7 +289,7 @@ touch that workflow step.
 After the one-time setup above is complete, every push to `main` triggers the
 `deploy_server` job in `.github/workflows/deploy.yml`, which:
 
-1. Builds the API image from `server/Dockerfile` and pushes it to
+1. Builds the API image from `backend/Dockerfile` and pushes it to
    `ghcr.io/cowglow/visual-directory-api:latest`.
 2. SCPs `docker-compose.prod.yml` to `/opt/visual-directory/` on the server.
 3. SSHes in, writes secrets to `/opt/visual-directory/.env` (mode `600`), pulls the
@@ -313,7 +329,7 @@ stale value in any one of them breaks the SSH step of the workflow:
 ```bash
 gh secret set HETZNER_HOST --repo cowglow/visual-directory --body "YOUR_SERVER_IP"
 gh secret set HETZNER_USER --repo cowglow/visual-directory --body "deploy"
-gh secret set HETZNER_SSH_KEY --repo cowglow/visual-directory < ~/.ssh/id_hetzner
+gh secret set HETZNER_SSH_KEY --repo cowglow/visual-directory < cert/id_hetzner
 ```
 
 The rest, set once and rarely touched again:

@@ -1,9 +1,9 @@
 # User Manual
 
 This is a map-based visual directory for keeping track of members and where they live.
-Leaders can add and edit members, organize them into groups, and see how far apart
-people are. Everyone who's logged in can see the full directory — you don't need to
-be a leader to look people up, only to make changes.
+Leaders can add and edit members and organize them into groups. Everyone who's logged
+in can see the full directory — you don't need to be a leader to look people up, only
+to make changes.
 
 ## Signing in
 
@@ -67,6 +67,23 @@ Unchecking it marks them active again.
 Click their pin, then **Remove**. This deletes them — there's no undo, so double
 check before confirming.
 
+### Quick-pinning a member without details yet (leaders only)
+
+If you just want to mark where someone lives without stopping to fill in the whole
+form — for example, working from a paper list and placing everyone first — hold
+**Shift** and click the map. This drops an amber pin with no name yet, no form
+interruption. Click that amber pin later (or find it in the Organizations list,
+where it shows as "Untitled member") and it opens the form directly so you can fill
+in the details; saving turns it into a normal pin.
+
+### Moving a member's pin (leaders only)
+
+If someone's location was placed slightly wrong, or they've moved, click their pin
+and choose **Move** from the popup instead of re-entering their address. The pin
+turns green and follows your cursor — click the new location to drop it there. This
+updates their address's coordinates only; if their street address also changed, use
+**Edit** for that.
+
 ## Organizations
 
 Leaders can group members into organizations (Region, Headquarter, Area, or
@@ -74,12 +91,12 @@ District). To create one: open the menu bar in the top-left corner, click
 **Actions**, then **Add Organization**. Give it a name and pick its type. Once
 created, it shows up as an option when adding or editing a member.
 
-## Finding the distance between members
-
-Click the ruler icon in the top-right corner of the map. A small panel opens where
-you can pick a starting point — either a specific member, or "My Location" (this
-asks your browser for permission to use your current location) — and it lists
-everyone else, sorted by how far away they are.
+Open **Actions → Organizations** to see everyone grouped into a tree by
+organization. Click a member's name there to highlight and center their pin on the
+map; double-click an organization's name to select and center every member in it at
+once (a single click only expands/collapses the group, so browsing the tree doesn't
+accidentally light up the whole map). Clicking a member also opens a small preview
+with their details and an **Edit** shortcut, without leaving the tree.
 
 ## Importing and exporting the roster
 
@@ -106,16 +123,17 @@ top of this manual — there's nothing else they need to do to accept the invite
 
 ## Other things in the interface
 
-- **Top-left**: the menu bar (File, Actions, About). "File" has import/export and
-  the language picker. "About" has some external links (not part of the directory
+- **Top-left**: the menu bar (File, Actions, About), sitting directly on the
+  desktop — there's no surrounding app window. "File" has import/export and the
+  language picker. "About" has some external links (not part of the directory
   itself). "Actions" has the Organizations and Map windows, plus — for leaders —
   Add Organization and Invite Account.
-- **Top-right, layers icon**: switch which map style/base layer is shown. Cosmetic
-  only — doesn't affect your data.
-- **Bottom-left**: a "Filter Range" slider and zoom controls. The slider limits how
-  many members are shown on the map at once — mainly useful right after importing a
-  very large CSV, so the map doesn't try to render everyone at once. Drag it to the
-  right (or hit "Enable"/"Disable") to show more.
+- **Windows**: the map and the Organizations tree are separate, independent
+  windows, each with its own title bar — drag a title bar to move it, or click the
+  small zoom box in its corner to expand it to (nearly) full screen and again to
+  restore it. Clicking anywhere in a window brings it to the front of the others.
+  Closing a window (its title bar's close box) doesn't lose any data — reopen it
+  from the **Actions** menu any time.
 
 ## If something goes wrong
 
@@ -132,13 +150,9 @@ top of this manual — there's nothing else they need to do to accept the invite
   action.
 - **Login link says "Invalid or expired"**: links only work once and expire after 15
   minutes. Just request a fresh one from the sign-in screen.
-- **The distance panel doesn't show "My Location"**: your browser may have blocked
-  location access, or your device couldn't get a location fix. You can still pick
-  any member as the starting point instead.
 
 ### Note for whoever runs the server
 
-Login links are currently only logged to the server's own console, not actually
-emailed — see `docs/PHASE_3_REPORT.md` for why (no email provider is wired up yet).
-Until that's set up, you'll need to check the server console to get someone's login
-link on their behalf, or set up real email sending.
+Login links are only logged to the server's own console, not actually emailed, until
+`RESEND_API_KEY`/`EMAIL_FROM` are set — see `docs/RESEND_EMAIL_SETUP.md`. Until then,
+you'll need to check the server console to get someone's login link on their behalf.

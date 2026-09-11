@@ -6,7 +6,7 @@ successfully, since it's not required to get to a working deploy.
 
 ## Why this can wait
 
-`getMailer()` in `server/src/email.ts` falls back to `consoleMailer` (logs the magic
+`getMailer()` in `backend/src/infrastructure/mail/get-mailer.ts` falls back to `consoleMailer` (logs the magic
 link server-side instead of emailing it) whenever `RESEND_API_KEY`/`EMAIL_FROM` aren't
 both set. So the app — including login — works fine with neither var set; you just
 read the link from `docker compose logs api` instead of getting an email. Real users

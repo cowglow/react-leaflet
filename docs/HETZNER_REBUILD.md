@@ -191,7 +191,7 @@ docker compose -f docker-compose.prod.yml exec api sh -c "SEED_LEADER_EMAIL=you@
 
 **Optional — start with a populated directory.** `pnpm seed:demo` wipes all
 organisations + members and inserts the curated roster in
-`server/prisma/demo-data.ts` (accounts and the audit log are untouched). Edit
+`backend/prisma/demo-data.ts` (accounts and the audit log are untouched). Edit
 that file first if you want different data, then:
 
 ```bash
