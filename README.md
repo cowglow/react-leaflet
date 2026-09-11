@@ -246,3 +246,10 @@ push to `main` (`.github/workflows/deploy.yml`) — see
 [How the frontend is hosted](#how-the-frontend-is-hosted) and
 [Deploying the backend](#deploying-the-backend) above. The one manual, one-time setup
 is in `docs/HETZNER_DEPLOY.md`.
+
+## Screenshots
+
+The nested Organizations tree (Region → Headquarter → Area → District → Group), with
+per-node member counts and the map behind it:
+
+![Organizations tree with nested hierarchy and member counts](docs/images/app-screenshot-org-hierarchy.png)
