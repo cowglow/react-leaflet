@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Marker, Popup } from "@vis.gl/react-maplibre";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
+import "./map-marker.css";
 
 interface MapMarkerProps {
   longitude: number;
@@ -30,6 +31,8 @@ interface MapMarkerProps {
    * by clicking the pin afterwards.
    */
   autoOpen?: boolean;
+  /** Extra popup action buttons (e.g. Edit), shown alongside Move in one row. */
+  actions?: ReactNode;
   children?: ReactNode;
 }
 
@@ -50,6 +53,7 @@ export default function MapMarker({
   selected,
   onSelect,
   autoOpen,
+  actions,
   children,
 }: MapMarkerProps) {
   const { t } = useTranslation();
@@ -104,19 +108,21 @@ export default function MapMarker({
           onClose={() => setOpen(false)}
         >
           {children}
-          {onMoveEnd && (
-            <>
-              <br />
-              <button
-                className="btn"
-                onClick={() => {
-                  setOpen(false);
-                  setMoving(true);
-                }}
-              >
-                {t.common.move}
-              </button>
-            </>
+          {(actions || onMoveEnd) && (
+            <div className="marker-popup-actions">
+              {actions}
+              {onMoveEnd && (
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setOpen(false);
+                    setMoving(true);
+                  }}
+                >
+                  {t.common.move}
+                </button>
+              )}
+            </div>
           )}
         </Popup>
       )}
