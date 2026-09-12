@@ -1,6 +1,6 @@
 [![Publish Site](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml/badge.svg)](https://github.com/cowglow/visual-directory/actions/workflows/deploy.yml)
 [![Tests](https://github.com/cowglow/visual-directory/actions/workflows/test.yml/badge.svg)](https://github.com/cowglow/visual-directory/actions/workflows/test.yml)
-[![API status](https://img.shields.io/website?url=https%3A%2F%2Fapi.cowglow.io%2Fhealth&label=api.cowglow.io)](https://api.cowglow.io/health)
+[![Hetzner Deploy](https://cowglow.github.io/visual-directory/status-badge.svg)](https://api.cowglow.io/health)
 
 # Visual Directory
 
@@ -40,9 +40,11 @@ push to `main` runs `pnpm install && pnpm build`, then
 force-pushes the contents of `dist/` to `gh-pages`, which is the branch GitHub Pages is
 configured to serve from. There's no separate deploy step to run by hand — merging to
 `main` is the deploy. The badge at the top of this README links to that workflow's run
-history. The third badge, "API status," is separate — it pings
-`https://api.cowglow.io/health` live rather than reporting the last deploy's CI
-result, so it reflects the backend actually being reachable right now.
+history. The third badge, "Hetzner Deploy," is separate and self-hosted — the same
+workflow checks `https://api.cowglow.io/health` once per deploy (after the API job
+finishes, whether or not it succeeded) and renders an Online/Offline SVG straight into
+the published site, so it reflects the backend's actual reachability right after each
+deploy rather than just whether the CI steps passed.
 
 Because it's a static export, the frontend never talks to a database directly — it
 only calls the backend's REST API, at whatever URL `VITE_API_URL` was set to when it

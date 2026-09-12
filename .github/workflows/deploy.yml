@@ -9,6 +9,11 @@ jobs:
   deploy_client:
     name: Build and Deploy Client
     runs-on: ubuntu-latest
+    # Runs after deploy_server (but even if it failed - see `if:`) so the status
+    # badge below reflects the API's actual post-deploy state, not a mid-restart
+    # blip from the two jobs racing.
+    needs: deploy_server
+    if: always()
     # test.yml's test job also publishes to the gh-pages branch (the test report,
     # under test-report/); this shared group serializes the two so their pushes to
     # gh-pages never race each other. See test.yml for the other half.
@@ -34,6 +39,46 @@ jobs:
       # reachable at https://cowglow.github.io/visual-directory/storybook/.
       - name: Build Storybook
         run: pnpm build-storybook --output-dir dist/storybook
+
+      # Self-hosted alternative to a shields.io badge - checked once per deploy
+      # (not live/polled), so it reflects the API's health right after this
+      # deploy rather than an external service's own periodic check.
+      - name: Generate API status badge
+        run: |
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://api.cowglow.io/health || echo "000")
+          if [ "$STATUS_CODE" = "200" ]; then
+            STATE="Online"; COLOR="#4c1"; MSG_WIDTH=54
+          else
+            STATE="Offline"; COLOR="#e05d44"; MSG_WIDTH=62
+          fi
+          LABEL="Hetzner Deploy"
+          LABEL_WIDTH=104
+          TOTAL_WIDTH=$((LABEL_WIDTH + MSG_WIDTH))
+          LABEL_CENTER=$((LABEL_WIDTH / 2 * 10))
+          MSG_CENTER=$(((LABEL_WIDTH + MSG_WIDTH / 2) * 10))
+          cat > dist/status-badge.svg << SVG
+          <svg xmlns="http://www.w3.org/2000/svg" width="${TOTAL_WIDTH}" height="20" role="img" aria-label="${LABEL}: ${STATE}">
+            <title>${LABEL}: ${STATE}</title>
+            <linearGradient id="s" x2="0" y2="100%">
+              <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+              <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <clipPath id="r">
+              <rect width="${TOTAL_WIDTH}" height="20" rx="3" fill="#fff"/>
+            </clipPath>
+            <g clip-path="url(#r)">
+              <rect width="${LABEL_WIDTH}" height="20" fill="#555"/>
+              <rect x="${LABEL_WIDTH}" width="${MSG_WIDTH}" height="20" fill="${COLOR}"/>
+              <rect width="${TOTAL_WIDTH}" height="20" fill="url(#s)"/>
+            </g>
+            <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+              <text x="${LABEL_CENTER}" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">${LABEL}</text>
+              <text x="${LABEL_CENTER}" y="130" transform="scale(.1)">${LABEL}</text>
+              <text x="${MSG_CENTER}" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">${STATE}</text>
+              <text x="${MSG_CENTER}" y="130" transform="scale(.1)">${STATE}</text>
+            </g>
+          </svg>
+          SVG
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
