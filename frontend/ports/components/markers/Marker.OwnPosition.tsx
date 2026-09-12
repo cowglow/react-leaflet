@@ -1,5 +1,6 @@
 import { Marker } from "@vis.gl/react-maplibre";
 import { useEffect, useState } from "react";
+import "./Marker.OwnPosition.css";
 
 const DEFAULT_POSITION = { lng: 11.0767, lat: 49.4521 };
 
@@ -26,5 +27,9 @@ export default function MarkerOwnPosition() {
     return null;
   }
 
-  return <Marker longitude={position.lng} latitude={position.lat} />;
+  return (
+    <Marker longitude={position.lng} latitude={position.lat} anchor="center">
+      <div className="own-position-marker" aria-hidden="true" />
+    </Marker>
+  );
 }

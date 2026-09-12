@@ -66,6 +66,8 @@ const en = {
     number: "No.",
     zip: "ZIP",
     city: "City",
+    address: "Address",
+    addressComingSoon: "Coming soon",
     telephone: "Telephone",
     email: "Email",
     organization: "Organization",

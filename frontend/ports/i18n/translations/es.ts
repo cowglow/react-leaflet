@@ -68,6 +68,8 @@ const es: Translations = {
     number: "Núm.",
     zip: "Código postal",
     city: "Ciudad",
+    address: "Dirección",
+    addressComingSoon: "Próximamente",
     telephone: "Teléfono",
     email: "Correo electrónico",
     organization: "Organización",

@@ -69,6 +69,8 @@ const de: Translations = {
     number: "Nr.",
     zip: "PLZ",
     city: "Stadt",
+    address: "Adresse",
+    addressComingSoon: "Demnächst verfügbar",
     telephone: "Telefon",
     email: "E-Mail",
     organization: "Organisation",

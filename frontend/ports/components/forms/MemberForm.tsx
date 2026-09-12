@@ -216,6 +216,16 @@ export default function MemberForm({ payload }: MemberFormProps) {
           <p>{t.memberForm.noLocation}</p>
         )}
 
+        <div className="field-stack">
+          <label htmlFor="member-address">{t.memberForm.address}</label>
+          <input
+            id="member-address"
+            type="text"
+            placeholder={t.memberForm.addressComingSoon}
+            disabled
+          />
+        </div>
+
         <div className="field-row field-stack">
           <div className="field-stack">
             <label htmlFor="member-telephone">{t.memberForm.telephone}</label>
