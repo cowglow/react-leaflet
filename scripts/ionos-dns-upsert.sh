@@ -35,7 +35,7 @@ if [ -z "$zone_id" ]; then
   exit 1
 fi
 
-record_id=$(api "${BASE}/zones/${zone_id}?recordName=${SUBDOMAIN}&recordType=A" \
+record_id=$(api "${BASE}/zones/${zone_id}?recordName=${SUBDOMAIN}.${DOMAIN}&recordType=A" \
   | jq -r '.records[0].id // empty')
 
 if [ -n "$record_id" ]; then
