@@ -31,7 +31,8 @@ Frontend (repo root):
 
 ```bash
 pnpm dev                              # vite dev server on :3000
-pnpm dev:all                          # backend up + dev server + Storybook, one terminal
+pnpm dev:up                           # backend up + dev server, one terminal
+pnpm dev:ai                           # launch claude code agent
 pnpm build                            # tsc && vite build
 pnpm lint                             # eslint frontend e2e --max-warnings 0
 pnpm test                             # vitest --coverage
