@@ -26,8 +26,9 @@ to restrict:
 
 ## 1. Create (or confirm) a non-root deploy user
 
-If you already followed step 3 of `HETZNER_DEPLOY.md`, this user (and the
-sudoers rule below) already exists — skip to step 2. If not, as `root`:
+If you provisioned the server via `HETZNER_DEPLOY.md` step 1, cloud-init already
+created this user (and the sudoers rule below) from `deploy/hetzner/user-data.yml` —
+skip to step 2. If not, as `root`:
 
 ```bash
 adduser --disabled-password --gecos "" deploy

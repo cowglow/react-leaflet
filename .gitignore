@@ -28,6 +28,10 @@ dist-ssr
 *storybook.log
 storybook-static
 cert/
+
+# Hetzner provisioning config/output — see deploy/hetzner/config.env.example
+deploy/hetzner/config.env
+deploy/hetzner/user-data.yml
 .mcp.json
 
 # Playwright

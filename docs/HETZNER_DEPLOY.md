@@ -11,15 +11,33 @@ the [Automated CI/CD](#automated-cicd) section.
 
 Replace `YOUR_SERVER_IP` below with the actual server IP throughout. The API subdomain
 used throughout this guide is `api.cowglow.io` — replace it if you ever move to a
-different domain.
+different domain (steps 1, 2, 4, and 7 below read the domain, subdomain, GitHub repo,
+frontend origin, and leader email from `deploy/hetzner/config.env` instead of having
+you hand-edit them here — see step 0).
 
 ## 0. What you'll need first
 
-- A Hetzner Cloud account and a project created in it.
-- A domain you control DNS for — here, `cowglow.io`, managed at IONOS. You do **not**
-  need a domain for the frontend; that stays on GitHub Pages. `api.cowglow.io` is a
-  dedicated subdomain just for this backend, so it's independent of whatever the root
-  `cowglow.io`/`www.cowglow.io` records already point at (see step 2).
+- A Hetzner Cloud account and a project created in it, plus the
+  [`hcloud` CLI](https://github.com/hetznercloud/cli) installed and pointed at that
+  project (`hcloud context create visual-directory`, which prompts for an API token
+  from **Console → Security → API Tokens**) — step 1 below uses it instead of the web
+  console.
+- `jq` installed (`brew install jq` / `apt install jq`) — `scripts/ionos-dns-upsert.sh`
+  (step 2) uses it to parse the IONOS API's responses.
+- A domain you control DNS for — here, `cowglow.io`, managed at IONOS, with an
+  **API key** generated (IONOS hosting console → **API Keys**) so
+  `scripts/ionos-dns-upsert.sh` (step 2) can point `api.cowglow.io` at the server
+  without touching the DNS panel by hand. You do **not** need a domain for the
+  frontend; that stays on GitHub Pages. `api.cowglow.io` is a dedicated subdomain
+  just for this backend, so it's independent of whatever the root
+  `cowglow.io`/`www.cowglow.io` records already point at.
+- `deploy/hetzner/config.env`, copied from
+  [`config.env.example`](../deploy/hetzner/config.env.example) with your real
+  `DOMAIN`/`SUBDOMAIN`/`CLIENT_ORIGIN`/`LEADER_EMAIL`/`GITHUB_REPO` filled in — every
+  command below that references one of those names assumes you've run
+  `set -a; source deploy/hetzner/config.env; set +a` first. Keep `IONOS_API_KEY` and
+  `GHCR_PAT` out of this file — export them directly in your shell instead (see the
+  file's own header comment for why).
 - A dedicated SSH key pair for this server, generated **passphrase-free** (GitHub
   Actions' SSH step can't unlock a passphrase-protected key non-interactively — using
   one is the single most common way this whole setup breaks), saved into `cert/` at
@@ -71,84 +89,98 @@ different domain.
 
 ## 1. Provision the server
 
-**Add the SSH key to Hetzner *before* creating the server** — Hetzner Cloud's
-project-level SSH key manager (Console → **Security → SSH Keys**) only gets injected
-into servers created (or rebuilt) *after* the key was added. Adding a key there while
-a server already exists does **nothing** to that server's `authorized_keys` — there's
-no retroactive push. If you add the key after the fact, you'll get a server you can't
-SSH into and have to delete and recreate it. So:
+**Add the SSH key to Hetzner *before* creating the server** — Hetzner Cloud only
+injects a project's SSH keys into a server *at creation time*. Adding a key to the
+project while a server already exists does **nothing** to that server's
+`authorized_keys` — there's no retroactive push. If you add the key after the fact,
+you'll get a server you can't SSH into and have to delete and recreate it.
 
-1. Console → **Security → SSH Keys → Add SSH Key** → paste the contents of
-   `cert/id_hetzner.pub` **and** `cert/id_hetzner_admin.pub` (two entries).
-2. *Then* create the server, and in the "SSH keys" field during creation, select
-   both keys you just added.
+Render `user-data.yml` from the template first (this is what replaces the old manual
+"initial server setup" SSH session — see the template's own header comment for what
+it does):
 
-Other server settings, in the Hetzner Cloud console (or via the `hcloud` CLI if you
-have it):
-
-- **Image**: Ubuntu 24.04 LTS.
-- **Type**: the cheapest shared vCPU type (CX22 or similar) is plenty for this app's
-  scale — a hand-written REST API and Postgres for a leadership roster, not a
-  high-traffic service. You can resize later if needed.
-- **Location**: pick an EU location (Falkenstein or Nuremberg) — matches the plan's
-  data-sovereignty reasoning for choosing Hetzner in the first place.
-- **Firewall**: create a Hetzner Cloud Firewall (not just `ufw` on the box — belt and
-  suspenders, but the cloud firewall is the one that actually matters if `ufw` is
-  ever misconfigured) allowing inbound:
-  - `22/tcp` (SSH) — ideally restricted to your own IP if it's stable.
-  - `80/tcp` and `443/tcp` (HTTP/HTTPS, for Caddy below).
-  - **Nothing else.** Do not open `4000` (the API's raw port), `5432` (Postgres), or
-    `8081` (Adminer) to the public internet — see step 5 for why, and how you still
-    get to Adminer safely.
-
-Note the server's public IP once it's created — that's `YOUR_SERVER_IP` below. Verify
-the key actually works before doing anything else:
 ```bash
-ssh -i cert/id_hetzner root@YOUR_SERVER_IP whoami
-# should print "root" with no password prompt
+sed -e "s#\${CI_PUBLIC_KEY}#$(cat cert/id_hetzner.pub)#" \
+    -e "s#\${ADMIN_PUBLIC_KEY}#$(cat cert/id_hetzner_admin.pub)#" \
+    deploy/hetzner/user-data.yml.tmpl > deploy/hetzner/user-data.yml
 ```
+
+Then, with `hcloud` pointed at your project (step 0):
+
+```bash
+hcloud ssh-key create --name github-actions-deploy --public-key-from-file cert/id_hetzner.pub
+hcloud ssh-key create --name admin --public-key-from-file cert/id_hetzner_admin.pub
+
+hcloud firewall create --name visual-directory \
+  --rules-file - <<'EOF'
+[
+  {"direction": "in", "protocol": "tcp", "port": "22", "source_ips": ["0.0.0.0/0", "::/0"]},
+  {"direction": "in", "protocol": "tcp", "port": "80", "source_ips": ["0.0.0.0/0", "::/0"]},
+  {"direction": "in", "protocol": "tcp", "port": "443", "source_ips": ["0.0.0.0/0", "::/0"]}
+]
+EOF
+
+hcloud server create --name visual-directory \
+  --image "$HETZNER_IMAGE" \
+  --type "$HETZNER_SERVER_TYPE" \
+  --location "$HETZNER_LOCATION" \
+  --ssh-key github-actions-deploy --ssh-key admin \
+  --firewall visual-directory \
+  --user-data-from-file deploy/hetzner/user-data.yml
+```
+
+Restrict the `22/tcp` rule's `source_ips` to your own IP if it's stable — the example
+above is intentionally open so a first run isn't blocked by whichever network you're
+on. `80`/`443` need to stay open to the world (Caddy below). **Nothing else** should
+ever be opened on this firewall — do not add `4000` (the API's raw port), `5432`
+(Postgres), or `8081` (Adminer); see step 5 for why, and how you still get to Adminer
+safely.
+
+Note the server's public IP from the `hcloud server create` output (or
+`hcloud server ip visual-directory`) — that's `YOUR_SERVER_IP` below. Cloud-init takes
+a minute or two after boot to finish installing Docker and creating `deploy`; poll
+until the key works:
+
+```bash
+until ssh -i cert/id_hetzner -o StrictHostKeyChecking=accept-new deploy@YOUR_SERVER_IP docker --version; do sleep 5; done
+```
+
+Prefer the web console instead? It has an equivalent **Cloud config** field on the
+server-creation screen — paste the rendered `deploy/hetzner/user-data.yml` into it,
+and pick both keys under **SSH keys**, with the same image/type/location/firewall
+settings as above.
 
 ## 2. Point DNS at it
 
-Domain is `cowglow.io`, managed at **IONOS**. Add a new `A` record for the `api`
-subdomain — this is independent of whatever `cowglow.io`/`www.cowglow.io` already
-point at (likely a separate GitHub Pages project via its own `A`/`CNAME` records —
-check first so you don't confuse the two later, but you can't break it by adding an
-unrelated subdomain).
+Domain is `$DOMAIN` (e.g. `cowglow.io`), managed at **IONOS**, with the `$SUBDOMAIN`
+A record (e.g. `api`) independent of whatever `$DOMAIN`/`www.$DOMAIN` already point at
+(likely a separate GitHub Pages project via its own `A`/`CNAME` records — this only
+ever touches the `$SUBDOMAIN` record, never those).
 
-**In the IONOS control panel:**
+```bash
+IONOS_API_KEY=... SERVER_IP=YOUR_SERVER_IP scripts/ionos-dns-upsert.sh
+```
 
-1. Log in at [ionos.de](https://www.ionos.de) (or `.com`) → **Domains & SSL** (German
-   UI: "Domains & SSL").
-2. Click into `cowglow.io` → **DNS** (German: "DNS-Einstellungen").
-3. You should see the existing records here — take note of what's already on
-   `cowglow.io` (root) and `www`: probably `A` records pointing at GitHub Pages' IPs
-   (`185.199.108.153` etc.) or a `CNAME` to `cowglow.github.io`. Leave those alone.
-4. **Add record**:
-   - Type: `A`
-   - Host name: `api`
-   - Points to: `YOUR_SERVER_IP` (the Hetzner server's public IP from step 1)
-   - TTL: default is fine (usually 1 hour or less)
-5. Save.
+(`DOMAIN`/`SUBDOMAIN` come from `deploy/hetzner/config.env`, already sourced per step
+0.) The script looks up the zone, then creates the record if it's missing or updates
+it in place if it already exists — either way it only ever touches that one record,
+never anything else in the zone.
 
 **Verify propagation:**
 
 ```bash
-dig +short api.cowglow.io
+dig +short "$SUBDOMAIN.$DOMAIN" @1.1.1.1
 # should print YOUR_SERVER_IP once propagated
 ```
 
 IONOS is usually fast (minutes), but DNS can take up to a few hours depending on TTL
 and resolver caching. If `dig` shows nothing or a stale value:
 
-- Confirm the record actually saved in the IONOS panel (page reloads/typos are the
-  most common cause).
-- Try a different resolver to rule out local caching: `dig +short api.cowglow.io @1.1.1.1`.
-- Check you didn't accidentally create the record on the wrong zone, or as `api.cowglow.io.cowglow.io`
-  (IONOS's "host name" field usually wants just `api`, not the full FQDN — double-check
-  which convention their panel uses, it varies).
-- If you get a result but it's wrong, `dig +trace api.cowglow.io` shows exactly which
-  nameserver is answering, useful for spotting a leftover record overriding the new one.
+- Confirm the record actually landed: `curl -s -H "X-API-Key: $IONOS_API_KEY" "https://api.hosting.ionos.com/dns/v1/zones/$(curl -s -H "X-API-Key: $IONOS_API_KEY" https://api.hosting.ionos.com/dns/v1/zones | jq -r --arg d "$DOMAIN" '.[] | select(.name==$d) | .id')?recordName=$SUBDOMAIN"`.
+- Try a different resolver to rule out local caching: `dig +short "$SUBDOMAIN.$DOMAIN" @8.8.8.8`.
+- If you get a result but it's wrong, `dig +trace "$SUBDOMAIN.$DOMAIN"` shows exactly
+  which nameserver is answering, useful for spotting a leftover record overriding the
+  new one (e.g. one created by hand in the IONOS panel before this script existed).
 
 Caddy (step 6) needs this record resolving correctly *before* it can issue a
 certificate — if `curl https://api.cowglow.io/health` fails later with a TLS/cert
@@ -156,50 +188,25 @@ error, come back and re-check DNS here first.
 
 ## 3. Initial server setup
 
-SSH in as root the first time:
+Cloud-init already did this at boot, from `deploy/hetzner/user-data.yml` (step 1): it
+created the `deploy` user with both SSH keys authorized, installed Docker, added
+`deploy` to the `docker` group, and gave it passwordless sudo. Nothing to do here by
+hand — just confirm it actually landed:
 
 ```bash
-ssh -i cert/id_hetzner root@YOUR_SERVER_IP
+ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP 'docker --version && sudo -n true && echo ok'
 ```
 
-Install Docker (the official convenience script is fine for a fresh box):
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Create a non-root user to actually operate as (optional but good practice):
-
-```bash
-adduser --disabled-password --gecos "" deploy
-usermod -aG docker deploy
-usermod -aG sudo deploy
-echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy
-chmod 0440 /etc/sudoers.d/deploy
-visudo -cf /etc/sudoers.d/deploy
-rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
-```
-
-Plain `adduser deploy` prompts interactively for a Unix password and GECOS fields
-(full name, room number, ...) — easy to fat-finger or Ctrl-C out of, and if you do,
-`adduser` leaves a half-created user behind that then blocks a retry with "user
-already exists" (`deluser --remove-home deploy` cleans that up if it happens). Since
-`deploy` only ever logs in over SSH with a key, it doesn't need a working Unix
-password at all — `--disabled-password --gecos ""` creates it non-interactively with
-no prompts and no usable password.
-
-That does mean `deploy` can't authenticate an interactive `sudo` password prompt
-either, so the `sudoers.d` drop-in above grants it passwordless sudo instead —
-standard practice for a single-purpose deploy/automation account. `visudo -cf` at the
-end validates the file's syntax before it's live, so a typo can't lock out `sudo`
+From here on, SSH in as `ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP` — and this is
+the user GitHub Actions should deploy as (see `HETZNER_USER` in step 4), not `root`.
+Once you've confirmed `deploy` works, consider following
+[`HETZNER_ROOT_LOCKDOWN.md`](./HETZNER_ROOT_LOCKDOWN.md) to disable root SSH login
 entirely.
 
-The `rsync` copies root's `authorized_keys` (i.e. `id_hetzner.pub`) to `deploy` too, so
-the same key works for both without a separate copy step. From here on, SSH in as
-`ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP` instead of root — and this is the user
-GitHub Actions should deploy as (see `HETZNER_USER` in step 8), not `root`. Once you've
-confirmed `deploy` works, consider following [`HETZNER_ROOT_LOCKDOWN.md`](./HETZNER_ROOT_LOCKDOWN.md)
-to disable root SSH login entirely.
+If the command above fails, cloud-init may still be running (`ssh ... 'cloud-init
+status --wait'` blocks until it finishes, then re-run the check) or it hit an error —
+`ssh -i cert/id_hetzner root@YOUR_SERVER_IP 'cat /var/log/cloud-init-output.log'` shows
+what happened.
 
 ## 4. Set the GitHub Secrets that drive the deploy
 
@@ -249,8 +256,8 @@ service, since that's not how the real frontend is served). It then runs
 issues its Let's Encrypt certificate automatically on first start, as long as `80`/
 `443` are reachable (firewall, step 1) and DNS resolves correctly (step 2).
 
-Watch it run with `gh run watch --repo cowglow/visual-directory`, or check
-`Settings → Actions` in the GitHub UI.
+Watch it run with `gh run watch --repo "$GITHUB_REPO"`, or check `Settings → Actions`
+in the GitHub UI.
 
 ## 6. Confirm it's reachable
 
@@ -268,10 +275,11 @@ The automated deploy runs migrations but never the seed script — there's no ac
 to log in with until you create one, once:
 
 ```bash
-ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP
-cd /opt/visual-directory
-docker compose -f docker-compose.prod.yml exec api sh -c "SEED_LEADER_EMAIL=you@example.com pnpm seed"
+ssh -i cert/id_hetzner deploy@YOUR_SERVER_IP \
+  "cd /opt/visual-directory && docker compose -f docker-compose.prod.yml exec -T api sh -c \"SEED_LEADER_EMAIL=$LEADER_EMAIL pnpm seed\""
 ```
+
+(`$LEADER_EMAIL` comes from `deploy/hetzner/config.env`, step 0.)
 
 ## 8. Point the frontend at it
 
@@ -327,20 +335,22 @@ they describe how to reach a specific box as a specific user with a specific key
 stale value in any one of them breaks the SSH step of the workflow:
 
 ```bash
-gh secret set HETZNER_HOST --repo cowglow/visual-directory --body "YOUR_SERVER_IP"
-gh secret set HETZNER_USER --repo cowglow/visual-directory --body "deploy"
-gh secret set HETZNER_SSH_KEY --repo cowglow/visual-directory < cert/id_hetzner
+gh secret set HETZNER_HOST --repo "$GITHUB_REPO" --body "YOUR_SERVER_IP"
+gh secret set HETZNER_USER --repo "$GITHUB_REPO" --body "deploy"
+gh secret set HETZNER_SSH_KEY --repo "$GITHUB_REPO" < cert/id_hetzner
 ```
 
-The rest, set once and rarely touched again:
+The rest, set once and rarely touched again (`$GITHUB_REPO`/`$CLIENT_ORIGIN` come from
+`deploy/hetzner/config.env`, step 0; paste your real `GHCR_PAT` in place of
+`YOUR_GHCR_PAT`):
 
 ```bash
-gh secret set POSTGRES_USER --repo cowglow/visual-directory --body "app"
-gh secret set POSTGRES_PASSWORD --repo cowglow/visual-directory --body "$(openssl rand -hex 24)"
-gh secret set POSTGRES_DB --repo cowglow/visual-directory --body "contact_book"
-gh secret set JWT_SECRET --repo cowglow/visual-directory --body "$(openssl rand -hex 32)"
-gh secret set CLIENT_ORIGIN --repo cowglow/visual-directory --body "https://cowglow.github.io"
-gh secret set GHCR_PAT --repo cowglow/visual-directory --body "YOUR_GHCR_PAT"
+gh secret set POSTGRES_USER --repo "$GITHUB_REPO" --body "app"
+gh secret set POSTGRES_PASSWORD --repo "$GITHUB_REPO" --body "$(openssl rand -hex 24)"
+gh secret set POSTGRES_DB --repo "$GITHUB_REPO" --body "contact_book"
+gh secret set JWT_SECRET --repo "$GITHUB_REPO" --body "$(openssl rand -hex 32)"
+gh secret set CLIENT_ORIGIN --repo "$GITHUB_REPO" --body "$CLIENT_ORIGIN"
+gh secret set GHCR_PAT --repo "$GITHUB_REPO" --body "YOUR_GHCR_PAT"
 ```
 
 `RESEND_API_KEY`/`EMAIL_FROM` are skipped here on purpose — leave them unset until
@@ -351,9 +361,9 @@ Verify what's set (values aren't shown, only names/update times) and re-run the
 workflow to confirm the new secrets actually work end-to-end:
 
 ```bash
-gh secret list --repo cowglow/visual-directory
-gh workflow run deploy.yml --repo cowglow/visual-directory
-gh run watch --repo cowglow/visual-directory
+gh secret list --repo "$GITHUB_REPO"
+gh workflow run deploy.yml --repo "$GITHUB_REPO"
+gh run watch --repo "$GITHUB_REPO"
 ```
 
 ### Production compose file

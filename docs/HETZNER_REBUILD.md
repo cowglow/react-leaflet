@@ -8,8 +8,10 @@ this one is just the ordered checklist with the real values filled in.
 Frontend is unaffected — it's on GitHub Pages and doesn't touch this server.
 
 Everything below assumes `api.cowglow.io` (the API subdomain) and the
-`cowglow/visual-directory` repo. `gh` and `ssh` must be installed and `gh auth login`
-already done.
+`cowglow/visual-directory` repo — steps 2, 3, 4, and 6 read those (plus `CLIENT_ORIGIN`
+and `LEADER_EMAIL`) from `deploy/hetzner/config.env` instead of having you hand-edit
+them here (see step 0). `gh`, `ssh`, `hcloud`, and `jq` must be installed and
+`gh auth login` already done.
 
 ## What survived the teardown vs. what you rebuild
 
@@ -30,11 +32,17 @@ re-seed one leader account at the end.
 ## 0. Set these once in your terminal
 
 ```bash
+set -a; source deploy/hetzner/config.env; set +a   # DOMAIN, SUBDOMAIN, GITHUB_REPO,
+                                                      # CLIENT_ORIGIN, LEADER_EMAIL,
+                                                      # HETZNER_* — see config.env.example
 export SERVER_IP=                        # fill in after step 2
 export SSH_KEY=cert/id_hetzner           # existing CI deploy key (repo-local, gitignored)
 export ADMIN_KEY=cert/id_hetzner_admin   # your personal key, for manual SSH
-export REPO=cowglow/visual-directory
 ```
+
+`IONOS_API_KEY` (for step 3) and `GHCR_PAT` (if it needs rotating in step 5) aren't in
+`config.env` — export those directly in your shell, same as the deploy key: they're
+credentials, not config.
 
 ## 1. SSH keys — reuse the existing ones
 
@@ -48,7 +56,7 @@ The repo already carries them in `cert/` (gitignored, never committed):
 
 Only generate a fresh key if `cert/id_hetzner` is missing or you want to rotate:
 `ssh-keygen -t ed25519 -C hetzner-deploy -f cert/id_hetzner -N ""`, then you *must*
-`gh secret set HETZNER_SSH_KEY --repo "$REPO" < cert/id_hetzner` in step 5.
+`gh secret set HETZNER_SSH_KEY --repo "$GITHUB_REPO" < cert/id_hetzner` in step 4.
 
 Confirm the CI key has no passphrase (CI can't unlock one — the most common cause of
 a broken deploy):
@@ -60,117 +68,115 @@ ssh-keygen -y -P "" -f "$SSH_KEY" >/dev/null && echo "ok, no passphrase"
 ## 2. Provision the server
 
 **Add the key to Hetzner *before* creating the server** — Hetzner only injects keys
-that existed at create time; adding one to an existing box does nothing.
+that existed at create time; adding one to an existing box does nothing. An old
+server's key copies may still exist in the project — a duplicate public key is
+rejected on `hcloud ssh-key create`, so either delete the stale one first or reuse it
+(`hcloud ssh-key list`).
 
-1. Hetzner Console → **Security → SSH Keys → Add SSH Key** → paste
-   `cert/id_hetzner.pub` **and** `cert/id_hetzner_admin.pub` (two entries). An old
-   server's copies may still be listed — a duplicate public key is rejected, so
-   either delete the stale one or reuse it.
-2. Console → **Servers → Add Server**:
-   - **Image**: Ubuntu 24.04 LTS
-   - **Type**: CX22 (cheapest shared vCPU — plenty)
-   - **Location**: Falkenstein or Nuremberg (EU)
-   - **SSH keys**: select **both** keys from step 1
-   - **Firewall**: attach one allowing inbound **only** `22/tcp`, `80/tcp`,
-     `443/tcp`. If your old firewall still exists in the project, just re-attach it.
-     Do **not** open `4000`, `5432`, or `8081`.
-3. Copy the server's public IP → `export SERVER_IP=<that ip>`.
-4. Smoke-test the key:
+Render `user-data.yml` (same template as a fresh setup — see
+[`HETZNER_DEPLOY.md`](./HETZNER_DEPLOY.md#1-provision-the-server) for what it does):
 
 ```bash
-ssh -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new root@"$SERVER_IP" whoami
-# -> root   (no password prompt)
+sed -e "s#\${CI_PUBLIC_KEY}#$(cat cert/id_hetzner.pub)#" \
+    -e "s#\${ADMIN_PUBLIC_KEY}#$(cat cert/id_hetzner_admin.pub)#" \
+    deploy/hetzner/user-data.yml.tmpl > deploy/hetzner/user-data.yml
 ```
 
-If this asks for a password or says "Permission denied (publickey)", the key on the
-box doesn't match — recreate the server with the key selected (step 2.2), don't try to
-patch `authorized_keys` after the fact.
+Then:
+
+```bash
+hcloud ssh-key create --name github-actions-deploy --public-key-from-file cert/id_hetzner.pub
+hcloud ssh-key create --name admin --public-key-from-file cert/id_hetzner_admin.pub
+
+# Re-attach the old firewall if it survived the teardown, otherwise recreate it:
+hcloud firewall create --name visual-directory --rules-file - <<'EOF'
+[
+  {"direction": "in", "protocol": "tcp", "port": "22", "source_ips": ["0.0.0.0/0", "::/0"]},
+  {"direction": "in", "protocol": "tcp", "port": "80", "source_ips": ["0.0.0.0/0", "::/0"]},
+  {"direction": "in", "protocol": "tcp", "port": "443", "source_ips": ["0.0.0.0/0", "::/0"]}
+]
+EOF
+
+hcloud server create --name visual-directory \
+  --image "$HETZNER_IMAGE" --type "$HETZNER_SERVER_TYPE" --location "$HETZNER_LOCATION" \
+  --ssh-key github-actions-deploy --ssh-key admin \
+  --firewall visual-directory \
+  --user-data-from-file deploy/hetzner/user-data.yml
+```
+
+Copy the server's public IP from the output (or `hcloud server ip visual-directory`)
+→ `export SERVER_IP=<that ip>`. Cloud-init takes a minute or two after boot to install
+Docker and create `deploy` — poll until it's done:
+
+```bash
+until ssh -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new deploy@"$SERVER_IP" docker --version; do sleep 5; done
+# -> prints the Docker version once cloud-init finishes (no password prompt)
+```
+
+If this keeps failing with "Permission denied (publickey)", the key on the box doesn't
+match — recreate the server with the key selected, don't try to patch
+`authorized_keys` after the fact. If it hangs instead,
+`ssh -i "$SSH_KEY" root@"$SERVER_IP" 'cat /var/log/cloud-init-output.log'` shows what
+cloud-init is stuck on.
 
 ## 3. Repoint DNS
 
-The `api` A record at IONOS still exists but points at the dead box. Update its value.
-
-1. [ionos.de](https://www.ionos.de) → **Domains & SSL** → `cowglow.io` → **DNS**.
-2. Edit the existing **A** record, host `api` → set **Points to** = `$SERVER_IP`.
-   Leave the root `cowglow.io` / `www` records alone.
-3. Verify (may take minutes to an hour):
+The `$SUBDOMAIN` A record at IONOS still exists but points at the dead box —
+`scripts/ionos-dns-upsert.sh` finds it by name and updates it in place (it only
+touches this one record, never the root `$DOMAIN`/`www` records):
 
 ```bash
-dig +short api.cowglow.io @1.1.1.1
+IONOS_API_KEY=... SERVER_IP="$SERVER_IP" scripts/ionos-dns-upsert.sh
+```
+
+Verify (may take minutes to an hour):
+
+```bash
+dig +short "$SUBDOMAIN.$DOMAIN" @1.1.1.1
 # -> $SERVER_IP
 ```
 
 Caddy can't issue its TLS cert until this resolves to the new box, so don't skip the
 verify.
 
-## 4. Bootstrap the box
-
-```bash
-ssh -i "$SSH_KEY" root@"$SERVER_IP"
-```
-
-Then, on the server:
-
-```bash
-# Docker
-curl -fsSL https://get.docker.com | sh
-
-# non-root deploy user (this is who CI logs in as)
-adduser --disabled-password --gecos "" deploy
-usermod -aG docker deploy
-usermod -aG sudo deploy
-echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy
-chmod 0440 /etc/sudoers.d/deploy
-visudo -cf /etc/sudoers.d/deploy
-rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
-
-exit
-```
-
-Confirm `deploy` works before moving on:
-
-```bash
-ssh -i "$SSH_KEY" deploy@"$SERVER_IP" 'docker --version'
-```
-
-## 5. Sync the GitHub secrets
+## 4. Sync the GitHub secrets
 
 Reusing `cert/id_hetzner`, **only `HETZNER_HOST` changes** — the `HETZNER_SSH_KEY`
 secret was already set from that key. **`HETZNER_HOST` must be the new IP** or the
 deploy's SSH/SCP step fails with `handshake failed: unable to authenticate`.
 
 ```bash
-gh secret set HETZNER_HOST  --repo "$REPO" --body "$SERVER_IP"
-gh secret set HETZNER_USER  --repo "$REPO" --body "deploy"          # unchanged; harmless to re-set
+gh secret set HETZNER_HOST  --repo "$GITHUB_REPO" --body "$SERVER_IP"
+gh secret set HETZNER_USER  --repo "$GITHUB_REPO" --body "deploy"          # unchanged; harmless to re-set
 
 # ONLY if you rotated the key in step 1 (or the deploy still fails auth after the
 # new box has cert/id_hetzner.pub in authorized_keys):
-gh secret set HETZNER_SSH_KEY --repo "$REPO" < cert/id_hetzner      # the PRIVATE key file
+gh secret set HETZNER_SSH_KEY --repo "$GITHUB_REPO" < cert/id_hetzner      # the PRIVATE key file
 ```
 
 Then confirm the rest are still present (values aren't shown):
 
 ```bash
-gh secret list --repo "$REPO"
+gh secret list --repo "$GITHUB_REPO"
 ```
 
 You should see `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `JWT_SECRET`,
 `CLIENT_ORIGIN`, `GHCR_PAT`. If `GHCR_PAT` is older than ~a year it may have expired
 (fine-grained PATs do) — regenerate at **GitHub → Settings → Developer settings →
 Personal access tokens → Fine-grained**, scope `read:packages`, and
-`gh secret set GHCR_PAT --repo "$REPO" --body "<new pat>"`.
+`gh secret set GHCR_PAT --repo "$GITHUB_REPO" --body "<new pat>"`.
 
-`CLIENT_ORIGIN` must be `https://cowglow.github.io` (scheme + host, no path) — it's the
-API's CORS allowlist.
+`CLIENT_ORIGIN` must match `$CLIENT_ORIGIN` from `deploy/hetzner/config.env` (scheme +
+host, no path) — it's the API's CORS allowlist.
 
-## 6. Deploy
+## 5. Deploy
 
 ```bash
 git commit --allow-empty -m "Redeploy to rebuilt server" && git push origin main
 # or, without a commit:
-gh workflow run deploy.yml --repo "$REPO"
+gh workflow run deploy.yml --repo "$GITHUB_REPO"
 
-gh run watch --repo "$REPO"
+gh run watch --repo "$GITHUB_REPO"
 ```
 
 The `deploy_server` job builds + pushes the image, SCPs `docker-compose.prod.yml` +
@@ -179,14 +185,13 @@ The `deploy_server` job builds + pushes the image, SCPs `docker-compose.prod.yml
 `docker compose ... exec -T api pnpm prisma:deploy` to apply **all** migrations
 (including `20260910155923_member_incomplete`) to the fresh DB.
 
-## 7. Seed the first leader (one-time, manual)
+## 6. Seed the first leader (one-time, manual)
 
 Migrations run automatically; the seed never does. With no account you can't log in.
 
 ```bash
-ssh -i "$SSH_KEY" deploy@"$SERVER_IP"
-cd /opt/visual-directory
-docker compose -f docker-compose.prod.yml exec api sh -c "SEED_LEADER_EMAIL=you@example.com pnpm seed"
+ssh -i "$SSH_KEY" deploy@"$SERVER_IP" \
+  "cd /opt/visual-directory && docker compose -f docker-compose.prod.yml exec -T api sh -c \"SEED_LEADER_EMAIL=$LEADER_EMAIL pnpm seed\""
 ```
 
 **Optional — start with a populated directory.** `pnpm seed:demo` wipes all
@@ -195,11 +200,11 @@ organisations + members and inserts the curated roster in
 that file first if you want different data, then:
 
 ```bash
-docker compose -f docker-compose.prod.yml exec -e SEED_LEADER_EMAIL=you@example.com api pnpm seed:demo
-exit
+ssh -i "$SSH_KEY" deploy@"$SERVER_IP" \
+  "cd /opt/visual-directory && docker compose -f docker-compose.prod.yml exec -T -e SEED_LEADER_EMAIL=$LEADER_EMAIL api pnpm seed:demo"
 ```
 
-## 8. Verify
+## 7. Verify
 
 ```bash
 curl https://api.cowglow.io/health
@@ -233,7 +238,7 @@ Log in, drop a normal pin and a Shift+click pin — you're back.
 
 | Symptom (in `gh run watch` or `curl`) | Cause / fix |
 |---|---|
-| `ssh: handshake failed: ... unable to authenticate, attempted methods [none publickey]` at the *Copy compose file* or *Deploy on Hetzner* step | `HETZNER_SSH_KEY` secret ≠ a key in the box's `authorized_keys`, or `HETZNER_HOST` is the old IP. Redo step 5 with the exact private-key file and new IP. Confirm locally first: `ssh -i "$SSH_KEY" deploy@"$SERVER_IP" whoami`. |
+| `ssh: handshake failed: ... unable to authenticate, attempted methods [none publickey]` at the *Copy compose file* or *Deploy on Hetzner* step | `HETZNER_SSH_KEY` secret ≠ a key in the box's `authorized_keys`, or `HETZNER_HOST` is the old IP. Redo step 4 with the exact private-key file and new IP. Confirm locally first: `ssh -i "$SSH_KEY" deploy@"$SERVER_IP" whoami`. |
 | `Error response from daemon: ... denied` / `manifest unknown` on `docker compose pull api` | `GHCR_PAT` expired or missing `read:packages`. Regenerate, `gh secret set GHCR_PAT`. |
 | `curl https://api.cowglow.io/health` → TLS/cert error | DNS not resolving to the new box yet (step 3), or firewall not allowing `80`/`443`. Fix DNS/firewall, then `docker compose -f docker-compose.prod.yml restart caddy` on the box to retry the cert. |
 | Deploy green but `/health` connection refused | `api` container crashed — `docker compose -f docker-compose.prod.yml logs api`. Usually a bad `DATABASE_URL` (check `POSTGRES_*` secrets are consistent) or the DB not healthy yet. |
