@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --port 3000",
-    "dev:ai": "claude --dangerously-skip-permissions",
+    "dev:ai": "claude --dangerously-skip-permissions --resume",
     "dev:up": "pnpm backend:up && pnpm dev",
     "docker:dev": "docker compose run --service-ports frontend bash",
     "build": "tsc && vite build",
