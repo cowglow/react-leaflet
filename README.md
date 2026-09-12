@@ -254,7 +254,7 @@ is in `docs/HETZNER_DEPLOY.md`.
 
 ## Screenshots
 
-The nested Organizations tree (Region → Headquarter → Area → District → Group), with
+The nested Organizations tree example data (Region → Headquarter → Area → District → Group), with
 per-node member counts and the map behind it:
 
 ![Organizations tree with nested hierarchy and member counts](docs/images/app-screenshot-org-hierarchy.png)
