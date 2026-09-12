@@ -17,10 +17,14 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
-  async viteFinal(viteConfig) {
+  async viteFinal(viteConfig, { configType }) {
     const { mergeConfig } = await import("vite");
     return mergeConfig(viteConfig, {
       plugins: [tsconfigPaths()],
+      // Published alongside the app at /visual-directory/storybook/ (see
+      // deploy.yml's "Build Storybook" step) — `storybook dev` keeps serving from
+      // root, so this only applies to the production build.
+      base: configType === "PRODUCTION" ? "/visual-directory/storybook/" : viteConfig.base,
     });
   },
 };

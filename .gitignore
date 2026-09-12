@@ -26,6 +26,7 @@ dist-ssr
 *.sw?
 
 *storybook.log
+storybook-static
 cert/
 .mcp.json
 

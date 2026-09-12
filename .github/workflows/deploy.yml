@@ -30,6 +30,11 @@ jobs:
         env:
           VITE_API_URL: https://api.cowglow.io
 
+      # Published into dist/ so it ships as part of the same GitHub Pages deploy,
+      # reachable at https://cowglow.github.io/visual-directory/storybook/.
+      - name: Build Storybook
+        run: pnpm build-storybook --output-dir dist/storybook
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
