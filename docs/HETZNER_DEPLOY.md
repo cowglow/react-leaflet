@@ -105,29 +105,39 @@ sed -e "s#\${CI_PUBLIC_KEY}#$(cat cert/id_hetzner.pub)#" \
     deploy/hetzner/user-data.yml.tmpl > deploy/hetzner/user-data.yml
 ```
 
-Then, with `hcloud` pointed at your project (step 0):
+Then, with `hcloud` pointed at your project (step 0). SSH keys and the firewall are
+registered idempotently — `scripts/hcloud-ensure-ssh-key.sh` matches by the key's
+fingerprint (not name) since Hetzner rejects re-uploading a public key that's already
+registered under any name, and `scripts/hcloud-ensure-firewall.sh` checks by name
+before creating — so re-running this against a project that already has either from a
+previous setup reuses them instead of erroring:
 
 ```bash
-hcloud ssh-key create --name github-actions-deploy --public-key-from-file cert/id_hetzner.pub
-hcloud ssh-key create --name admin --public-key-from-file cert/id_hetzner_admin.pub
+CI_KEY_NAME=$(scripts/hcloud-ensure-ssh-key.sh github-actions-deploy cert/id_hetzner.pub)
+ADMIN_KEY_NAME=$(scripts/hcloud-ensure-ssh-key.sh admin cert/id_hetzner_admin.pub)
 
-hcloud firewall create --name visual-directory \
-  --rules-file - <<'EOF'
+scripts/hcloud-ensure-firewall.sh visual-directory <(cat <<'EOF'
 [
   {"direction": "in", "protocol": "tcp", "port": "22", "source_ips": ["0.0.0.0/0", "::/0"]},
   {"direction": "in", "protocol": "tcp", "port": "80", "source_ips": ["0.0.0.0/0", "::/0"]},
   {"direction": "in", "protocol": "tcp", "port": "443", "source_ips": ["0.0.0.0/0", "::/0"]}
 ]
 EOF
+)
 
 hcloud server create --name visual-directory \
   --image "$HETZNER_IMAGE" \
   --type "$HETZNER_SERVER_TYPE" \
   --location "$HETZNER_LOCATION" \
-  --ssh-key github-actions-deploy --ssh-key admin \
+  --ssh-key "$CI_KEY_NAME" --ssh-key "$ADMIN_KEY_NAME" \
   --firewall visual-directory \
   --user-data-from-file deploy/hetzner/user-data.yml
 ```
+
+`hcloud server create` itself is deliberately left non-idempotent — if a server named
+`visual-directory` already exists, it fails outright rather than silently creating a
+second one or reusing the wrong box. Run `hcloud server list` first if you're not sure
+whether one already exists.
 
 Restrict the `22/tcp` rule's `source_ips` to your own IP if it's stable — the example
 above is intentionally open so a first run isn't blocked by whichever network you're

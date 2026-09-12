@@ -69,9 +69,10 @@ ssh-keygen -y -P "" -f "$SSH_KEY" >/dev/null && echo "ok, no passphrase"
 
 **Add the key to Hetzner *before* creating the server** — Hetzner only injects keys
 that existed at create time; adding one to an existing box does nothing. An old
-server's key copies may still exist in the project — a duplicate public key is
-rejected on `hcloud ssh-key create`, so either delete the stale one first or reuse it
-(`hcloud ssh-key list`).
+server's key copies and firewall commonly survive a teardown (they're project-level,
+not server-level) — `scripts/hcloud-ensure-ssh-key.sh` and
+`scripts/hcloud-ensure-firewall.sh` (also used in `HETZNER_DEPLOY.md`) check for and
+reuse them automatically instead of erroring on a duplicate name/key.
 
 Render `user-data.yml` (same template as a fresh setup — see
 [`HETZNER_DEPLOY.md`](./HETZNER_DEPLOY.md#1-provision-the-server) for what it does):
@@ -85,24 +86,27 @@ sed -e "s#\${CI_PUBLIC_KEY}#$(cat cert/id_hetzner.pub)#" \
 Then:
 
 ```bash
-hcloud ssh-key create --name github-actions-deploy --public-key-from-file cert/id_hetzner.pub
-hcloud ssh-key create --name admin --public-key-from-file cert/id_hetzner_admin.pub
+CI_KEY_NAME=$(scripts/hcloud-ensure-ssh-key.sh github-actions-deploy cert/id_hetzner.pub)
+ADMIN_KEY_NAME=$(scripts/hcloud-ensure-ssh-key.sh admin cert/id_hetzner_admin.pub)
 
-# Re-attach the old firewall if it survived the teardown, otherwise recreate it:
-hcloud firewall create --name visual-directory --rules-file - <<'EOF'
+scripts/hcloud-ensure-firewall.sh visual-directory <(cat <<'EOF'
 [
   {"direction": "in", "protocol": "tcp", "port": "22", "source_ips": ["0.0.0.0/0", "::/0"]},
   {"direction": "in", "protocol": "tcp", "port": "80", "source_ips": ["0.0.0.0/0", "::/0"]},
   {"direction": "in", "protocol": "tcp", "port": "443", "source_ips": ["0.0.0.0/0", "::/0"]}
 ]
 EOF
+)
 
 hcloud server create --name visual-directory \
   --image "$HETZNER_IMAGE" --type "$HETZNER_SERVER_TYPE" --location "$HETZNER_LOCATION" \
-  --ssh-key github-actions-deploy --ssh-key admin \
+  --ssh-key "$CI_KEY_NAME" --ssh-key "$ADMIN_KEY_NAME" \
   --firewall visual-directory \
   --user-data-from-file deploy/hetzner/user-data.yml
 ```
+
+If `hcloud server create` itself fails with a name conflict, the old server wasn't
+actually deleted yet — `hcloud server list` to confirm, delete it, then retry.
 
 Copy the server's public IP from the output (or `hcloud server ip visual-directory`)
 → `export SERVER_IP=<that ip>`. Cloud-init takes a minute or two after boot to install
