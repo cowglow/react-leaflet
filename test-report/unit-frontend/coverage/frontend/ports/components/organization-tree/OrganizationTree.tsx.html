@@ -559,7 +559,9 @@
 <a name='L494'></a><a href='#L494'>494</a>
 <a name='L495'></a><a href='#L495'>495</a>
 <a name='L496'></a><a href='#L496'>496</a>
-<a name='L497'></a><a href='#L497'>497</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -957,25 +959,25 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -988,20 +990,22 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1011,7 +1015,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1020,6 +1023,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1447,15 +1451,24 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
 <span class="cstat-no" title="statement not covered" >      &lt;div className="org-tree-layout"&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;div className="org-tree-main"&gt;</span>
 <span class="cstat-no" title="statement not covered" >          {!hasOrganizations &amp;&amp; unassignedMembers.length === 0 &amp;&amp; &lt;p&gt;{t.organizationTree.empty}&lt;/p&gt;}</span>
-<span class="cstat-no" title="statement not covered" >          {allExpandableIds.length &gt; 0 &amp;&amp; (</span>
-<span class="cstat-no" title="statement not covered" >            &lt;div className="org-tree-toolbar org-tree-toolbar--top"&gt;</span>
-<span class="cstat-no" title="statement not covered" >              &lt;button</span>
-<span class="cstat-no" title="statement not covered" >                type="button"</span>
-<span class="cstat-no" title="statement not covered" >                className="btn"</span>
-<span class="cstat-no" title="statement not covered" >                onClick={() =&gt; setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}</span>
-              &gt;
-<span class="cstat-no" title="statement not covered" >                {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}</span>
-<span class="cstat-no" title="statement not covered" >              &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >          {(allExpandableIds.length &gt; 0 || hasSelection) &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="org-tree-toolbar"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              {allExpandableIds.length &gt; 0 ? (</span>
+<span class="cstat-no" title="statement not covered" >                &lt;button</span>
+<span class="cstat-no" title="statement not covered" >                  type="button"</span>
+<span class="cstat-no" title="statement not covered" >                  className="btn"</span>
+<span class="cstat-no" title="statement not covered" >                  onClick={() =&gt; setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}</span>
+                &gt;
+<span class="cstat-no" title="statement not covered" >                  {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/button&gt;</span>
+              ) : (
+<span class="cstat-no" title="statement not covered" >                &lt;span /&gt;</span>
+              )}
+<span class="cstat-no" title="statement not covered" >              {hasSelection &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >                &lt;button type="button" className="btn" onClick={() =&gt; dispatch(clearSelection())}&gt;</span>
+<span class="cstat-no" title="statement not covered" >                  {t.organizationTree.clear}</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/button&gt;</span>
+              )}
 <span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
           )}
 <span class="cstat-no" title="statement not covered" >          &lt;ul className="org-tree"&gt;</span>
@@ -1509,13 +1522,6 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
 <span class="cstat-no" title="statement not covered" >              &lt;/li&gt;</span>
             )}
 <span class="cstat-no" title="statement not covered" >          &lt;/ul&gt;</span>
-<span class="cstat-no" title="statement not covered" >          {hasSelection &amp;&amp; (</span>
-<span class="cstat-no" title="statement not covered" >            &lt;div className="org-tree-toolbar"&gt;</span>
-<span class="cstat-no" title="statement not covered" >              &lt;button className="btn" onClick={() =&gt; dispatch(clearSelection())}&gt;</span>
-<span class="cstat-no" title="statement not covered" >                {t.organizationTree.clear}</span>
-<span class="cstat-no" title="statement not covered" >              &lt;/button&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
-          )}
 <span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        {hasSelection &amp;&amp; (</span>
@@ -1558,7 +1564,7 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-13T01:23:30.448Z
+                at 2026-09-13T01:31:51.915Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
