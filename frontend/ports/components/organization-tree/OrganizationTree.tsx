@@ -390,15 +390,24 @@ export default function OrganizationTree({ z }: { z?: number }) {
       <div className="org-tree-layout">
         <div className="org-tree-main">
           {!hasOrganizations && unassignedMembers.length === 0 && <p>{t.organizationTree.empty}</p>}
-          {allExpandableIds.length > 0 && (
-            <div className="org-tree-toolbar org-tree-toolbar--top">
-              <button
-                type="button"
-                className="btn"
-                onClick={() => setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}
-              >
-                {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}
-              </button>
+          {(allExpandableIds.length > 0 || hasSelection) && (
+            <div className="org-tree-toolbar">
+              {allExpandableIds.length > 0 ? (
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}
+                >
+                  {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}
+                </button>
+              ) : (
+                <span />
+              )}
+              {hasSelection && (
+                <button type="button" className="btn" onClick={() => dispatch(clearSelection())}>
+                  {t.organizationTree.clear}
+                </button>
+              )}
             </div>
           )}
           <ul className="org-tree">
@@ -452,13 +461,6 @@ export default function OrganizationTree({ z }: { z?: number }) {
               </li>
             )}
           </ul>
-          {hasSelection && (
-            <div className="org-tree-toolbar">
-              <button className="btn" onClick={() => dispatch(clearSelection())}>
-                {t.organizationTree.clear}
-              </button>
-            </div>
-          )}
         </div>
 
         {hasSelection && (

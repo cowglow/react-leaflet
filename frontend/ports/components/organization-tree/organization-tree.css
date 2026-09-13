@@ -11,13 +11,9 @@
 
 .org-tree-toolbar {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.org-tree-toolbar--top {
-  justify-content: flex-start;
-  margin-top: 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
