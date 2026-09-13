@@ -12,6 +12,7 @@ export type DialogType =
 export type DialogPayload = {
   coordinates?: GeoCoordinate;
   memberId?: string;
+  organizationId?: string;
 };
 
 export type WindowInstance = {

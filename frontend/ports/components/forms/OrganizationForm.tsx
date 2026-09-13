@@ -1,21 +1,26 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "infrastructure/redux/hooks.ts";
-import { bringToFront, closeWindow } from "infrastructure/redux/windows/windows.slice.ts";
+import { bringToFront, closeWindow, DialogPayload } from "infrastructure/redux/windows/windows.slice.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import {
   addOrganizationRequested,
+  removeOrganizationRequested,
   resetOrganizationMutation,
+  updateOrganizationRequested,
 } from "infrastructure/redux/organization/organization.slice.ts";
 import {
+  getOrganizationById,
   getOrganizationMutationError,
   getOrganizationMutationRequestId,
   getOrganizationMutationStatus,
 } from "infrastructure/redux/organization/organization.selectors.ts";
+import { isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
 import { createRequestId } from "infrastructure/redux/request-id.ts";
 import { createOrganization } from "domain/organization/organization.factory.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import type { OrganizationType } from "domain/shared/types.ts";
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
+import ConfirmDialog from "ports/components/dialogs/ConfirmDialog.tsx";
 import "./forms.css";
 
 const organizationTypes: OrganizationType[] = [
@@ -36,15 +41,27 @@ const PARENT_TYPE: Partial<Record<OrganizationType, OrganizationType>> = {
   Group: "District",
 };
 
-export default function OrganizationForm({ z }: { z?: number }) {
+interface OrganizationFormProps {
+  payload: DialogPayload | null;
+  z?: number;
+}
+
+export default function OrganizationForm({ payload, z }: OrganizationFormProps) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const [name, setName] = useState("");
-  const [type, setType] = useState<OrganizationType>("District");
-  const [parentId, setParentId] = useState("");
   const organizations = useSelector(getOrganizations);
+  const leader = useSelector(isLeader);
+  const existingOrganization = useSelector((state) =>
+    payload?.organizationId ? getOrganizationById(state, payload.organizationId) : undefined,
+  );
+  const isEditMode = Boolean(existingOrganization);
 
-  const pendingRequestId = useRef<string | null>(null);
+  const [name, setName] = useState(existingOrganization?.name ?? "");
+  const [type, setType] = useState<OrganizationType>(existingOrganization?.type ?? "District");
+  const [parentId, setParentId] = useState(existingOrganization?.parentId ?? "");
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
+
+  const pendingRequest = useRef<{ id: string; kind: "save" | "remove" } | null>(null);
   const mutationStatus = useSelector(getOrganizationMutationStatus);
   const mutationRequestId = useSelector(getOrganizationMutationRequestId);
   const mutationError = useSelector(getOrganizationMutationError);
@@ -62,16 +79,19 @@ export default function OrganizationForm({ z }: { z?: number }) {
   }, [type]);
 
   useEffect(() => {
-    if (!pendingRequestId.current || mutationRequestId !== pendingRequestId.current) {
+    const pending = pendingRequest.current;
+    if (!pending || mutationRequestId !== pending.id) {
       return;
     }
     if (mutationStatus === "succeeded") {
-      pendingRequestId.current = null;
+      pendingRequest.current = null;
       dispatch(resetOrganizationMutation());
       dispatch(closeWindow("ORGANIZATION_DIALOG"));
     } else if (mutationStatus === "failed") {
-      pendingRequestId.current = null;
-      alert(mutationError ?? t.organizationForm.saveFailed);
+      pendingRequest.current = null;
+      alert(
+        mutationError ?? (pending.kind === "remove" ? t.organizationForm.removeFailed : t.organizationForm.saveFailed),
+      );
       dispatch(resetOrganizationMutation());
     }
   }, [mutationStatus, mutationRequestId, mutationError, dispatch, t]);
@@ -79,18 +99,59 @@ export default function OrganizationForm({ z }: { z?: number }) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     const requestId = createRequestId();
-    pendingRequestId.current = requestId;
-    dispatch(
-      addOrganizationRequested({
-        requestId,
-        organization: createOrganization(name, type, parentId || undefined),
-      }),
-    );
+    pendingRequest.current = { id: requestId, kind: "save" };
+    if (existingOrganization) {
+      dispatch(
+        updateOrganizationRequested({
+          requestId,
+          organization: { ...existingOrganization, name, type, parentId: parentId || undefined },
+        }),
+      );
+    } else {
+      dispatch(
+        addOrganizationRequested({
+          requestId,
+          organization: createOrganization(name, type, parentId || undefined),
+        }),
+      );
+    }
   };
+
+  const handleRemove = () => {
+    if (!existingOrganization) {
+      dispatch(closeWindow("ORGANIZATION_DIALOG"));
+      return;
+    }
+    const requestId = createRequestId();
+    pendingRequest.current = { id: requestId, kind: "remove" };
+    dispatch(removeOrganizationRequested({ requestId, id: existingOrganization.id }));
+  };
+
+  if (confirmingRemove && existingOrganization) {
+    return (
+      <DesktopWindow
+        title={t.organizationForm.confirmRemoveTitle}
+        onClose={() => dispatch(closeWindow("ORGANIZATION_DIALOG"))}
+        onFocus={() => dispatch(bringToFront("ORGANIZATION_DIALOG"))}
+        initialPosition={{ x: 160, y: 140 }}
+        width="min(400px, 92vw)"
+        height="auto"
+        z={z}
+        padded
+      >
+        <ConfirmDialog
+          message={t.organizationForm.confirmRemoveMessage(existingOrganization.name)}
+          confirmLabel={t.common.remove}
+          onConfirm={handleRemove}
+          onCancel={() => setConfirmingRemove(false)}
+        />
+      </DesktopWindow>
+    );
+  }
 
   return (
     <DesktopWindow
-      title={t.organizationForm.title}
+      title={isEditMode ? t.organizationForm.editTitle : t.organizationForm.addTitle}
       onClose={() => dispatch(closeWindow("ORGANIZATION_DIALOG"))}
       onFocus={() => dispatch(bringToFront("ORGANIZATION_DIALOG"))}
       initialPosition={{ x: 160, y: 140 }}
@@ -157,6 +218,11 @@ export default function OrganizationForm({ z }: { z?: number }) {
           >
             {t.common.cancel}
           </button>
+          {isEditMode && leader && (
+            <button type="button" className="btn" onClick={() => setConfirmingRemove(true)}>
+              {t.common.remove}
+            </button>
+          )}
           <button type="submit" className="btn btn-default">
             {t.common.save}
           </button>

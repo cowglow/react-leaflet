@@ -55,6 +55,52 @@ const organizationSlice = createSlice({
         mutationStatus: "succeeded",
       };
     },
+    updateOrganizationRequested(
+      state,
+      action: PayloadAction<{ requestId: string; organization: Organization }>,
+    ) {
+      return {
+        ...state,
+        mutationRequestId: action.payload.requestId,
+        mutationStatus: "pending",
+        mutationError: null,
+      };
+    },
+    updateOrganizationSucceeded(
+      state,
+      action: PayloadAction<{ requestId: string; organization: Organization }>,
+    ) {
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.organization.id ? action.payload.organization : item,
+        ),
+        mutationRequestId: action.payload.requestId,
+        mutationStatus: "succeeded",
+      };
+    },
+    removeOrganizationRequested(
+      state,
+      action: PayloadAction<{ requestId: string; id: string }>,
+    ) {
+      return {
+        ...state,
+        mutationRequestId: action.payload.requestId,
+        mutationStatus: "pending",
+        mutationError: null,
+      };
+    },
+    removeOrganizationSucceeded(
+      state,
+      action: PayloadAction<{ requestId: string; id: string }>,
+    ) {
+      return {
+        ...state,
+        items: state.items.filter((item) => item.id !== action.payload.id),
+        mutationRequestId: action.payload.requestId,
+        mutationStatus: "succeeded",
+      };
+    },
     organizationMutationFailed(
       state,
       action: PayloadAction<{ requestId: string; error: string }>,
@@ -78,6 +124,10 @@ export const {
   fetchOrganizationsFailed,
   addOrganizationRequested,
   addOrganizationSucceeded,
+  updateOrganizationRequested,
+  updateOrganizationSucceeded,
+  removeOrganizationRequested,
+  removeOrganizationSucceeded,
   organizationMutationFailed,
   resetOrganizationMutation,
 } = organizationSlice.actions;

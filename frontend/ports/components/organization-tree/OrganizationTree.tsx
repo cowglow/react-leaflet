@@ -112,6 +112,8 @@ function OrgNodeItem({
   selectedSet,
   onSelectMember,
   onSelectGroup,
+  leader,
+  onEditOrganization,
   t,
 }: {
   node: OrgTreeNode;
@@ -121,6 +123,8 @@ function OrgNodeItem({
   selectedSet: Set<string>;
   onSelectMember: (id: string, event: MouseEvent | KeyboardEvent) => void;
   onSelectGroup: (groupKey: string, groupMembers: Member[]) => void;
+  leader: boolean;
+  onEditOrganization: (organizationId: string) => void;
   t: Translations;
 }) {
   const directMembers = membersOf(node.organization.id);
@@ -146,6 +150,19 @@ function OrgNodeItem({
           <span className={`org-name org-name--${state}`}>
             {node.organization.name} ({allMembers.length})
           </span>
+          {leader && (
+            <button
+              type="button"
+              className="btn org-edit-btn"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onEditOrganization(node.organization.id);
+              }}
+            >
+              {t.common.edit}
+            </button>
+          )}
         </summary>
         {node.children.length > 0 && (
           <ul>
@@ -159,6 +176,8 @@ function OrgNodeItem({
                 selectedSet={selectedSet}
                 onSelectMember={onSelectMember}
                 onSelectGroup={onSelectGroup}
+                leader={leader}
+                onEditOrganization={onEditOrganization}
                 t={t}
               />
             ))}
@@ -301,6 +320,10 @@ export default function OrganizationTree({ z }: { z?: number }) {
                 selectedSet={selectedSet}
                 onSelectMember={selectMember}
                 onSelectGroup={selectGroup}
+                leader={leader}
+                onEditOrganization={(organizationId) =>
+                  dispatch(openWindow({ type: "ORGANIZATION_DIALOG", payload: { organizationId } }))
+                }
                 t={t}
               />
             ))}
