@@ -22,21 +22,67 @@
   padding: 0;
 }
 
+/* Tree connector lines: a vertical rail per nesting level (one border-left
+   per <ul>), with a short horizontal tick on each item joining it to the
+   rail - the "├──" / "└──" effect, without literal box-drawing characters
+   (which don't reflow or localize well). */
 .org-tree ul {
-  padding-left: 1.25rem;
-  border-left: 1px solid #000;
-  margin-left: 0.4rem;
+  position: relative;
+  padding-left: 1.5rem;
+  margin-left: 0.65rem;
+  border-left: 1px solid #999;
+}
+
+.org-tree ul > li {
+  position: relative;
+}
+
+.org-tree ul > li::before {
+  content: "";
+  position: absolute;
+  top: 0.85em;
+  left: -1.5rem;
+  width: 1.5rem;
+  border-top: 1px solid #999;
 }
 
 .org-tree > li + li {
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.org-tree ul > li + li {
+  margin-top: 0.6rem;
 }
 
 .org-tree summary {
   cursor: pointer;
+  list-style: none;
   display: flex;
-  align-items: center;
-  gap: 0.5em;
+  align-items: flex-start;
+}
+
+.org-tree summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Only expandable (has-children) nodes get a disclosure marker at all - a
+   leaf has nothing to expand, so org-leaf-row below renders without one. */
+.org-tree summary::before {
+  content: "▸";
+  flex: none;
+  width: 1em;
+  margin-right: 0.15em;
+  margin-top: 0.35em;
+  font-size: 0.75em;
+}
+
+.org-tree details[open] > summary::before {
+  content: "▾";
+}
+
+.org-leaf-row {
+  cursor: pointer;
+  padding-left: 1.15em;
 }
 
 .org-edit-btn {
@@ -44,29 +90,73 @@
   padding: 0 0.5em;
 }
 
+/* The two-line block shared by an expandable row's <summary> and a leaf
+   row's plain div: a small "type" line (abbreviation badge + full type
+   name) above the name/count/action grid line. */
+.org-node-header {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.15rem 0.3rem;
+}
+
+.org-type-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 0.72em;
+  color: #444;
+  margin-bottom: 0.15em;
+}
+
+.org-abbr {
+  display: inline-block;
+  border: 1px solid #000;
+  padding: 0 0.35em;
+  font-weight: 700;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.org-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+}
+
 .org-name {
-  cursor: pointer;
+  font-weight: 700;
+  overflow-wrap: anywhere;
   user-select: none;
 }
 
-.org-name--some {
-  font-weight: 700;
+.org-member-count {
+  font-size: 0.85em;
+  color: #333;
+  white-space: nowrap;
+  justify-self: end;
 }
 
-.org-name--all {
-  font-weight: 700;
+.org-node-header--some {
+  background: #ddd;
 }
 
-.org-name--some::before,
-.org-name--all::before {
-  content: "\25CF";
-  margin-right: 0.35em;
-  font-size: 0.7em;
-  vertical-align: middle;
+.org-node-header--all {
+  background: #000;
+  color: #fff;
 }
 
-.org-name--some::before {
-  color: #888;
+.org-node-header--all .org-type-label {
+  color: #ccc;
+}
+
+.org-node-header--all .org-abbr {
+  border-color: #fff;
+  color: #fff;
+}
+
+.org-node-header--all .org-member-count {
+  color: #ccc;
 }
 
 .org-tree-member {
@@ -86,8 +176,10 @@
 }
 
 .org-tree-empty {
-  margin: 0.25rem 0 0.25rem 1.25rem;
+  margin: 0.15rem 0.3rem 0;
+  padding-left: 1.15em;
   font-style: italic;
+  font-size: 0.85em;
 }
 
 .org-preview {

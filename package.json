@@ -8,6 +8,7 @@
     "dev": "vite --host --port 3000",
     "dev:ai": "claude --dangerously-skip-permissions --resume",
     "dev:up": "pnpm backend:up && pnpm dev",
+    "dev:down": "docker compose down",
     "docker:dev": "docker compose run --service-ports frontend bash",
     "build": "tsc && vite build",
     "lint": "eslint frontend e2e --report-unused-disable-directives --max-warnings 0",

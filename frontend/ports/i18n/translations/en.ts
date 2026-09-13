@@ -127,6 +127,7 @@ const en = {
     selectHint: "Double-click to select all members",
     clear: "Clear",
     selectedCount: (count: number) => `${count} members selected`,
+    memberCount: (count: number) => `${count} ${count === 1 ? "member" : "members"}`,
     coordinates: "Coordinates",
     noPhone: "No phone",
     noEmail: "No email",

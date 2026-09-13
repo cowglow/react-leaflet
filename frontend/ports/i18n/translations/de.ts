@@ -130,6 +130,7 @@ const de: Translations = {
     selectHint: "Doppelklick, um alle Mitglieder auszuwählen",
     clear: "Zurücksetzen",
     selectedCount: (count: number) => `${count} Mitglieder ausgewählt`,
+    memberCount: (count: number) => `${count} ${count === 1 ? "Mitglied" : "Mitglieder"}`,
     coordinates: "Koordinaten",
     noPhone: "Kein Telefon",
     noEmail: "Keine E-Mail",

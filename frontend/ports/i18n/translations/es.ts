@@ -129,6 +129,7 @@ const es: Translations = {
     selectHint: "Doble clic para seleccionar todos los miembros",
     clear: "Limpiar",
     selectedCount: (count: number) => `${count} miembros seleccionados`,
+    memberCount: (count: number) => `${count} ${count === 1 ? "miembro" : "miembros"}`,
     coordinates: "Coordenadas",
     noPhone: "Sin teléfono",
     noEmail: "Sin correo",

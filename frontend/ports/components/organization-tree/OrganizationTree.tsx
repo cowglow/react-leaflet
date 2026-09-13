@@ -17,12 +17,34 @@ import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import type { Member } from "domain/member/member.types.ts";
 import type { Organization } from "domain/organization/organization.types.ts";
+import type { OrganizationType } from "domain/shared/types.ts";
 import type { Translations } from "ports/i18n/translations/index.ts";
 import "./organization-tree.css";
 
 // A sentinel key alongside real organization ids in the `openOrgs` expand/collapse
 // set — safe since organization ids are UUIDs, never this literal string.
 const UNASSIGNED_KEY = "__unassigned__";
+
+// Short codes used throughout docs/INITIAL_ORGANIZATION_MAP.md and by the
+// organization itself - shown as a small badge next to the full (translated)
+// type name, not translated themselves since they're the org's own naming
+// convention, not UI chrome.
+const TYPE_ABBREVIATION: Record<OrganizationType, string> = {
+  Region: "RG",
+  Headquarter: "HS",
+  Area: "BR",
+  District: "BZ",
+  Group: "GR",
+};
+
+// Real org names already carry their own type prefix (e.g. "HS Franken",
+// per docs/INITIAL_ORGANIZATION_MAP.md) - stripped for display only, since
+// the abbreviation now has its own badge and repeating it in the name reads
+// as duplicated noise. The stored name itself is never touched.
+function displayOrgName(organization: Organization): string {
+  const prefix = `${TYPE_ABBREVIATION[organization.type]} `;
+  return organization.name.startsWith(prefix) ? organization.name.slice(prefix.length) : organization.name;
+}
 
 function isMulti(event: MouseEvent | KeyboardEvent) {
   return event.shiftKey || event.metaKey || event.ctrlKey;
@@ -104,13 +126,57 @@ function MemberRow({
   );
 }
 
+// The two-line "type label above name, member count + edit action alongside"
+// block shared by both an expandable (has children) row's <summary> content
+// and a leaf row's plain clickable content.
+function OrgNodeHeader({
+  organization,
+  memberCount,
+  state,
+  leader,
+  onEditOrganization,
+  t,
+}: {
+  organization: Organization;
+  memberCount: number;
+  state: "none" | "some" | "all";
+  leader: boolean;
+  onEditOrganization: () => void;
+  t: Translations;
+}) {
+  return (
+    <div className={`org-node-header org-node-header--${state}`}>
+      <div className="org-type-label">
+        <span className="org-abbr">{TYPE_ABBREVIATION[organization.type]}</span>
+        {t.organizationTypes[organization.type]}
+      </div>
+      <div className="org-row">
+        <span className="org-name">{displayOrgName(organization)}</span>
+        <span className="org-member-count">{t.organizationTree.memberCount(memberCount)}</span>
+        {leader && (
+          <button
+            type="button"
+            className="btn org-edit-btn"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onEditOrganization();
+            }}
+          >
+            {t.common.edit}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function OrgNodeItem({
   node,
   membersOf,
   openOrgs,
   toggleOpen,
   selectedSet,
-  onSelectMember,
   onSelectGroup,
   leader,
   onEditOrganization,
@@ -121,7 +187,6 @@ function OrgNodeItem({
   openOrgs: Set<string>;
   toggleOpen: (key: string, open: boolean) => void;
   selectedSet: Set<string>;
-  onSelectMember: (id: string, event: MouseEvent | KeyboardEvent) => void;
   onSelectGroup: (groupKey: string, groupMembers: Member[]) => void;
   leader: boolean;
   onEditOrganization: (organizationId: string) => void;
@@ -129,10 +194,48 @@ function OrgNodeItem({
 }) {
   const directMembers = membersOf(node.organization.id);
   const allMembers = subtreeMembers(node, membersOf);
+  const hasChildren = node.children.length > 0;
   const state = groupState(
     allMembers.map((member) => member.id),
     selectedSet,
   );
+  const editThis = () => onEditOrganization(node.organization.id);
+
+  const header = (
+    <OrgNodeHeader
+      organization={node.organization}
+      memberCount={allMembers.length}
+      state={state}
+      leader={leader}
+      onEditOrganization={editThis}
+      t={t}
+    />
+  );
+
+  if (!hasChildren) {
+    // A leaf has nothing to expand/collapse - the whole row just selects its
+    // own (direct = subtree, for a leaf) members, no disclosure control.
+    return (
+      <li>
+        <div
+          className="org-leaf-row"
+          role="button"
+          tabIndex={0}
+          title={t.organizationTree.selectHint}
+          onClick={() => onSelectGroup(node.organization.id, directMembers)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              onSelectGroup(node.organization.id, directMembers);
+            }
+          }}
+        >
+          {header}
+          {directMembers.length === 0 && <p className="org-tree-empty">{t.organizationTree.noMembers}</p>}
+        </div>
+      </li>
+    );
+  }
 
   return (
     <li>
@@ -147,57 +250,24 @@ function OrgNodeItem({
           title={t.organizationTree.selectHint}
           onDoubleClick={() => onSelectGroup(node.organization.id, allMembers)}
         >
-          <span className={`org-name org-name--${state}`}>
-            {node.organization.name} ({allMembers.length})
-          </span>
-          {leader && (
-            <button
-              type="button"
-              className="btn org-edit-btn"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onEditOrganization(node.organization.id);
-              }}
-            >
-              {t.common.edit}
-            </button>
-          )}
+          {header}
         </summary>
-        {node.children.length > 0 && (
-          <ul>
-            {node.children.map((child) => (
-              <OrgNodeItem
-                key={child.organization.id}
-                node={child}
-                membersOf={membersOf}
-                openOrgs={openOrgs}
-                toggleOpen={toggleOpen}
-                selectedSet={selectedSet}
-                onSelectMember={onSelectMember}
-                onSelectGroup={onSelectGroup}
-                leader={leader}
-                onEditOrganization={onEditOrganization}
-                t={t}
-              />
-            ))}
-          </ul>
-        )}
-        {directMembers.length > 0 ? (
-          <ul>
-            {directMembers.map((member) => (
-              <MemberRow
-                key={member.id}
-                member={member}
-                selected={selectedSet.has(member.id)}
-                onSelect={(event) => onSelectMember(member.id, event)}
-                t={t}
-              />
-            ))}
-          </ul>
-        ) : (
-          node.children.length === 0 && <p className="org-tree-empty">{t.organizationTree.noMembers}</p>
-        )}
+        <ul>
+          {node.children.map((child) => (
+            <OrgNodeItem
+              key={child.organization.id}
+              node={child}
+              membersOf={membersOf}
+              openOrgs={openOrgs}
+              toggleOpen={toggleOpen}
+              selectedSet={selectedSet}
+              onSelectGroup={onSelectGroup}
+              leader={leader}
+              onEditOrganization={onEditOrganization}
+              t={t}
+            />
+          ))}
+        </ul>
       </details>
     </li>
   );
@@ -318,7 +388,6 @@ export default function OrganizationTree({ z }: { z?: number }) {
                 openOrgs={openOrgs}
                 toggleOpen={toggleOpen}
                 selectedSet={selectedSet}
-                onSelectMember={selectMember}
                 onSelectGroup={selectGroup}
                 leader={leader}
                 onEditOrganization={(organizationId) =>
