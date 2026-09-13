@@ -73,8 +73,32 @@ const windowsSlice = createSlice({
       }
       return { ...state, items: restack(state.items, action.payload) };
     },
+    // Drops every window referencing an entity that no longer exists (e.g. an
+    // "Edit Member" dialog restored from localStorage for someone since
+    // deleted) - checked once member/organization data has actually loaded,
+    // never on faith.
+    pruneStaleWindows(
+      state,
+      action: PayloadAction<{ memberIds: Set<string>; organizationIds: Set<string> }>,
+    ) {
+      const { memberIds, organizationIds } = action.payload;
+      const kept = state.items.filter((window) => {
+        const memberId = window.payload?.memberId;
+        const organizationId = window.payload?.organizationId;
+        if (memberId && !memberIds.has(memberId)) return false;
+        if (organizationId && !organizationIds.has(organizationId)) return false;
+        return true;
+      });
+      return kept.length === state.items.length ? state : { ...state, items: kept };
+    },
+    // Wipes every open window - used on logout so the next person to use this
+    // browser doesn't inherit a leader-only dialog (Manage Accounts, Invite,
+    // an org/member edit form) restored from localStorage.
+    resetWindows() {
+      return { items: [] };
+    },
   },
 });
 
-export const { openWindow, closeWindow, bringToFront } = windowsSlice.actions;
+export const { openWindow, closeWindow, bringToFront, pruneStaleWindows, resetWindows } = windowsSlice.actions;
 export default windowsSlice.reducer;

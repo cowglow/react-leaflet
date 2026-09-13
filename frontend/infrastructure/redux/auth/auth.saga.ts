@@ -9,6 +9,7 @@ import {
   inviteAccountFailed,
   inviteAccountRequested,
   inviteAccountSucceeded,
+  logout,
   requestMagicLinkFailed,
   requestMagicLinkRequested,
   requestMagicLinkSucceeded,
@@ -22,6 +23,7 @@ import {
   verifyMagicLinkRequested,
   verifyMagicLinkSucceeded,
 } from "infrastructure/redux/auth/auth.slice.ts";
+import { resetWindows } from "infrastructure/redux/windows/windows.slice.ts";
 
 function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -136,6 +138,12 @@ function* updateAccountSaga(action: ReturnType<typeof updateAccountRequested>) {
   }
 }
 
+// Wipes open windows on logout so the next person to use this browser
+// doesn't inherit a leader-only dialog restored from localStorage.
+function* logoutSaga() {
+  yield put(resetWindows());
+}
+
 export function* authSaga() {
   yield all([
     takeEvery(restoreSessionRequested, restoreSessionSaga),
@@ -144,5 +152,6 @@ export function* authSaga() {
     takeEvery(inviteAccountRequested, inviteAccountSaga),
     takeEvery(fetchAccountsRequested, fetchAccountsSaga),
     takeEvery(updateAccountRequested, updateAccountSaga),
+    takeEvery(logout, logoutSaga),
   ]);
 }
