@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/360</span>
+                <span class='fraction'>0/376</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/360</span>
+                <span class='fraction'>0/376</span>
             </div>
         
             
@@ -537,7 +537,28 @@
 <a name='L472'></a><a href='#L472'>472</a>
 <a name='L473'></a><a href='#L473'>473</a>
 <a name='L474'></a><a href='#L474'>474</a>
-<a name='L475'></a><a href='#L475'>475</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -635,12 +656,20 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -874,6 +903,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -918,6 +949,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1107,6 +1149,14 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
 // what "select this node" and its member count both mean once orgs nest.
 <span class="cstat-no" title="statement not covered" >function subtreeMembers(node: OrgTreeNode, membersOf: (organizationId: string) =&gt; Member[]): Member[] {</span>
 <span class="cstat-no" title="statement not covered" >  return [...membersOf(node.organization.id), ...node.children.flatMap((child) =&gt; subtreeMembers(child, membersOf))];</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+// Ids of every node that actually has children - the only ones that render a
+// disclosure control at all, so the only ones "expand all" needs to open.
+<span class="cstat-no" title="statement not covered" >function expandableIds(nodes: OrgTreeNode[]): string[] {</span>
+<span class="cstat-no" title="statement not covered" >  return nodes.flatMap((node) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    node.children.length &gt; 0 ? [node.organization.id, ...expandableIds(node.children)] : [],</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >function MemberRow({</span>
@@ -1352,6 +1402,8 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
 <span class="cstat-no" title="statement not covered" >  const hasSelection = selectedIds.length &gt; 0;</span>
 <span class="cstat-no" title="statement not covered" >  const hasOrganizations = organizations.length &gt; 0;</span>
 <span class="cstat-no" title="statement not covered" >  const tree = buildOrgTree(organizations);</span>
+<span class="cstat-no" title="statement not covered" >  const allExpandableIds = expandableIds(tree);</span>
+<span class="cstat-no" title="statement not covered" >  const allExpanded = allExpandableIds.length &gt; 0 &amp;&amp; allExpandableIds.every((id) =&gt; openOrgs.has(id));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  const membersOf = (organizationId: string) =&gt;</span>
 <span class="cstat-no" title="statement not covered" >    members.filter((member) =&gt; member.organizationId === organizationId);</span>
@@ -1392,6 +1444,17 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
 <span class="cstat-no" title="statement not covered" >      &lt;div className="org-tree-layout"&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;div className="org-tree-main"&gt;</span>
 <span class="cstat-no" title="statement not covered" >          {!hasOrganizations &amp;&amp; unassignedMembers.length === 0 &amp;&amp; &lt;p&gt;{t.organizationTree.empty}&lt;/p&gt;}</span>
+<span class="cstat-no" title="statement not covered" >          {allExpandableIds.length &gt; 0 &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="org-tree-toolbar org-tree-toolbar--top"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;button</span>
+<span class="cstat-no" title="statement not covered" >                type="button"</span>
+<span class="cstat-no" title="statement not covered" >                className="btn"</span>
+<span class="cstat-no" title="statement not covered" >                onClick={() =&gt; setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}</span>
+              &gt;
+<span class="cstat-no" title="statement not covered" >                {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+          )}
 <span class="cstat-no" title="statement not covered" >          &lt;ul className="org-tree"&gt;</span>
 <span class="cstat-no" title="statement not covered" >            {tree.map((node) =&gt; (</span>
 <span class="cstat-no" title="statement not covered" >              &lt;OrgNodeItem</span>
@@ -1492,7 +1555,7 @@ type OrgTreeNode = { organization: Organization; children: OrgTreeNode[] };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-13T01:08:13.009Z
+                at 2026-09-13T01:11:23.546Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
