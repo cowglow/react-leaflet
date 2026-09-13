@@ -22,6 +22,12 @@ export type AuthState = {
   inviteRequestId: string | null;
   inviteStatus: MutationStatus;
   inviteError: string | null;
+  accounts: Account[];
+  accountsStatus: MutationStatus;
+  accountsError: string | null;
+  updateAccountRequestId: string | null;
+  updateAccountStatus: MutationStatus;
+  updateAccountError: string | null;
 };
 
 const initialState: AuthState = {
@@ -33,6 +39,12 @@ const initialState: AuthState = {
   inviteRequestId: null,
   inviteStatus: "idle",
   inviteError: null,
+  accounts: [],
+  accountsStatus: "idle",
+  accountsError: null,
+  updateAccountRequestId: null,
+  updateAccountStatus: "idle",
+  updateAccountError: null,
 };
 
 const authSlice = createSlice({
@@ -113,6 +125,47 @@ const authSlice = createSlice({
     resetInviteAccount(state) {
       return { ...state, inviteRequestId: null, inviteStatus: "idle" as const, inviteError: null };
     },
+    fetchAccountsRequested(state) {
+      return { ...state, accountsStatus: "pending" as const, accountsError: null };
+    },
+    fetchAccountsSucceeded(state, action: PayloadAction<Account[]>) {
+      return { ...state, accountsStatus: "succeeded" as const, accounts: action.payload };
+    },
+    fetchAccountsFailed(state, action: PayloadAction<string>) {
+      return { ...state, accountsStatus: "failed" as const, accountsError: action.payload };
+    },
+    updateAccountRequested(
+      state,
+      action: PayloadAction<{ requestId: string; accountId: string; role: Role; memberId?: string | null }>,
+    ) {
+      return {
+        ...state,
+        updateAccountRequestId: action.payload.requestId,
+        updateAccountStatus: "pending" as const,
+        updateAccountError: null,
+      };
+    },
+    updateAccountSucceeded(state, action: PayloadAction<{ requestId: string; account: Account }>) {
+      return {
+        ...state,
+        updateAccountRequestId: action.payload.requestId,
+        updateAccountStatus: "succeeded" as const,
+        accounts: state.accounts.map((account) =>
+          account.id === action.payload.account.id ? action.payload.account : account,
+        ),
+      };
+    },
+    updateAccountFailed(state, action: PayloadAction<{ requestId: string; error: string }>) {
+      return {
+        ...state,
+        updateAccountRequestId: action.payload.requestId,
+        updateAccountStatus: "failed" as const,
+        updateAccountError: action.payload.error,
+      };
+    },
+    resetUpdateAccount(state) {
+      return { ...state, updateAccountRequestId: null, updateAccountStatus: "idle" as const, updateAccountError: null };
+    },
   },
 });
 
@@ -131,5 +184,12 @@ export const {
   inviteAccountSucceeded,
   inviteAccountFailed,
   resetInviteAccount,
+  fetchAccountsRequested,
+  fetchAccountsSucceeded,
+  fetchAccountsFailed,
+  updateAccountRequested,
+  updateAccountSucceeded,
+  updateAccountFailed,
+  resetUpdateAccount,
 } = authSlice.actions;
 export default authSlice.reducer;

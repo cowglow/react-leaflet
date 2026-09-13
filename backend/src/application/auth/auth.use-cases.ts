@@ -8,6 +8,7 @@ import type { Mailer } from "../mailer.js";
 import type { TokenSigner } from "../token-signer.js";
 import type { TokenGenerator } from "../token-generator.js";
 import {
+  AccountNotFoundError,
   DuplicateAccountError,
   MailDeliveryError,
   MemberAlreadyLinkedError,
@@ -113,5 +114,45 @@ export function createInviteAccountUseCase(deps: InviteAccountDeps) {
       role: input.role,
       memberId: input.memberId ?? null,
     });
+  };
+}
+
+export interface UpdateAccountDeps {
+  accountRepository: AccountRepository;
+  memberRepository: MemberRepository;
+}
+
+export interface UpdateAccountInput {
+  accountId: string;
+  role: Role;
+  // undefined = leave the current link alone; null = unlink; a string = link to
+  // that member (replacing any current link).
+  memberId?: string | null;
+}
+
+export function createUpdateAccountUseCase(deps: UpdateAccountDeps) {
+  return async function updateAccount(input: UpdateAccountInput, actorAccountId: string): Promise<Account> {
+    const existing = await deps.accountRepository.findById(input.accountId);
+    if (!existing) {
+      throw new AccountNotFoundError("Account not found");
+    }
+
+    const memberId = input.memberId === undefined ? existing.memberId : input.memberId;
+    if (memberId) {
+      const member = await deps.memberRepository.findById(memberId);
+      if (!member) {
+        throw new MemberNotFoundError("Member not found");
+      }
+      const alreadyLinked = await deps.accountRepository.findByMemberId(memberId);
+      if (alreadyLinked && alreadyLinked.id !== existing.id) {
+        throw new MemberAlreadyLinkedError("That member is already linked to another account");
+      }
+    }
+
+    const updated = await deps.accountRepository.update(input.accountId, { role: input.role, memberId }, actorAccountId);
+    if (!updated) {
+      throw new AccountNotFoundError("Account not found");
+    }
+    return updated;
   };
 }

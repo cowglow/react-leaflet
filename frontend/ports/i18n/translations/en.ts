@@ -32,6 +32,7 @@ const en = {
     addOrganization: "Add Organization",
     addMember: "Add Member",
     inviteAccount: "Invite Account",
+    manageAccounts: "Manage Accounts",
     openOrganizations: "Open Organizations",
     map: "Map",
     openMap: "Open Map",
@@ -81,12 +82,17 @@ const en = {
       `Remove ${name}? This cannot be undone.`,
   },
   organizationForm: {
-    title: "Add Organization",
+    addTitle: "Add Organization",
+    editTitle: "Edit Organization",
     name: "Name",
     type: "Type",
     parent: "Parent",
     noParent: "— None —",
     saveFailed: "Failed to save organization",
+    removeFailed: "Failed to remove organization",
+    confirmRemoveTitle: "Remove Organization?",
+    confirmRemoveMessage: (name: string) =>
+      `Remove ${name}? Its members will become unassigned, not deleted. This cannot be undone.`,
   },
   inviteForm: {
     title: "Invite Account",
@@ -100,6 +106,15 @@ const en = {
     invited: (email: string, role: string) =>
       `Invited ${email} as ${role}. They can now request a login link with that email.`,
     inviteFailed: "Failed to invite account",
+  },
+  accountsForm: {
+    title: "Manage Accounts",
+    loading: "Loading accounts…",
+    empty: "No accounts yet — invite someone first.",
+    email: "Email",
+    role: "Role",
+    member: "Linked member",
+    updateFailed: "Failed to update account",
   },
   organizationTree: {
     title: "Organizations",

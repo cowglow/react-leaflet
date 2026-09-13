@@ -5,6 +5,7 @@ export type DialogType =
   | "MEMBER_DIALOG"
   | "ORGANIZATION_DIALOG"
   | "INVITE_DIALOG"
+  | "ACCOUNTS_DIALOG"
   | "ORGANIZATION_TREE_DIALOG"
   | "MAP_DIALOG";
 

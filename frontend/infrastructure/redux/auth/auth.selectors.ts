@@ -44,3 +44,23 @@ export function getInviteRequestId(state: RootState): string | null {
 export function getInviteError(state: RootState): string | null {
   return state.auth.inviteError;
 }
+
+export function getAccounts(state: RootState): Account[] {
+  return state.auth.accounts;
+}
+
+export function getAccountsStatus(state: RootState) {
+  return state.auth.accountsStatus;
+}
+
+export function getUpdateAccountStatus(state: RootState) {
+  return state.auth.updateAccountStatus;
+}
+
+export function getUpdateAccountRequestId(state: RootState): string | null {
+  return state.auth.updateAccountRequestId;
+}
+
+export function getUpdateAccountError(state: RootState): string | null {
+  return state.auth.updateAccountError;
+}

@@ -34,6 +34,7 @@ const es: Translations = {
     addOrganization: "Agregar organización",
     addMember: "Agregar miembro",
     inviteAccount: "Invitar cuenta",
+    manageAccounts: "Administrar cuentas",
     openOrganizations: "Abrir organizaciones",
     map: "Mapa",
     openMap: "Abrir mapa",
@@ -83,12 +84,17 @@ const es: Translations = {
       `¿Eliminar a ${name}? Esta acción no se puede deshacer.`,
   },
   organizationForm: {
-    title: "Agregar organización",
+    addTitle: "Agregar organización",
+    editTitle: "Editar organización",
     name: "Nombre",
     type: "Tipo",
     parent: "Superior",
     noParent: "— Ninguno —",
     saveFailed: "No se pudo guardar la organización",
+    removeFailed: "No se pudo eliminar la organización",
+    confirmRemoveTitle: "¿Eliminar organización?",
+    confirmRemoveMessage: (name: string) =>
+      `¿Eliminar ${name}? Sus miembros quedarán sin asignar, no se eliminarán. Esta acción no se puede deshacer.`,
   },
   inviteForm: {
     title: "Invitar cuenta",
@@ -102,6 +108,15 @@ const es: Translations = {
     invited: (email: string, role: string) =>
       `Se invitó a ${email} como ${role}. Ahora puede solicitar un enlace de acceso con ese correo.`,
     inviteFailed: "No se pudo enviar la invitación",
+  },
+  accountsForm: {
+    title: "Administrar cuentas",
+    loading: "Cargando cuentas…",
+    empty: "Aún no hay cuentas — invita a alguien primero.",
+    email: "Correo electrónico",
+    role: "Rol",
+    member: "Miembro vinculado",
+    updateFailed: "No se pudo actualizar la cuenta",
   },
   organizationTree: {
     title: "Organizaciones",

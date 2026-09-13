@@ -5,3 +5,4 @@ export class MailDeliveryError extends Error {}
 export class DuplicateAccountError extends Error {}
 export class MemberNotFoundError extends Error {}
 export class MemberAlreadyLinkedError extends Error {}
+export class AccountNotFoundError extends Error {}

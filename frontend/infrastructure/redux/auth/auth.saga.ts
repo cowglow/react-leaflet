@@ -3,6 +3,9 @@ import { apiFetch, NetworkError } from "infrastructure/api/api-client.ts";
 import { getStoredToken, setStoredToken } from "infrastructure/api/token-storage.ts";
 import {
   Account,
+  fetchAccountsFailed,
+  fetchAccountsRequested,
+  fetchAccountsSucceeded,
   inviteAccountFailed,
   inviteAccountRequested,
   inviteAccountSucceeded,
@@ -12,6 +15,9 @@ import {
   restoreSessionFailed,
   restoreSessionRequested,
   restoreSessionSucceeded,
+  updateAccountFailed,
+  updateAccountRequested,
+  updateAccountSucceeded,
   verifyMagicLinkFailed,
   verifyMagicLinkRequested,
   verifyMagicLinkSucceeded,
@@ -39,6 +45,17 @@ function inviteAccountApi(input: {
   memberId?: string;
 }): Promise<{ account: Account }> {
   return apiFetch("/auth/invite", { method: "POST", body: JSON.stringify(input) });
+}
+
+function fetchAccountsApi(): Promise<{ accounts: Account[] }> {
+  return apiFetch("/auth/accounts");
+}
+
+function updateAccountApi(
+  accountId: string,
+  input: { role: string; memberId?: string | null },
+): Promise<{ account: Account }> {
+  return apiFetch(`/auth/accounts/${accountId}`, { method: "PATCH", body: JSON.stringify(input) });
 }
 
 function* restoreSessionSaga() {
@@ -100,11 +117,32 @@ function* inviteAccountSaga(action: ReturnType<typeof inviteAccountRequested>) {
   }
 }
 
+function* fetchAccountsSaga() {
+  try {
+    const { accounts }: { accounts: Account[] } = yield call(fetchAccountsApi);
+    yield put(fetchAccountsSucceeded(accounts));
+  } catch (error) {
+    yield put(fetchAccountsFailed(errorMessage(error, "Failed to load accounts")));
+  }
+}
+
+function* updateAccountSaga(action: ReturnType<typeof updateAccountRequested>) {
+  const { requestId, accountId, role, memberId } = action.payload;
+  try {
+    const { account }: { account: Account } = yield call(updateAccountApi, accountId, { role, memberId });
+    yield put(updateAccountSucceeded({ requestId, account }));
+  } catch (error) {
+    yield put(updateAccountFailed({ requestId, error: errorMessage(error, "Failed to update account") }));
+  }
+}
+
 export function* authSaga() {
   yield all([
     takeEvery(restoreSessionRequested, restoreSessionSaga),
     takeEvery(requestMagicLinkRequested, requestMagicLinkSaga),
     takeEvery(verifyMagicLinkRequested, verifyMagicLinkSaga),
     takeEvery(inviteAccountRequested, inviteAccountSaga),
+    takeEvery(fetchAccountsRequested, fetchAccountsSaga),
+    takeEvery(updateAccountRequested, updateAccountSaga),
   ]);
 }

@@ -114,6 +114,10 @@ export function createMenuConfig({
               label: t.menu.inviteAccount,
               action: () => dispatch(openWindow({ type: "INVITE_DIALOG" })),
             },
+            {
+              label: t.menu.manageAccounts,
+              action: () => dispatch(openWindow({ type: "ACCOUNTS_DIALOG" })),
+            },
           ] as MenuConfigItem[])
         : []),
     ],

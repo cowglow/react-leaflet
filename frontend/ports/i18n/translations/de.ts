@@ -34,6 +34,7 @@ const de: Translations = {
     addOrganization: "Organisation hinzufügen",
     addMember: "Mitglied hinzufügen",
     inviteAccount: "Konto einladen",
+    manageAccounts: "Konten verwalten",
     openOrganizations: "Organisationen öffnen",
     map: "Karte",
     openMap: "Karte öffnen",
@@ -84,12 +85,17 @@ const de: Translations = {
       `${name} entfernen? Dies kann nicht rückgängig gemacht werden.`,
   },
   organizationForm: {
-    title: "Organisation hinzufügen",
+    addTitle: "Organisation hinzufügen",
+    editTitle: "Organisation bearbeiten",
     name: "Name",
     type: "Typ",
     parent: "Übergeordnet",
     noParent: "— Keine —",
     saveFailed: "Organisation konnte nicht gespeichert werden",
+    removeFailed: "Organisation konnte nicht entfernt werden",
+    confirmRemoveTitle: "Organisation entfernen?",
+    confirmRemoveMessage: (name: string) =>
+      `${name} entfernen? Ihre Mitglieder werden nicht gelöscht, sondern nicht mehr zugewiesen. Dies kann nicht rückgängig gemacht werden.`,
   },
   inviteForm: {
     title: "Konto einladen",
@@ -103,6 +109,15 @@ const de: Translations = {
     invited: (email: string, role: string) =>
       `${email} als ${role} eingeladen. Die Person kann nun mit dieser E-Mail einen Login-Link anfordern.`,
     inviteFailed: "Einladung konnte nicht gesendet werden",
+  },
+  accountsForm: {
+    title: "Konten verwalten",
+    loading: "Konten werden geladen…",
+    empty: "Noch keine Konten – zuerst jemanden einladen.",
+    email: "E-Mail",
+    role: "Rolle",
+    member: "Verknüpftes Mitglied",
+    updateFailed: "Konto konnte nicht aktualisiert werden",
   },
   organizationTree: {
     title: "Organisationen",

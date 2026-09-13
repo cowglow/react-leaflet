@@ -3,12 +3,15 @@ import type { Role } from "../../../domain/shared/types.js";
 import {
   createInviteAccountUseCase,
   createRequestMagicLinkUseCase,
+  createUpdateAccountUseCase,
   createVerifyMagicLinkUseCase,
   type InviteAccountDeps,
   type RequestMagicLinkDeps,
+  type UpdateAccountDeps,
   type VerifyMagicLinkDeps,
 } from "../../../application/auth/auth.use-cases.js";
 import {
+  AccountNotFoundError,
   DuplicateAccountError,
   MailDeliveryError,
   MemberAlreadyLinkedError,
@@ -17,7 +20,7 @@ import {
 import { requireRole } from "../middleware/require-role.js";
 import { asyncHandler } from "../lib/async-handler.js";
 
-export type AuthRouterDeps = RequestMagicLinkDeps & VerifyMagicLinkDeps & InviteAccountDeps & {
+export type AuthRouterDeps = RequestMagicLinkDeps & VerifyMagicLinkDeps & InviteAccountDeps & UpdateAccountDeps & {
   requireAuth: RequestHandler;
 };
 
@@ -26,6 +29,7 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
   const requestMagicLink = createRequestMagicLinkUseCase(deps);
   const verifyMagicLink = createVerifyMagicLinkUseCase(deps);
   const inviteAccount = createInviteAccountUseCase(deps);
+  const updateAccount = createUpdateAccountUseCase(deps);
 
   router.post(
     "/magic-link",
@@ -90,6 +94,47 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
           return;
         }
         if (err instanceof MemberNotFoundError) {
+          res.status(404).json({ error: err.message });
+          return;
+        }
+        throw err;
+      }
+    }),
+  );
+
+  router.get(
+    "/accounts",
+    deps.requireAuth,
+    requireRole("leader"),
+    asyncHandler(async (_req, res) => {
+      const accounts = await deps.accountRepository.findAll();
+      res.json({ accounts });
+    }),
+  );
+
+  router.patch(
+    "/accounts/:id",
+    deps.requireAuth,
+    requireRole("leader"),
+    asyncHandler(async (req, res) => {
+      const { role, memberId } = req.body as { role?: Role; memberId?: string | null };
+      if (!role) {
+        res.status(400).json({ error: "role is required" });
+        return;
+      }
+
+      try {
+        const account = await updateAccount(
+          { accountId: req.params.id, role, memberId },
+          req.account!.accountId,
+        );
+        res.json({ account });
+      } catch (err) {
+        if (err instanceof MemberAlreadyLinkedError) {
+          res.status(409).json({ error: err.message });
+          return;
+        }
+        if (err instanceof MemberNotFoundError || err instanceof AccountNotFoundError) {
           res.status(404).json({ error: err.message });
           return;
         }
