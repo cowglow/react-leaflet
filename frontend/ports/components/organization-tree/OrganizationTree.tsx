@@ -155,10 +155,7 @@ function OrgNodeHeader({
 }) {
   return (
     <div className={`org-node-header org-node-header--${state}`}>
-      <div className="org-type-label">
-        <span className="org-abbr">{TYPE_ABBREVIATION[organization.type]}</span>
-        {t.organizationTypes[organization.type]}
-      </div>
+      <div className="org-type-label">{t.organizationTypes[organization.type]}</div>
       <div className="org-row">
         <span className="org-name">{displayOrgName(organization)}</span>
         <span className="org-member-count">{t.organizationTree.memberCount(memberCount)}</span>

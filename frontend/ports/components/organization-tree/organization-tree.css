@@ -73,22 +73,15 @@
 }
 
 /* The two-line block shared by an expandable row's <summary> and a leaf
-   row's plain div: a small "type" line (abbreviation + full type name)
-   above the name/count/action grid line. */
+   row's plain div: a small type-name line above the name/count/action grid
+   line. */
 .org-node-header {
   padding: 0.15rem 0.3rem;
 }
 
 .org-type-label {
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
   font-size: 0.72em;
   margin-bottom: 0.15em;
-}
-
-.org-abbr {
-  font-weight: 700;
 }
 
 .org-row {
