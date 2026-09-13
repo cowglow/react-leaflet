@@ -126,6 +126,8 @@ const en = {
     noMembers: "No members",
     selectHint: "Double-click to select all members",
     clear: "Clear",
+    expandAll: "Expand all",
+    collapseAll: "Collapse all",
     selectedCount: (count: number) => `${count} members selected`,
     memberCount: (count: number) => `${count} ${count === 1 ? "member" : "members"}`,
     coordinates: "Coordinates",

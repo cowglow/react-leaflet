@@ -15,6 +15,12 @@
   margin-top: 0.5rem;
 }
 
+.org-tree-toolbar--top {
+  justify-content: flex-start;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
 .org-tree,
 .org-tree ul {
   list-style: none;

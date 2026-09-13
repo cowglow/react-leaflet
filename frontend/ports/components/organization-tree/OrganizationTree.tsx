@@ -96,6 +96,14 @@ function subtreeMembers(node: OrgTreeNode, membersOf: (organizationId: string) =
   return [...membersOf(node.organization.id), ...node.children.flatMap((child) => subtreeMembers(child, membersOf))];
 }
 
+// Ids of every node that actually has children - the only ones that render a
+// disclosure control at all, so the only ones "expand all" needs to open.
+function expandableIds(nodes: OrgTreeNode[]): string[] {
+  return nodes.flatMap((node) =>
+    node.children.length > 0 ? [node.organization.id, ...expandableIds(node.children)] : [],
+  );
+}
+
 function MemberRow({
   member,
   selected,
@@ -339,6 +347,8 @@ export default function OrganizationTree({ z }: { z?: number }) {
   const hasSelection = selectedIds.length > 0;
   const hasOrganizations = organizations.length > 0;
   const tree = buildOrgTree(organizations);
+  const allExpandableIds = expandableIds(tree);
+  const allExpanded = allExpandableIds.length > 0 && allExpandableIds.every((id) => openOrgs.has(id));
 
   const membersOf = (organizationId: string) =>
     members.filter((member) => member.organizationId === organizationId);
@@ -379,6 +389,17 @@ export default function OrganizationTree({ z }: { z?: number }) {
       <div className="org-tree-layout">
         <div className="org-tree-main">
           {!hasOrganizations && unassignedMembers.length === 0 && <p>{t.organizationTree.empty}</p>}
+          {allExpandableIds.length > 0 && (
+            <div className="org-tree-toolbar org-tree-toolbar--top">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setOpenOrgs(allExpanded ? new Set() : new Set(allExpandableIds))}
+              >
+                {allExpanded ? t.organizationTree.collapseAll : t.organizationTree.expandAll}
+              </button>
+            </div>
+          )}
           <ul className="org-tree">
             {tree.map((node) => (
               <OrgNodeItem

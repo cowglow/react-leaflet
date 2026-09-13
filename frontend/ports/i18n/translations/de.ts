@@ -129,6 +129,8 @@ const de: Translations = {
     noMembers: "Keine Mitglieder",
     selectHint: "Doppelklick, um alle Mitglieder auszuwählen",
     clear: "Zurücksetzen",
+    expandAll: "Alle ausklappen",
+    collapseAll: "Alle einklappen",
     selectedCount: (count: number) => `${count} Mitglieder ausgewählt`,
     memberCount: (count: number) => `${count} ${count === 1 ? "Mitglied" : "Mitglieder"}`,
     coordinates: "Koordinaten",

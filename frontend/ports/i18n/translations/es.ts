@@ -128,6 +128,8 @@ const es: Translations = {
     noMembers: "Sin miembros",
     selectHint: "Doble clic para seleccionar todos los miembros",
     clear: "Limpiar",
+    expandAll: "Expandir todo",
+    collapseAll: "Contraer todo",
     selectedCount: (count: number) => `${count} miembros seleccionados`,
     memberCount: (count: number) => `${count} ${count === 1 ? "miembro" : "miembros"}`,
     coordinates: "Coordenadas",
