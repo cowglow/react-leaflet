@@ -186,6 +186,7 @@ function OrgNodeItem({
   openOrgs,
   toggleOpen,
   selectedSet,
+  onSelectMember,
   onSelectGroup,
   leader,
   onEditOrganization,
@@ -196,6 +197,7 @@ function OrgNodeItem({
   openOrgs: Set<string>;
   toggleOpen: (key: string, open: boolean) => void;
   selectedSet: Set<string>;
+  onSelectMember: (id: string, event: MouseEvent | KeyboardEvent) => void;
   onSelectGroup: (groupKey: string, groupMembers: Member[]) => void;
   leader: boolean;
   onEditOrganization: (organizationId: string) => void;
@@ -222,8 +224,11 @@ function OrgNodeItem({
   );
 
   if (!hasChildren) {
-    // A leaf has nothing to expand/collapse - the whole row just selects its
-    // own (direct = subtree, for a leaf) members, no disclosure control.
+    // A leaf has nothing to expand/collapse, but its members are always
+    // shown (not hidden behind a toggle, since there's no disclosure control
+    // to hide them behind) - double-click the header to select all of them
+    // at once, matching a branch's header; click one by name to select just
+    // that person.
     return (
       <li>
         <div
@@ -231,7 +236,7 @@ function OrgNodeItem({
           role="button"
           tabIndex={0}
           title={t.organizationTree.selectHint}
-          onClick={() => onSelectGroup(node.organization.id, directMembers)}
+          onDoubleClick={() => onSelectGroup(node.organization.id, directMembers)}
           onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
@@ -240,8 +245,22 @@ function OrgNodeItem({
           }}
         >
           {header}
-          {directMembers.length === 0 && <p className="org-tree-empty">{t.organizationTree.noMembers}</p>}
         </div>
+        {directMembers.length > 0 ? (
+          <ul>
+            {directMembers.map((member) => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                selected={selectedSet.has(member.id)}
+                onSelect={(event) => onSelectMember(member.id, event)}
+                t={t}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="org-tree-empty">{t.organizationTree.noMembers}</p>
+        )}
       </li>
     );
   }
@@ -270,6 +289,7 @@ function OrgNodeItem({
               openOrgs={openOrgs}
               toggleOpen={toggleOpen}
               selectedSet={selectedSet}
+              onSelectMember={onSelectMember}
               onSelectGroup={onSelectGroup}
               leader={leader}
               onEditOrganization={onEditOrganization}
@@ -346,6 +366,10 @@ export default function OrganizationTree({ z }: { z?: number }) {
 
   const selectedSet = new Set(selectedIds);
   const hasSelection = selectedIds.length > 0;
+  // On mobile, selecting a group still highlights it on the map (the actual
+  // point of selecting) - the text preview panel is desktop-only real estate
+  // better spent letting the map itself be seen.
+  const showPreview = hasSelection && !isMobileDevice();
   const hasOrganizations = organizations.length > 0;
   const tree = buildOrgTree(organizations);
   const allExpandableIds = expandableIds(tree);
@@ -382,7 +406,7 @@ export default function OrganizationTree({ z }: { z?: number }) {
       onClose={() => dispatch(closeWindow("ORGANIZATION_TREE_DIALOG"))}
       onFocus={() => dispatch(bringToFront("ORGANIZATION_TREE_DIALOG"))}
       initialPosition={{ x: 96, y: 96 }}
-      width={hasSelection ? "min(810px, 94vw)" : "min(460px, 92vw)"}
+      width={showPreview ? "min(810px, 94vw)" : "min(460px, 92vw)"}
       height="auto"
       z={z}
       padded
@@ -419,6 +443,7 @@ export default function OrganizationTree({ z }: { z?: number }) {
                 openOrgs={openOrgs}
                 toggleOpen={toggleOpen}
                 selectedSet={selectedSet}
+                onSelectMember={selectMember}
                 onSelectGroup={selectGroup}
                 leader={leader}
                 onEditOrganization={(organizationId) =>
@@ -463,13 +488,13 @@ export default function OrganizationTree({ z }: { z?: number }) {
           </ul>
         </div>
 
-        {hasSelection && (
+        {showPreview && (
           <aside className="org-preview">
             {selectedMembers.length === 1 ? (
               <MemberPreview
                 member={selectedMembers[0]}
                 organizationName={organizationNameFor(selectedMembers[0])}
-                canWrite={(leader || ownMemberId === selectedMembers[0].id) && !isMobileDevice()}
+                canWrite={leader || ownMemberId === selectedMembers[0].id}
                 t={t}
                 onEdit={() =>
                   dispatch(
