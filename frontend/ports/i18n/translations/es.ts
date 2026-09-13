@@ -104,6 +104,8 @@ const es: Translations = {
     roleLeader: "Líder (lectura y escritura)",
     linkToMember: "Vincular a una entrada del directorio",
     noMemberLink: "Ninguna",
+    createNewMember: "Crear una nueva entrada del directorio para esta persona",
+    createMemberFailed: "No se pudo crear el nuevo miembro",
     sendInvite: "Enviar invitación",
     invited: (email: string, role: string) =>
       `Se invitó a ${email} como ${role}. Ahora puede solicitar un enlace de acceso con ese correo.`,

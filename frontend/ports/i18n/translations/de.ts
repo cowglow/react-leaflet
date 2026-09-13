@@ -105,6 +105,8 @@ const de: Translations = {
     roleLeader: "Leiter (Lesen + Schreiben)",
     linkToMember: "Mit Verzeichniseintrag verknüpfen",
     noMemberLink: "Keiner",
+    createNewMember: "Neuen Verzeichniseintrag dafür anlegen",
+    createMemberFailed: "Neues Mitglied konnte nicht angelegt werden",
     sendInvite: "Einladung senden",
     invited: (email: string, role: string) =>
       `${email} als ${role} eingeladen. Die Person kann nun mit dieser E-Mail einen Login-Link anfordern.`,
