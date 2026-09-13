@@ -60,35 +60,15 @@
   margin-top: 0.6rem;
 }
 
+/* Disclosure marker is the browser's own default (only expandable nodes
+   have one at all - a leaf has nothing to expand, so org-leaf-row below
+   renders without a <summary> and without one). */
 .org-tree summary {
   cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: flex-start;
-}
-
-.org-tree summary::-webkit-details-marker {
-  display: none;
-}
-
-/* Only expandable (has-children) nodes get a disclosure marker at all - a
-   leaf has nothing to expand, so org-leaf-row below renders without one. */
-.org-tree summary::before {
-  content: "▸";
-  flex: none;
-  width: 1em;
-  margin-right: 0.15em;
-  margin-top: 0.35em;
-  font-size: 0.75em;
-}
-
-.org-tree details[open] > summary::before {
-  content: "▾";
 }
 
 .org-leaf-row {
   cursor: pointer;
-  padding-left: 1.15em;
 }
 
 .org-edit-btn {
@@ -97,11 +77,9 @@
 }
 
 /* The two-line block shared by an expandable row's <summary> and a leaf
-   row's plain div: a small "type" line (abbreviation badge + full type
-   name) above the name/count/action grid line. */
+   row's plain div: a small "type" line (abbreviation + full type name)
+   above the name/count/action grid line. */
 .org-node-header {
-  flex: 1 1 auto;
-  min-width: 0;
   padding: 0.15rem 0.3rem;
 }
 
@@ -114,12 +92,7 @@
 }
 
 .org-abbr {
-  display: inline-block;
-  border: 1px solid #000;
-  padding: 0 0.35em;
   font-weight: 700;
-  font-size: 0.9em;
-  line-height: 1.4;
 }
 
 .org-row {
@@ -148,10 +121,6 @@
 .org-node-header--all {
   background: #000;
   color: #fff;
-}
-
-.org-node-header--all .org-abbr {
-  border-color: #fff;
 }
 
 .org-tree-member {
