@@ -36,7 +36,7 @@
   position: relative;
   padding-left: 1.5rem;
   margin-left: 0.65rem;
-  border-left: 1px solid #999;
+  border-left: 1px solid #000;
 }
 
 .org-tree ul > li {
@@ -49,7 +49,7 @@
   top: 0.85em;
   left: -1.5rem;
   width: 1.5rem;
-  border-top: 1px solid #999;
+  border-top: 1px solid #000;
 }
 
 .org-tree > li + li {
@@ -110,7 +110,6 @@
   align-items: center;
   gap: 0.4em;
   font-size: 0.72em;
-  color: #444;
   margin-bottom: 0.15em;
 }
 
@@ -138,7 +137,6 @@
 
 .org-member-count {
   font-size: 0.85em;
-  color: #333;
   white-space: nowrap;
   justify-self: end;
 }
@@ -152,17 +150,8 @@
   color: #fff;
 }
 
-.org-node-header--all .org-type-label {
-  color: #ccc;
-}
-
 .org-node-header--all .org-abbr {
   border-color: #fff;
-  color: #fff;
-}
-
-.org-node-header--all .org-member-count {
-  color: #ccc;
 }
 
 .org-tree-member {
