@@ -14,6 +14,7 @@ import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getOrganizations } from "infrastructure/redux/organization/organization.selectors.ts";
 import { getMembers } from "infrastructure/redux/member/member.selectors.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { isMobileDevice } from "infrastructure/device/is-mobile-device.ts";
 import DesktopWindow from "ports/components/windows/DesktopWindow.tsx";
 import type { Member } from "domain/member/member.types.ts";
 import type { Organization } from "domain/organization/organization.types.ts";
@@ -161,7 +162,7 @@ function OrgNodeHeader({
       <div className="org-row">
         <span className="org-name">{displayOrgName(organization)}</span>
         <span className="org-member-count">{t.organizationTree.memberCount(memberCount)}</span>
-        {leader && (
+        {leader && !isMobileDevice() && (
           <button
             type="button"
             className="btn org-edit-btn"
@@ -466,7 +467,7 @@ export default function OrganizationTree({ z }: { z?: number }) {
               <MemberPreview
                 member={selectedMembers[0]}
                 organizationName={organizationNameFor(selectedMembers[0])}
-                canWrite={leader || ownMemberId === selectedMembers[0].id}
+                canWrite={(leader || ownMemberId === selectedMembers[0].id) && !isMobileDevice()}
                 t={t}
                 onEdit={() =>
                   dispatch(

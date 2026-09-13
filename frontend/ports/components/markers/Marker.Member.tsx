@@ -16,6 +16,7 @@ import {
 } from "infrastructure/redux/selection/selection.selectors.ts";
 import { useTranslation } from "ports/context/i18n/i18n.hook.ts";
 import { getMemberId, isLeader } from "infrastructure/redux/auth/auth.selectors.ts";
+import { isMobileDevice } from "infrastructure/device/is-mobile-device.ts";
 import type { Member } from "domain/member/member.types.ts";
 
 interface MemberMarkerProps {
@@ -105,7 +106,8 @@ export default function MemberMarker({ member }: MemberMarkerProps) {
       autoOpen={autoOpen}
       onMoveEnd={canWrite ? handleMoveEnd : undefined}
       actions={
-        canWrite && (
+        canWrite &&
+        !isMobileDevice() && (
           <button className="btn" onClick={openForm}>
             {t.common.edit}
           </button>
