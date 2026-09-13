@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/130</span>
+                <span class='fraction'>0/145</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/130</span>
+                <span class='fraction'>0/145</span>
             </div>
         
             
@@ -196,8 +196,38 @@
 <a name='L131'></a><a href='#L131'>131</a>
 <a name='L132'></a><a href='#L132'>132</a>
 <a name='L133'></a><a href='#L133'>133</a>
-<a name='L134'></a><a href='#L134'>134</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -365,6 +395,7 @@
 <span class="cstat-no" title="statement not covered" >    addOrganization: "Agregar organización",</span>
 <span class="cstat-no" title="statement not covered" >    addMember: "Agregar miembro",</span>
 <span class="cstat-no" title="statement not covered" >    inviteAccount: "Invitar cuenta",</span>
+<span class="cstat-no" title="statement not covered" >    manageAccounts: "Administrar cuentas",</span>
 <span class="cstat-no" title="statement not covered" >    openOrganizations: "Abrir organizaciones",</span>
 <span class="cstat-no" title="statement not covered" >    map: "Mapa",</span>
 <span class="cstat-no" title="statement not covered" >    openMap: "Abrir mapa",</span>
@@ -414,12 +445,17 @@
 <span class="cstat-no" title="statement not covered" >      `¿Eliminar a ${name}? Esta acción no se puede deshacer.`,</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
 <span class="cstat-no" title="statement not covered" >  organizationForm: {</span>
-<span class="cstat-no" title="statement not covered" >    title: "Agregar organización",</span>
+<span class="cstat-no" title="statement not covered" >    addTitle: "Agregar organización",</span>
+<span class="cstat-no" title="statement not covered" >    editTitle: "Editar organización",</span>
 <span class="cstat-no" title="statement not covered" >    name: "Nombre",</span>
 <span class="cstat-no" title="statement not covered" >    type: "Tipo",</span>
 <span class="cstat-no" title="statement not covered" >    parent: "Superior",</span>
 <span class="cstat-no" title="statement not covered" >    noParent: "— Ninguno —",</span>
 <span class="cstat-no" title="statement not covered" >    saveFailed: "No se pudo guardar la organización",</span>
+<span class="cstat-no" title="statement not covered" >    removeFailed: "No se pudo eliminar la organización",</span>
+<span class="cstat-no" title="statement not covered" >    confirmRemoveTitle: "¿Eliminar organización?",</span>
+<span class="cstat-no" title="statement not covered" >    confirmRemoveMessage: (name: string) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >      `¿Eliminar ${name}? Sus miembros quedarán sin asignar, no se eliminarán. Esta acción no se puede deshacer.`,</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
 <span class="cstat-no" title="statement not covered" >  inviteForm: {</span>
 <span class="cstat-no" title="statement not covered" >    title: "Invitar cuenta",</span>
@@ -433,6 +469,15 @@
 <span class="cstat-no" title="statement not covered" >    invited: (email: string, role: string) =&gt;</span>
 <span class="cstat-no" title="statement not covered" >      `Se invitó a ${email} como ${role}. Ahora puede solicitar un enlace de acceso con ese correo.`,</span>
 <span class="cstat-no" title="statement not covered" >    inviteFailed: "No se pudo enviar la invitación",</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  accountsForm: {</span>
+<span class="cstat-no" title="statement not covered" >    title: "Administrar cuentas",</span>
+<span class="cstat-no" title="statement not covered" >    loading: "Cargando cuentas…",</span>
+<span class="cstat-no" title="statement not covered" >    empty: "Aún no hay cuentas — invita a alguien primero.",</span>
+<span class="cstat-no" title="statement not covered" >    email: "Correo electrónico",</span>
+<span class="cstat-no" title="statement not covered" >    role: "Rol",</span>
+<span class="cstat-no" title="statement not covered" >    member: "Miembro vinculado",</span>
+<span class="cstat-no" title="statement not covered" >    updateFailed: "No se pudo actualizar la cuenta",</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
 <span class="cstat-no" title="statement not covered" >  organizationTree: {</span>
 <span class="cstat-no" title="statement not covered" >    title: "Organizaciones",</span>
@@ -469,7 +514,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-12T23:19:58.982Z
+                at 2026-09-13T00:03:51.485Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
