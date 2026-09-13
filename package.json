@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "scripts/dev-cert-ensure.sh",
     "dev": "vite --host --port 3000",
     "dev:ai": "claude --dangerously-skip-permissions --resume",
     "dev:up": "pnpm backend:up && pnpm dev",
