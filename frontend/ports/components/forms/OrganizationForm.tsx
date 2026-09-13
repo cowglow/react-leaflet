@@ -60,6 +60,7 @@ export default function OrganizationForm({ payload, z }: OrganizationFormProps) 
   const [type, setType] = useState<OrganizationType>(existingOrganization?.type ?? "District");
   const [parentId, setParentId] = useState(existingOrganization?.parentId ?? "");
   const [confirmingRemove, setConfirmingRemove] = useState(false);
+  const [createAnother, setCreateAnother] = useState(false);
 
   const pendingRequest = useRef<{ id: string; kind: "save" | "remove" } | null>(null);
   const mutationStatus = useSelector(getOrganizationMutationStatus);
@@ -86,7 +87,14 @@ export default function OrganizationForm({ payload, z }: OrganizationFormProps) 
     if (mutationStatus === "succeeded") {
       pendingRequest.current = null;
       dispatch(resetOrganizationMutation());
-      dispatch(closeWindow("ORGANIZATION_DIALOG"));
+      if (pending.kind === "save" && !isEditMode && createAnother) {
+        // Batch-add: stay open with a blank name instead of closing. Keeps
+        // type/parent sticky - adding several orgs at the same level under
+        // the same parent in a row is the common case.
+        setName("");
+      } else {
+        dispatch(closeWindow("ORGANIZATION_DIALOG"));
+      }
     } else if (mutationStatus === "failed") {
       pendingRequest.current = null;
       alert(
@@ -94,7 +102,7 @@ export default function OrganizationForm({ payload, z }: OrganizationFormProps) 
       );
       dispatch(resetOrganizationMutation());
     }
-  }, [mutationStatus, mutationRequestId, mutationError, dispatch, t]);
+  }, [mutationStatus, mutationRequestId, mutationError, isEditMode, createAnother, dispatch, t]);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -204,6 +212,18 @@ export default function OrganizationForm({ payload, z }: OrganizationFormProps) 
                 </option>
               ))}
             </select>
+          </div>
+        )}
+
+        {!isEditMode && (
+          <div className="field-row field-stack">
+            <input
+              id="org-create-another"
+              type="checkbox"
+              checked={createAnother}
+              onChange={(event) => setCreateAnother(event.target.checked)}
+            />
+            <label htmlFor="org-create-another">{t.organizationForm.createAnother}</label>
           </div>
         )}
 

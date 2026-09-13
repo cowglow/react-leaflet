@@ -64,6 +64,7 @@ export default function MemberForm({ payload }: MemberFormProps) {
       : new Date().toISOString().slice(0, 10),
   );
   const [confirmingRemove, setConfirmingRemove] = useState(false);
+  const [createAnother, setCreateAnother] = useState(false);
 
   // Correlates a save/remove this form issued with the outcome the saga reports
   // back — see request-id.ts. Without it, this effect could react to some other
@@ -81,13 +82,29 @@ export default function MemberForm({ payload }: MemberFormProps) {
     if (mutationStatus === "succeeded") {
       pendingRequest.current = null;
       dispatch(resetMemberMutation());
-      dispatch(closeWindow("MEMBER_DIALOG"));
+      if (pending.kind === "save" && !isEditMode && createAnother) {
+        // Batch-add: stay open with a blank form instead of closing. Keeps
+        // the organization sticky - adding several members to the same one
+        // in a row is the common case - but clears everything else.
+        setFirstName("");
+        setLastName("");
+        setStreet("");
+        setNumber("");
+        setZip("");
+        setCity("");
+        setTelephone("");
+        setEmail("");
+        setLostContact(false);
+        setLastActiveDate(new Date().toISOString().slice(0, 10));
+      } else {
+        dispatch(closeWindow("MEMBER_DIALOG"));
+      }
     } else if (mutationStatus === "failed") {
       pendingRequest.current = null;
       alert(mutationError ?? (pending.kind === "remove" ? t.memberForm.removeFailed : t.memberForm.saveFailed));
       dispatch(resetMemberMutation());
     }
-  }, [mutationStatus, mutationRequestId, mutationError, dispatch, t]);
+  }, [mutationStatus, mutationRequestId, mutationError, isEditMode, createAnother, dispatch, t]);
 
   const title = isEditMode ? t.memberForm.editTitle : t.memberForm.addTitle;
 
@@ -293,6 +310,18 @@ export default function MemberForm({ payload }: MemberFormProps) {
               </div>
             )}
           </>
+        )}
+
+        {!isEditMode && (
+          <div className="field-row field-stack">
+            <input
+              id="member-create-another"
+              type="checkbox"
+              checked={createAnother}
+              onChange={(event) => setCreateAnother(event.target.checked)}
+            />
+            <label htmlFor="member-create-another">{t.memberForm.createAnother}</label>
+          </div>
         )}
 
         <div
