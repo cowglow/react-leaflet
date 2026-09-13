@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/application/organization/organization.repository.ts</title>
+    <title>Code coverage report for frontend/infrastructure/device/is-mobile-device.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,25 +19,25 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/application/organization</a> organization.repository.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">frontend/infrastructure/device</a> is-mobile-device.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
                 <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
                 <span class='fraction'>1/1</span>
             </div>
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -75,30 +75,33 @@
 <a name='L10'></a><a href='#L10'>10</a>
 <a name='L11'></a><a href='#L11'>11</a>
 <a name='L12'></a><a href='#L12'>12</a>
-<a name='L13'></a><a href='#L13'>13</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { Organization, OrganizationInput } from "../../domain/organization/organization.types.js";
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Detects mobile devices via client metadata (User-Agent Client Hints where
+// available, User-Agent string otherwise) - deliberately not viewport size,
+// so a narrow desktop window (or a resized browser) never counts as mobile
+// and a wide-viewport tablet/phone in landscape still does.
+<span class="cstat-no" title="statement not covered" >const MOBILE_USER_AGENT_PATTERN = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;</span>
 &nbsp;
-// Same shape as MemberRepository — see its comment for why writes are atomic with
-// their audit entry internally, and why update/delete signal "not found" with `null`
-// rather than a thrown error.
-export interface OrganizationRepository {
-  findAll(): Promise&lt;Organization[]&gt;;
-  findById(id: string): Promise&lt;Organization | null&gt;;
-  create(input: OrganizationInput, actorAccountId: string): Promise&lt;Organization&gt;;
-  update(id: string, input: OrganizationInput, actorAccountId: string): Promise&lt;Organization | null&gt;;
-  delete(id: string, actorAccountId: string): Promise&lt;boolean&gt;;
-}
+<span class="cstat-no" title="statement not covered" >export function isMobileDevice(): boolean {</span>
+<span class="cstat-no" title="statement not covered" >  const uaData = (navigator as Navigator &amp; { userAgentData?: { mobile?: boolean } }).userAgentData;</span>
+<span class="cstat-no" title="statement not covered" >  if (typeof uaData?.mobile === "boolean") {</span>
+<span class="cstat-no" title="statement not covered" >    return uaData.mobile;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  return MOBILE_USER_AGENT_PATTERN.test(navigator.userAgent);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -106,7 +109,7 @@ export interface OrganizationRepository {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-13T01:17:43.851Z
+                at 2026-09-13T01:17:42.544Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
